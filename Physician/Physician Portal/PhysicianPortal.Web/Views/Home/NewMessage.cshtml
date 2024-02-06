@@ -1,0 +1,100 @@
+﻿@model PhysicianPortal.Web.Models.AddMessageViewModel
+@using Kendo.Mvc.UI
+@{
+    Layout = null;
+}
+@Styles.Render("~/Content/css")
+@using (Ajax.BeginForm("NewMessage", "Home", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onNewMessageSuccess" }, new { @class = "form-horizontal", role = "form", @id = "newMessageForm" }))
+{
+
+    @Html.AntiForgeryToken()
+
+    @Html.Hidden("PhysicianIdEncrypted", null, new { id = "physicianIdField" })
+    @Html.Hidden("PatientIdEncrypted", null, new { id = "patientIdField" })
+
+    <div class="validation-summary" style="height: auto;"></div>
+    <div class="padding10">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Pharmacist") || User.IsInRole("Technician"))
+            {
+                //Admin or Super Admin or Pharmacist can select any physician
+                //Technician can only select from physicians that are registered against him in UserPhysicianRelationship table
+                //Physician can not chose the physician as he can send a message only against the physician assigned to him
+                if (Model.PatientIdEncrypted == null)
+                {
+                    //Only show the physician select when the PatientId is null, i.e the screen is openend from the home screen,
+                    //when coming from the PatientDetails screen we already have the PatientId
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box form-group custom-input-form">
+                        @Html.LabelFor(m => m.PhysicianName)
+                        <br />
+                        @(Html.Kendo().AutoComplete()
+                            .Name("physicianAutocomplete")
+                            .DataTextField("FullName")
+                            .Filter("contains")
+                            .Placeholder("Select physician...")
+                            .MinLength(2)
+                            .HtmlAttributes(new { @class = "max-width-field" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPhysicians", "Home")
+                                       .Data("getSelectedPatientAndSearchText");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            .Events(e => e
+                                .Select("onSelectAutoComPhysician")
+                                .Filtering("onFilterAutoComPhysician"))
+                        )
+                    </div>
+                }
+            }
+            @if (Model.PatientIdEncrypted == null)
+            {
+                //Only show the patient select when the PatientId is null, i.e the screen is openend from the home screen,
+                //when coming from the PatientDetails screen we already have the PatientId
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box form-group custom-input-form">
+                    @{
+                        //If a physician or technician is logged in, set the minimum number of characters to 1
+                        int numberOfChars = 2;
+                        if (User.IsInRole("Physician") || User.IsInRole("Technician"))
+                        {
+                            numberOfChars = 1;
+                        }
+                    }
+                    @Html.LabelFor(m => m.PatientName)
+                    <br />
+                    @(Html.Kendo().AutoComplete()
+                    .Name("patientAutocomplete")
+                    .DataTextField("FullName")
+                    .Filter("contains")
+                    .Placeholder("Select patient...")
+                    .MinLength(numberOfChars)
+                    .HtmlAttributes(new { @class = "max-width-field" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPatients", "Home")
+                               .Data("getSelectedPhysicianAndSearchText");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Events(e => e
+                        .Select("onSelectAutoComPatient")
+                        .Filtering("onFilterAutoComPatient"))
+                    )
+                </div>
+                        }
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box form-group custom-input-form">
+                @Html.LabelFor(m => m.MessageBody)
+                <br />
+                @Html.TextAreaFor(m => m.MessageBody, new { @class = "k-textbox max-width-field", rows = 6, style = "max-width: 100%" })
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <button type="button" onclick="submitNewMessageForm(this);" class="btn btn-primary login-form-field" tabindex="3">Submit</button>
+            </div>
+        </div>
+    </div>
+                        }

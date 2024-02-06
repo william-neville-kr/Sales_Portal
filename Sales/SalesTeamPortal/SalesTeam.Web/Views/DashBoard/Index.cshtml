@@ -1,0 +1,632 @@
+﻿@{
+    ViewBag.Title = "Dash Board";
+}
+
+<h2>Dash Board</h2>
+
+@*<div class="demo-section k-content wide">
+        @(Html.Kendo().Chart()
+            .Name("chart")
+            .HtmlAttributes(new { style = "height: 400px;" })
+            .Title("Site Visitors Stats /thousands/")
+            .Legend(legend => legend
+                .Position(ChartLegendPosition.Bottom)
+            )
+            .SeriesDefaults(seriesDefaults => seriesDefaults
+                .Column().Stack(true)
+            )
+            .Series(series =>
+            {
+                series.Column(new double[] { 56000, 63000, 74000, 91000, 117000, 138000 }).Name("Total Visits");
+                series.Column(new double[] { 52000, 34000, 23000, 48000, 67000, 83000 }).Name("Unique visitors");
+            })
+            .CategoryAxis(axis => axis
+                .Categories("Jan", "Feb", "Mar", "Apr", "May", "Jun")
+                .MajorGridLines(lines => lines.Visible(false))
+            )
+            .ValueAxis(axis => axis
+                .Numeric()
+                .Line(line => line.Visible(false))
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0}")
+            )
+        )
+    </div>*@
+
+@*<div class="demo-section k-content wide">
+        @(Html.Kendo().Chart<Kendo.Mvc.Examples.Models.ElectricityProduction>()
+            .Name("chart")
+            .HtmlAttributes(new { style = "height: 400px;" })
+            .Title("Spain electricity production (GWh)")
+            .Legend(legend => legend
+                .Position(ChartLegendPosition.Top)
+            )
+            .DataSource(ds => ds.Read(read => read.Action("_SpainElectricityProduction", "chart-api")))
+            .Series(series =>
+            {
+                series.Column(model => model.Nuclear).Name("Nuclear");
+                series.Column(model => model.Hydro).Name("Hydro");
+                series.Column(model => model.Wind).Name("Wind");
+            })
+            .CategoryAxis(axis => axis
+                .Categories(model => model.Year)
+                .Labels(labels => labels.Rotation(-90))
+            )
+            .ValueAxis(axis => axis.Numeric()
+                .Labels(labels => labels.Format("{0:N0}"))
+                .MajorUnit(10000)
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:N0}")
+            )
+            .Events(events => events
+                .SeriesClick("onSeriesClick")
+                .SeriesHover("onSeriesHover")
+                .DataBound("onDataBound")
+                .AxisLabelClick("onAxisLabelClick")
+                .PlotAreaClick("onPlotAreaClick")
+                .PlotAreaHover("onPlotAreaHover")
+                .Render("onRender")
+                .LegendItemClick("onLegendItemClick")
+                .LegendItemHover("onLegendItemHover")
+                .DragStart("onDragStart")
+                .Drag("onDrag")
+                .DragEnd("onDragEnd")
+                .ZoomStart("onZoomStart")
+                .Zoom("onZoom")
+                .ZoomEnd("onZoomEnd")
+            )
+        )
+    </div>
+
+    <script>
+        function onSeriesClick(e) {
+            console.log(kendo.format("Series click :: {0} ({1}): {2}",
+                e.series.name, e.category, e.value));
+        }
+
+        function onSeriesHover(e) {
+            console.log(kendo.format("Series hover :: {0} ({1}): {2}",
+                e.series.name, e.category, e.value));
+        }
+
+        function onDataBound(e) {
+            console.log("Data bound");
+        }
+
+        function onAxisLabelClick(e) {
+            console.log(kendo.format("Axis label click :: {0} axis : {1}",
+                e.axis.type, e.text));
+        }
+
+        function onPlotAreaClick(e) {
+            console.log(kendo.format("Plot area click :: {0} : {1:N0}",
+                e.category, e.value
+            ));
+        }
+
+        function onPlotAreaHover(e) {
+            console.log(kendo.format("Plot area hover :: {0} : {1:N0}",
+                e.category, e.value
+            ));
+        }
+
+        function onRender(e) {
+            console.log("Render");
+        }
+
+        function onLegendItemClick(e) {
+            console.log(kendo.format("Legend item click :: {0}",
+                e.text));
+        }
+
+        function onLegendItemHover(e) {
+            console.log(kendo.format("Legend item hover :: {0}",
+                e.text));
+        }
+
+        function onDragStart(e) {
+            console.log("Drag start");
+        }
+
+        function onDrag(e) {
+            console.log("Drag");
+        }
+
+        function onDragEnd(e) {
+            console.log("Drag end");
+        }
+
+        function onZoomStart(e) {
+            console.log("Zoom start");
+        }
+
+        function onZoom(e) {
+            console.log(kendo.format("Zoom :: {0}", e.delta));
+
+            // Prevent scrolling
+            e.originalEvent.preventDefault();
+        }
+
+        function onZoomEnd(e) {
+            console.log("Zoom end");
+        }
+
+        $(function () {
+            $(document).bind("kendo:skinChange", updateTheme);
+        });
+
+        function updateTheme() {
+            $("#chart").getKendoChart().setOptions({ theme: kendoTheme });
+        }
+    </script>
+
+    <div class="box wide">
+        <h4>Console log</h4>
+        <div class="console"></div>
+    </div>*@
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="display: table;">
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Referral Date From</label>
+        @(Html.Kendo().DatePicker()
+              .Name("dpReferralDateFrom")
+              //.Events(e => e.Change("dpReferralDateFrom_change"))
+              .HtmlAttributes(new { style = "width: 100%", onkeydown = "javascript:return false;" })
+        )
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Referral Date To</label>
+        @(Html.Kendo().DatePicker()
+              .Name("dpReferralDateTo")
+              //.Events(e => e.Change("dpReferralDateTo_change"))
+              .HtmlAttributes(new { style = "width: 100%", onkeydown = "javascript:return false;" })
+        )
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Sales Team Member</label>
+        @(Html.Kendo().DropDownList()
+        .Name("SalesTeamList")
+        .DataTextField("MasterSalesRepresentativeFullName")
+        .DataValueField("SalesTeamId")
+        .Events(e => e.Change("onChangeSalesTeamList").DataBound("onDataBoundSalesTeamList"))
+        .BindTo(ViewBag.GetSalesTeamList)
+        )
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Physician</label>
+        @(Html.Kendo().DropDownList()
+        .Name("PhysicianList")
+        .DataTextField("FullName")
+        .DataValueField("PhysicianId")
+        .AutoBind(false)
+        )
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label> . </label>
+        <button class="btn btn-primary btn-sm" onclick="changeLabelData(); generateChartFun(); generateDrugChartFun(); generateActivityStatusChart();">Generate</button>
+    </div>
+</div>
+
+<br />
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="display: table;">
+    <div class="col-lg-offset-1 col-md-offset-1 col-lg-10 col-md-10 col-sm-12 col-xs-12">
+        <label id="lblPhysicianChart"></label>
+        <div id="PhysicianChart"></div>
+    </div>
+    <br />
+    <div class="col-lg-offset-1 col-md-offset-1 col-lg-10 col-md-10 col-sm-12 col-xs-12">
+        <label id="lblDrugChart"></label>
+        <div id="DrugChart"></div>
+    </div>
+    <br />
+    <div class="col-lg-offset-1 col-md-offset-1 col-lg-10 col-md-10 col-sm-12 col-xs-12">
+        <label id="lblActivityStatusChart"></label>
+        <div id="ActivityStatusChart"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var todayDate = new Date();
+        var lastWeekDate = new Date(todayDate.getFullYear(), todayDate.getMonth() - 1, todayDate.getDate());
+
+        var setReferralDateTo = kendo.toString(kendo.parseDate(todayDate), 'MM/dd/yyyy');
+        $("#dpReferralDateTo").data("kendoDatePicker").value(setReferralDateTo);
+        var setReferralDateFrom = kendo.toString(kendo.parseDate(lastWeekDate), 'MM/dd/yyyy');
+        $("#dpReferralDateFrom").data("kendoDatePicker").value(setReferralDateFrom);
+
+        changeLabelData();
+
+        $("#PhysicianChart").kendoChart({
+            title: { text: "Patients Associated with Physicians", font: "bold 16px Arial,Helvetica,sans-serif" },
+            seriesColors: ["#488eb6"],
+            series: [{
+                type: "column",
+                field: "value",
+                categoryField: "category",
+                labels: { visible: true, template: "${value}" }
+            }],
+            categoryAxis: {
+                field: 'category', labels: { rotation: -60, padding: { right: 10 } }
+            },
+            tooltip: {
+                visible: true,
+                template: "<center>${category} have <b>${value} Patients</b><br/>Click to see detail</center>"
+            },
+            seriesClick: seriesClickPhysicianChart
+        });
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        getPhysicianChartData(lastWeekDate.toJSON(), todayDate.toJSON(), salesTeamId);
+
+        $("#DrugChart").kendoChart({
+            title: { text: "Patients Associated with Drugs", font: "bold 16px Arial,Helvetica,sans-serif" },
+            seriesColors: ["#bad8bd"],
+            series: [{
+                type: "column",
+                field: "value",
+                categoryField: "category",
+                labels: { visible: true, template: "${value}" }
+            }],
+            categoryAxis: {
+                field: 'category', labels: { rotation: -60, padding: { right: 10 } }
+            },
+            tooltip: {
+                visible: true,
+                template: "<center>${category} have <b>${value} Patients</b><br/>Click to see detail</center>"
+            },
+            seriesClick: seriesClickDrugChart
+        });
+        getDrugChartData(lastWeekDate.toJSON(), todayDate.toJSON(), salesTeamId);
+
+        $("#ActivityStatusChart").kendoChart({
+            title: { text: "Patients Associated with Activity Status", font: "bold 16px Arial,Helvetica,sans-serif" },
+            seriesColors: ["#b3b3ff"],
+            series: [{
+                type: "column",
+                field: "value",
+                categoryField: "category",
+                labels: { visible: true, template: "${value}" }
+            }],
+            categoryAxis: {
+                field: 'category', labels: { rotation: -60, padding: { right: 10 } }
+            },
+            tooltip: {
+                visible: true,
+                template: "<center>${category} have <b>${value} Patients</b>" //<br/>Click to see detail</center>
+            }
+            //,
+            //seriesClick: seriesClickActivityStatusChart
+        });
+        //var physicianId = $("#PhysicianList").data("kendoDropDownList").dataItem().PhysicianId;
+        //getActivityStatusChartData(lastWeekDate.toJSON(), todayDate.toJSON(), salesTeamId, physicianId);
+
+        //$("#SalesTeamList").blur(function (event) {
+        //    event.preventDefault();
+        //});
+    });
+
+    function seriesClickPhysicianChart(e) {
+        var categorySelected = e.category;
+        drillDownPhysicianChart(e.dataItem.PhysicianId);
+    }
+
+    function getPhysicianChartData(referralDateFrom, referralDateTo, salesTeamId) {
+        $.ajax({
+            url: '@Url.Action("GetPhysicianChartData", "DashBoard")',
+            data: { SalesTeamId: salesTeamId, ReferralDateFrom: referralDateFrom, ReferralDateTo: referralDateTo },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.PhysicianName, value: item.PatientCount, PhysicianId: item.PhysicianId });
+                    });
+                    var physicianChart = $("#PhysicianChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "Patients Associated with Physicians";
+                    physicianChart.options.tooltip.template = "<center>${category} have <b>${value} Patients</b><br/>Click to see detail</center>";
+                    physicianChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function drillDownPhysicianChart(PhysicianId) {
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        $.ajax({
+            url: '@Url.Action("DrillDownPhysicianChart", "DashBoard")',
+            data: { SalesTeamId: salesTeamId, PhysicianId: PhysicianId, ReferralDateFrom: $("#dpReferralDateFrom").val(), ReferralDateTo: $("#dpReferralDateTo").val() },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.DrugShortName, value: item.PatientCount, PhysicianId: item.PhysicianId });
+                    });
+                    var physicianChart = $("#PhysicianChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "Patients Associated with Drugs";
+                    physicianChart.options.tooltip.template = "<center>Physician gives <b>${value} Patients</b> ${category}<br/>Click to see detail</center>";
+                    physicianChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function generateChartFun() {
+        var referralDateFrom = $("#dpReferralDateFrom").val();
+        var referralDateTo = $("#dpReferralDateTo").val();
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        if (referralDateFrom != "" && referralDateTo != "") {
+            getPhysicianChartData(referralDateFrom, referralDateTo, salesTeamId);
+        }
+    }
+
+    // Drug Chart
+
+    function seriesClickDrugChart(e) {
+        var categorySelected = e.category;
+        //drillDownDrugChart(categorySelected);
+        drillDownDrugChart(e.dataItem.DrugShortName);
+    }
+
+    function getDrugChartData(referralDateFrom, referralDateTo, salesTeamId) {
+        $.ajax({
+            url: '@Url.Action("GetDrugChartData", "DashBoard")',
+            data: { SalesTeamId: salesTeamId, ReferralDateFrom: referralDateFrom, ReferralDateTo: referralDateTo },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.DrugShortName, value: item.PatientCount, DrugShortName: item.DrugShortName });
+                    });
+                    var physicianChart = $("#DrugChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "Patients Associated with Drugs";
+                    physicianChart.options.tooltip.template = "<center>Physician gives <b>${value} Patients</b> ${category}<br/>Click to see detail</center>";
+                    physicianChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function drillDownDrugChart(DrugShortName) {
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        $.ajax({
+            url: '@Url.Action("DrillDownDrugChart", "DashBoard")',
+            data: { SalesTeamId: salesTeamId, DrugShortName: DrugShortName, ReferralDateFrom: $("#dpReferralDateFrom").val(), ReferralDateTo: $("#dpReferralDateTo").val() },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.PhysicianName, value: item.PatientCount, DrugShortName: item.DrugShortName });
+                    });
+                    var physicianChart = $("#DrugChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "Patients Associated with Physicians";
+                    physicianChart.options.tooltip.template = "<center>${category} have <b>${value} Patients</b><br/>Click to see detail</center>";
+                    physicianChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function generateDrugChartFun() {
+        var referralDateFrom = $("#dpReferralDateFrom").val();
+        var referralDateTo = $("#dpReferralDateTo").val();
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        if (referralDateFrom != "" && referralDateTo != "") {
+            getDrugChartData(referralDateFrom, referralDateTo, salesTeamId);
+        }
+    }
+
+    function changeLabelData() {
+        $("#lblPhysicianChart").html("Showing data from Referral Date <b>" + $("#dpReferralDateFrom").val() + "</b> to <b>" + $("#dpReferralDateTo").val() + "</b>");
+        $("#lblDrugChart").html("Showing data from Referral Date <b>" + $("#dpReferralDateFrom").val() + "</b> to <b>" + $("#dpReferralDateTo").val() + "</b>");
+        if ($("#PhysicianList").data("kendoDropDownList").dataItem() != null) {
+            var physicianFullName = $("#PhysicianList").data("kendoDropDownList").dataItem().FullName;
+            $("#lblActivityStatusChart").html("Showing data from Referral Date <b>" + $("#dpReferralDateFrom").val() + "</b> to <b>" + $("#dpReferralDateTo").val() + "</b> for Physician <b>" + physicianFullName + "</b>");
+        }
+    }
+
+    function onChangeSalesTeamList(e) {
+        var dataItem = e.sender.dataItem();
+        getPhysicianList(dataItem.SalesTeamId);
+    }
+
+    function onDataBoundSalesTeamList(e) {
+        getPhysicianList(e.sender.dataItem().SalesTeamId);
+    }
+
+    function getPhysicianList(salesTeamId) {
+        $.ajax({
+            url: '@Url.Action("GetPhysicianList", "DashBoard")',
+            data: { SalesTeamId: salesTeamId },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ FullName: item.FullName, PhysicianId: item.PhysicianId });
+                    });
+                    var physicianList = $("#PhysicianList").data("kendoDropDownList");
+                    physicianList.dataSource.data(tempArray);
+                    physicianList.select(0);
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            },
+            complete: function (data) {
+                var physician = $("#PhysicianList").data("kendoDropDownList").dataItem();
+                $("#lblActivityStatusChart").html("Showing data from Referral Date <b>" + $("#dpReferralDateFrom").val() + "</b> to <b>" + $("#dpReferralDateTo").val() + "</b> for Physician <b>" + physician.FullName + "</b>");
+                generateActivityStatusChart();
+                //var todayDate = new Date();
+                //var lastWeekDate = new Date(todayDate.getFullYear(), todayDate.getMonth() - 1, todayDate.getDate());
+                //getActivityStatusChartData(lastWeekDate.toJSON(), todayDate.toJSON(), salesTeamId, physician.PhysicianId);
+            }
+        });
+    }
+
+    // Activity Status Chart
+
+    //function seriesClickActivityStatusChart(e) {
+    //    var categorySelected = e.category;
+    //    drillDownDrugChart(e.dataItem.DrugShortName);
+    //}
+
+    function getActivityStatusChartData(referralDateFrom, referralDateTo, salesTeamId, physicianId) {
+        $.ajax({
+            url: '@Url.Action("GetActivityStatusChartData", "DashBoard")',
+            data: { SalesTeamId: salesTeamId, PhysicianId: physicianId, ReferralDateFrom: referralDateFrom, ReferralDateTo: referralDateTo },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.ActivityStatus, value: item.PatientCount });
+                    });
+                    var activityStatusChart = $("#ActivityStatusChart").data("kendoChart");
+                    activityStatusChart.dataSource.data(tempArray);
+                    //activityStatusChart.options.series[0].type = "column";
+                    //activityStatusChart.options.title.text = "Patients Associated with Activity Status";
+                    //activityStatusChart.options.tooltip.template = "<center>Physician gives <b>${value} Patients</b> ${category}<br/>Click to see detail</center>";
+                    activityStatusChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    @*function drillDownDrugChart(DrugShortName) {
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        $.ajax({
+            url: '@Url.Action("DrillDownDrugChart", "DashBoard")',
+            data: { ReferralDateFrom: $("#dpReferralDateFrom").val(), ReferralDateTo: $("#dpReferralDateTo").val(), DrugShortName: DrugShortName, SalesTeamId: salesTeamId },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.PhysicianName, value: item.PatientCount, DrugShortName: item.DrugShortName });
+                    });
+                    var physicianChart = $("#DrugChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "Patients Associated with Physicians";
+                    physicianChart.options.tooltip.template = "<center>${category} have <b>${value} Patients</b><br/>Click to see detail</center>";
+                    physicianChart.refresh();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }*@
+
+    function generateActivityStatusChart() {
+        var referralDateFrom = $("#dpReferralDateFrom").val();
+        var referralDateTo = $("#dpReferralDateTo").val();
+        var salesTeamId = $("#SalesTeamList").data("kendoDropDownList").dataItem().SalesTeamId;
+        var physicianId = $("#PhysicianList").data("kendoDropDownList").dataItem().PhysicianId;
+        if (referralDateFrom != "" && referralDateTo != "") {
+            getActivityStatusChartData(referralDateFrom, referralDateTo, salesTeamId, physicianId);
+        }
+    }
+    // Common Function
+    //function getRandomColor() {
+    //    //var letters = '0123456789ABCDEF';
+    //    //var color = '#';
+    //    //for (var i = 0; i < 6; i++) {
+    //    //    color += letters[Math.floor(Math.random() * 16)];
+    //    //}
+    //    //return color;
+    //    //return "#" + ((1 << 24) * Math.random() | 0).toString(16);
+    //    //return "#488eb6";
+    //    return "#bad8bd";
+    //}
+</script>

@@ -1,0 +1,376 @@
+﻿@using Microsoft.AspNet.Identity
+@using PhysicianPortal.Core.Repository
+@using PhysicianPortal.Core.Data
+@using PhysicianPortal.Core.Helpers;
+@using Microsoft.AspNet.Identity.Owin
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Physician Portal</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Styles.Render("~/Content/kendo/2017.1.118/css")
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/doubletap")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/UserCustomization")
+
+    <script src="~/Scripts/jQueryMasked/jquery.maskedinput.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#loading-image').hide();
+
+            $(document).bind('ajaxStop', function () {
+                $('#loading-image').hide();
+            });
+            //.bind('ajaxStart', function () {
+            //    $('#loading-image').show();
+            //});
+
+            $("#DropDownMenu  li").each(function () {
+                if (window.location.href.indexOf($(this).find("a").attr("href")) > 0) {
+                    $(this).find("a").addClass("activeTab");
+                }
+            });
+
+            $(document).click(function () {
+                if ($("#navAdmin").hasClass("open")) {
+                    $("#navAdmin").removeClass("open");
+                }
+            });
+
+            $("#ddlNavAdmin").click(function (e) {
+                e.stopPropagation();
+                if ($("#navAdmin").hasClass("open")) {
+                    $("#navAdmin").removeClass("open");
+                }
+                else {
+                    $("#navAdmin").addClass("open");
+                }
+            });
+
+            $("#ddlNavReports").click(function (e) {
+                e.stopPropagation();
+                if ($("#navReports").hasClass("open")) {
+                    $("#navReports").removeClass("open");
+                }
+                else {
+                    $("#navReports").addClass("open");
+                }
+            });
+
+            $(".navbar-toggle").hover(function (e) {
+                $(this).css("background-color", "#2466a3");
+            });
+
+            $(".navbar-toggle").click(function (e) {
+                e.stopPropagation();
+                $(this).css("background-color", "#2466a3");
+                if ($("#mainMenu").hasClass("collapse")) {
+                    $("#mainMenu").removeClass("collapse");
+                }
+                else {
+                    $("#mainMenu").addClass("collapse");
+                }
+            });
+
+            document.addEventListener('touchstart', function (e) {
+                var x = document.activeElement;
+                console.log(x.nodeName);
+                if ((' ' + x.className + ' ').indexOf(' ' + 'dissmiss-keyboard-ipad' + ' ') > -1 || x.nodeName.toLowerCase() === "input" || x.nodeName.toLowerCase() === "textarea") {
+                    e.preventDefault();
+                    document.activeElement.blur();
+                }
+
+            }, false);
+
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                <text>
+            $.ajax({
+                url: '@Url.Action("GetNewUsersCount", "Admin")',
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.success) {
+                        $("#newUsersNumber").text(data.message);
+                    }
+                    else {
+                        console.log(data.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+            </text>
+            }
+
+            $("#refreshSessionBtn").click(function () {
+                $.ajax({
+                    url: '@Url.Action("RenewSession", "Base")',
+                    //data: JSON.stringify({ physicianId: selectedPatientForNewMessage.PhysicianId }),
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                    },
+                    success: function (data) {
+                        $("#divTimeoutAlert").data("kendoWindow").close();
+                    },
+                    error: function (xhr) {
+                        console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            });
+        });
+
+        setInterval(function () {
+            $.ajax({
+                url: '@Url.Action("CheckForTimeout", "Base")',
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                },
+                success: function (data) {
+
+                    if (data.success && data.message <= 60.0 && data.message > 0.0) {
+                        $("#divTimeoutAlert").kendoWindow({
+                            modal: true,
+                            width: 400,
+                            title: "Timeout",
+                            visible: false,
+                            resizable: false,
+                            draggable: false
+                        })
+                         .data("kendoWindow")
+                         .center()
+                         .open();
+                    }
+                    else if (data.success && data.message == 0.0) {
+                        if ($("#divTimeoutAlert").data("kendoWindow") != undefined) {
+                            $("#divTimeoutAlert").data("kendoWindow").close();
+                        }
+                        window.location.href = '@Url.Content("~/Account/Login")';
+                    }
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div id="loading-image">
+        <img src="~/Content/Images/ajax-loader.gif" />
+    </div>
+    @{
+        //Check for DefaultHomePage type, which is store in the user claims
+        var userManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        var userClaim = userManager.GetClaims(User.Identity.GetUserId()).FirstOrDefault(t => t.Type.Equals("DefaultHomePage"));
+        int homePageId = userClaim?.Value.ToInt0() ?? 0;
+        HomePage homePage = unitOfWork.HomePagesRepository.GetSingle(t => t.HomePageId == homePageId);
+        //var url = Url.Action(homePage?.HomePageValue ?? "HomeDetail", "Home");
+        var url = Url.Content("~/Home/" + (homePage?.HomePageValue ?? "HomeDetail"));
+        if (User.IsInRole("Pharmacist"))
+        {
+            url = Url.Content("~/Home/" + (homePage?.HomePageValue ?? "HomePharmacist"));
+        }
+    }
+    <div style="background-color:#d9534f; height:10px;"> </div>
+    <div class="row header col-lg-12 col-md-12 col-sm-12 col-xs-12 paddingLeftRight0" style="margin-top: 0px; float:none">
+        <div class="headerLogo col-lg-4 col-md-4 col-sm-4 col-xs-12 paddingLeftRight0">
+            <a href='@url'>
+                <table>
+                    <tr>
+                        <td style="padding-right: 20px;   vertical-align: inherit;">
+                            <img src="~/Content/images/KrogerLogo.png" class="kroggerLogo" />
+                        </td>
+                        <td>
+                            <h3>Specialty<br />Pharmacy</h3>
+                        </td>
+                    </tr>
+                </table>
+            </a>
+        </div>
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 paddingLeftRight0">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding10" style="text-align: center;margin-top: 10px;">
+                <h3 style="text-align: center;color: red;font-size: 42px;margin-bottom: 10px;">Training</h3>
+                <a href="@Url.Action("Index", "Feedback")" class="btn btn-primary">Feedback</a>
+            </div>
+
+            @Html.Partial("_LoginPartial")
+        </div>
+    </div>
+
+    <div class="row" style="margin: 0">
+        <div class="navbar-inverse adjustMainMenue" role="banner">
+            <nav role="navigation" class="navbar navbar-inverse navbar-default" style="margin-top: 0px;">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="mainMenu">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse adjustMainMenue" id="mainMenu">
+                    <ul id="DropDownMenu" class="nav navbar-nav" style="width: 100%;">
+                        <li>
+                            <a href='@url' class="" title="">
+                                Home
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href='@Url.Content("~/Patients/Index")' class="" title="">
+                                My Patients
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Action("Refills", "Home")' class="" title="">
+                                Refills
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/Insurances/Index")' class="" title="">
+                                Insurance
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/Notes/Index")' class="" title="">
+                                My Notes
+                            </a>
+                        </li>
+                        @*<li>
+                                <a href='@Url.Content("~/Reports/Index")' class="" title="">
+                                    Reports
+                                </a>
+                            </li>*@
+
+                        @* As we have comment reports so there is no need to show reports section*@
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <li>
+                                <ul class="nav ace-nav">
+                                    <li class="dark-opaque" id="navReports">
+                                        <a data-toggle="dropdown" class="dropdown-toggle noselect" id="ddlNavReports">
+                                            Reports
+                                            <span class="glyphicon glyphicon-chevron-down"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-close" style="z-index: 1001;">
+                                            @*<li>
+                                                    <a href='@Url.Content("~/Reports/Index")' class="" title="">
+                                                        Reports
+                                                    </a>
+                                                </li>*@
+                                            @if (User.IsInRole("SuperAdmin"))
+                                            {
+                                                <li>
+                                                    <a href='@Url.Content("~/Reports/DocumentsHistory")' class="" title="">
+                                                        Documents History
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        <li>
+                            <a href='@Url.Action("Index", "Dashboard")' class="" title="">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Physician"))
+                        {
+                            <li>
+                                <ul class="nav ace-nav">
+                                    <li class="dark-opaque" id="navAdmin">
+                                        <a data-toggle="dropdown" class="dropdown-toggle noselect" id="ddlNavAdmin">
+                                            Admin
+                                            <span class="glyphicon glyphicon-chevron-down"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-close" style="z-index: 1001;">
+                                            <li>
+                                                <a href='@Url.Content("~/Admin/Index")' class="" title=""> User List </a>
+                                            </li>
+                                            @if (User.IsInRole("SuperAdmin"))
+                                            {
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/NewUsers")' class="" title=""> Verify User <span id="newUsersNumber" class="badge"></span></a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/Pharmacies")' class="" title=""> Manage Pharmacies </a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/ApplicationSettings")' class="" title=""> App Settings </a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/ActivityLogs")' class="" title=""> Activity Log </a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/ErrorLogs")' class="" title=""> Error Log </a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/ManageOffices")' class="" title=""> Manage Offices </a>
+                                                </li>
+                                                <li>
+                                                    <a href='@Url.Content("~/Admin/PatientDetailDocuments")' class="" title=""> Patient Documents </a>
+                                                </li>
+                                                @*<li>
+                                                        <a href='@Url.Content("~/Admin/ReferralDocuments")' class="" title=""> Referral document  </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href='@Url.Content("~/Admin/RefillDocuments")' class="" title=""> Refill document </a>
+                                                    </li>*@
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="body-content">
+        @RenderBody()
+        <hr />
+        <footer></footer>
+    </div>
+
+    <div id="divTimeoutAlert" style="display: none;">
+        <div style="text-align:center; min-height: 34px;">
+            <p>
+                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                Your session is about to end because of inactivity
+            </p>
+        </div>
+        <div style="text-align: center">
+            <button id="refreshSessionBtn" class="k-button" style="">Renew session</button>
+        </div>
+    </div>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

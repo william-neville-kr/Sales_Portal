@@ -1,0 +1,99 @@
+﻿@model SalesTeam.Core.Data.Feedback
+@{
+    ViewBag.Title = "Add Edit";
+}
+
+<h3>Feedback</h3>
+
+<div class="container">
+    @using (Html.BeginForm("AddEdit", "Feedback", FormMethod.Post, new { id = "formFeedback" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.FeedbackId)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Subject, htmlAttributes: new { style = "font-weight: bold;" })
+                @(Html.Kendo().TextBoxFor(m => m.Subject)
+                    .Name("Subject")
+                    .HtmlAttributes(new { style = "width: 100%; min-width: 100%;", placeholder = "Subject", required = "required", validationmessage = "Enter Subject", @class = "form-control", autocomplete = "off" })
+                )
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description, htmlAttributes: new { style = "font-weight: bold;" })
+                @(Html.Kendo().EditorFor(model => model.Description)
+                    .Name("Description")
+                    .HtmlAttributes(new { style = "height:440px", aria_label = "editor", required = "required", validationmessage = "Enter Description" })
+                    .Resizable(resizable => resizable.Content(true).Toolbar(true))
+                    .Encode(false)
+                )
+            </div>
+
+            <div class="form-group">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-left: 0;">
+                    @Html.LabelFor(model => model.FeedbackStatusId, htmlAttributes: new { style = "font-weight: bold;" })
+                    @(Html.Kendo().DropDownListFor(m => m.FeedbackStatusId)
+                      .Name("FeedbackStatusId")
+                      .DataTextField("Name")
+                      .DataValueField("FeedbackStatusId")
+                      .HtmlAttributes(new { style = "width: 100%;" })
+                      .DataSource(source =>
+                      {
+                          source.Read(read =>
+                          {
+                              read.Action("GetFeedbackStatusList", "Feedback");
+                          })
+                          .ServerFiltering(false);
+                      })
+                    )
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-right: 0;">
+                    @Html.LabelFor(model => model.FeedbackRelatedId, htmlAttributes: new { style = "font-weight: bold;" })
+                    @(Html.Kendo().DropDownListFor(m => m.FeedbackRelatedId)
+                      .Name("FeedbackRelatedId")
+                      .DataTextField("Name")
+                      .DataValueField("FeedbackRelatedId")
+                      .HtmlAttributes(new { style = "width: 100%;" })
+                      .DataSource(source =>
+                      {
+                          source.Read(read =>
+                          {
+                              read.Action("GetFeedbackRelatedList", "Feedback");
+                          })
+                          .ServerFiltering(false);
+                      })
+                    )
+                </div>
+            </div>
+
+            <div class="form-group" style="text-align: center;">
+                <input type="submit" value="Save" class="btn btn-primary" onclick="SaveFeedback();" />
+                <a href="@Url.Action("Index", "Feedback")" class="btn btn-danger">Cancel</a>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    function SaveFeedback() {
+
+        var editOfficeForm = $("#formFeedback");
+        var validator = editOfficeForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            status.text("Successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            editOfficeForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+    }
+</script>

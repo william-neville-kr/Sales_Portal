@@ -1,0 +1,64 @@
+﻿<div class="msls-label" style="min-width: 30px; padding: 6px 10px 6px 0; margin: 5px">
+    <label>Last Used Date</label>
+    <span>
+        @Model.LastUsedDate.ToShortDateString()
+    </span>
+</div>
+<div style="padding:10px;  border: 1px solid;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                    <label>Insurance Name</label>
+                    <span>
+                        @Model.InsuranceName
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                    <label>Insurance Level Name</label>
+                    <span>
+                        @Model.InsuranceLevelName
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0" style="display: inline-block;">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                    <label>Insurance Type</label>
+                    <span>
+                        @Model.InsuranceType
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                    <label>Insurance Level Number</label>
+                    <span>
+                        @Model.InsuranceLevelNumber
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                    <label>Insurance Process Control Number</label>
+                    <span>
+                        @Model.InsuranceProcessControlNumber
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                    <label>Insurance Bank Identification Number</label>
+                    <span>
+                        @*@Model.PhoneNumber*@
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,106 @@
+﻿@model PhysicianPortal.Web.Models.EditPhysicianSignature
+
+@{
+    Layout = null;
+}
+<h2>Signature</h2>
+
+@using (Ajax.BeginForm("EditPhysicianSignature", "Admin", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onSignatureEditSuccess" },
+                                        new { @class = "form-horizontal", role = "form", id = "formEditPassword" }))
+{
+    <div id="signatureMainDiv">
+        @Html.AntiForgeryToken()
+        <h4>Add a Signature</h4>
+        <hr />
+        <div style="padding-left:40px !important">
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Signature")
+            @Html.HiddenFor(m => m.PhysicianId)
+            @Html.HiddenFor(m => m.Signature, new { @id = "Signature" })
+            <div class="col-md-10">
+                @if (Model.SignatureBase64String != null)
+                {
+                    <img id="sigImage" src="@Model.SignatureBase64String">
+                }
+                <div id="divSignatures" style="display: inline-block; display:none;"></div>
+            </div>
+        </div>
+
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1" style="text-align: center; display: flex;">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="text-align: center">
+                <button type="submit" class="btn btn-primary login-form-field">Save</button>
+            </div>
+
+            @if (Model.SignatureBase64String != null)
+            {
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="text-align: center">
+                    <button type="button" onclick="clearSignature();" class="btn btn-primary login-form-field">Clear</button>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    var imgString = '@Model.SignatureBase64String';
+    $(document).ready(function () {
+        $.getScript('@Url.Content("~/Scripts/jSignature/jSignature.min.js")', function () {
+            var sigDiv = $("#divSignatures");
+            var hidSig = $("#Signature");
+            //sigDiv.empty();
+            //hidSig.empty();
+            debugger;
+            if (imgString == "") {
+                addSignature(sigDiv, hidSig);
+            }
+        });
+    });
+
+    function clearSignature() {
+        $("#sigImage").hide();
+        var sigDiv = $("#divSignatures");
+        var hidSig = $("#Signature");
+        $("#Signature").val(null);
+        addSignature(sigDiv, hidSig);
+    }
+
+    function addSignature(elementTemp, contentItemTemp) {
+        $("#divSignatures").show();
+        $(elementTemp).html("");
+        var sig = $("<div class='tableGrid' id='signature' style='height:200px; width: 900px; border: black 1px solid;'></div>");
+        sig.appendTo($(elementTemp));
+
+        setTimeout(function () {
+            //Initialize and start capturing
+            sig.jSignature();
+
+            // Listen for changes made via the custom control and update the content item whenever it changes.
+
+            sig.bind("change", function (e) {
+                var img = sig.jSignature("getData", "image");
+                if (img != null) {
+                    if (contentItemTemp.val() != img[1]) {
+                        contentItemTemp.val(img[1]);
+                    }
+                }
+            });
+        }, 0);
+    }
+
+
+
+    function onSignatureEditSuccess(arg) {
+        if (arg.success) {
+            $.notifyBar({ html: arg.message, cssClass: 'success', position: 'top' });
+            $("#PhysicinSignatureWindowEditUser").data("kendoWindow").close();
+        }
+        else {
+            $.notifyBar({ html: arg.message, cssClass: 'error', position: 'top' });
+        }
+    }
+
+</script>

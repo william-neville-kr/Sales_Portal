@@ -1,0 +1,120 @@
+﻿@model PhysicianPortal.Web.Models.VerifyCodeViewModel
+@using Kendo.Mvc.UI
+@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = "Verify Code";
+}
+
+<div class="loginPageBody">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        @using (Html.BeginForm("VerifyCode", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", style = "margin: 0px;" }))
+        {
+            <div id="loginContainer" class="loginPage">
+                <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px;">
+                    <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                    <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                    <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>                    
+
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("provider", @Model.Provider)
+                    @Html.Hidden("rememberMe", @Model.RememberMe)
+                    <h4 class="text-center" id="ValidationSummaryId">Enter verification code</h4>
+                    <span class="validation-summary-errors">
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
+                    </span>
+                    <div class="form-group login-padding30">
+                        @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Code, new { @class = "form-control", @style = "max-width: initial" })
+                    </div>
+                    <div class="form-group login-padding30">
+                        <a onclick="rememberMePopup()" class="text-center" style="color: #337ab7">Remember this browser?</a>
+                        <br />
+                        <label style="margin-right: 20px;">@Html.RadioButtonFor(m => m.RememberBrowser, true)Yes</label>
+                        <label>@Html.RadioButtonFor(m => m.RememberBrowser, false)No</label>
+                    </div>
+                    <div class="form-group login-padding30">
+                        <input type="submit" class="btn btn-primary btn-block login-form-field" value="Submit" />
+                    </div>
+                    <div class="form-group login-padding30 center">
+                        <label>Did not recieve a verification code?</label>
+                        <br />
+                        <a onclick="resendCode()" class="text-center" style="color: #337ab7">Resend Code</a>
+                        @*<button class="btn btn-primary" onclick="resendCode()">Resend Code</button>*@
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="divAlertDialog"></div>
+
+<script>
+    function resendCode() {
+        var request = {
+            provider: '@Model.Provider'
+        };
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(request),
+            url: '@Url.Content("~/Account/ResendCode")',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "danger", position: "top" });
+                }
+            }
+        });
+    }
+
+    function rememberMePopup() {
+
+        $("#divAlertDialog").kendoWindow({
+            content: {
+                url: '@Url.Action("RememberBrowser", "Account")'
+            },
+            modal: true,
+            //width: "70%",
+            //height: "70%",
+            //maxWidth: 800,
+            //maxHeight: 600,
+            //minWidth: 300,
+            //minHeight: 300,
+            //title: "Add New User",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divAlertDialog").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null)
+                    {
+                        x.blur();
+                    }
+                    $("#divAlertDialog").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+</script>
+

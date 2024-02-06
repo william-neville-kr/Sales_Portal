@@ -1,0 +1,168 @@
+﻿@(Html.Kendo().Grid<PhysicianPortal.Web.Models.PharmacyDocumentModel>()
+    .Name("gridPharmacyDocuments")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.DocumentDescription).Title("Document Name").ClientTemplate(
+            String.Format(
+                    @"<div class='document-icon'
+                        style='background-image: url({0});'></div>
+                    <div class='document-name'>#: DocumentDescription #</div>", Url.Content("~/Content/Images/pdf_logo.png")));
+        columns.Bound(c => c.DocumentCreatedDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Created");
+        columns.Bound(c => c.DocumentAssignedDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Assigned");
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPharmacyDocumentsRecords", "Patients", Model))
+        .Sort(sort => sort.Add("DocumentCreatedDate").Descending())
+        .PageSize(10)
+    )
+    .Selectable()
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChangePharmacyDocuments"))
+)
+
+<script type="text/javascript">
+    var data;
+    function onChangePharmacyDocuments(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridPharmacyDocuments").on("dblclick", "tr.k-state-selected", function () {
+            previewPharmacyDocuments(data);
+        });
+        $("#gridPharmacyDocuments").on("doubletap", "tr.k-state-selected", function () {
+            previewPharmacyDocuments(data);
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    function getPharmacyDocumentData(documentId) {
+
+        $.ajax({
+            url: '@Url.Action("GetPharmacyDocumentData", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: documentId }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+
+                    if (data.filetype == "tif") {
+                        $("#divDocumentViewer").html('<img id="imgDocument" style="width:98%; border:1px solid #000;" src="" >');
+                        $("#imgDocument").attr("src", "data:image/tiff;base64," + data.fileData);
+                    }
+                    else {
+                        var object = "<object data='{FileName}' type='application/pdf' style='width: inherit; height: 1000px;'>";
+                        object += "</object>";
+                        object = object.replace(/{FileName}/g, "data:application/pdf;base64," + data.fileData);
+
+                        $("#divDocumentViewer").html(object);
+                    }
+
+
+                    $("#divPreviewDocument").kendoWindow({
+                        modal: true,
+                        width: 800,
+                        height: 600,
+                        maxWidth: 1200,
+                        maxHeight: 1200,
+                        minWidth: 300,
+                        minHeight: 300,
+                        title: "Pharmacy Documents",
+                        visible: false,
+                        resizable: true,
+                        draggable: true,
+                        actions: ["Close"],
+                        open: function (e) {
+                            $("body").css("overflow", "hidden");
+                        },
+                        close: function (e) {
+                            $("body").css("overflow", "");
+                        },
+                        refresh: function () {
+                            $("#divPreviewDocument").bind("orientationchange", function (event) {
+                                var x = document.activeElement;
+                                if (x != undefined && x != null) {
+                                    x.blur();
+                                }
+                                $("#divPreviewDocument").data("kendoWindow").center();
+                            });
+                        }
+                    }).data("kendoWindow").center().open();
+
+
+                }
+                else {
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function previewPharmacyDocuments(patientDocuments) {
+        $("#divPreviewDocument").css("display", "block");
+        getPharmacyDocumentData(patientDocuments.DocumentIdEncrypted);
+    }
+
+    function cancelPharmacyRefaxDocConfirmation() {
+        $("#divRefaxPharmacyDocConfirm").data("kendoWindow").close();
+    }
+
+
+
+    function refaxPharmacyDocument() {
+        var documentIdEncrypted = data.DocumentIdEncrypted;
+        var _faxNumber = $("#idFaxNumberPharmacyDoc").val();
+        //var _physicianId = $("#hidPhysicianId").val();
+        var emailAddress = $("#txtEmailAddressPharmacyDoc").val();
+
+        $.ajax({
+            url: '@Url.Action("FaxPharmacyDocument", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({
+                DocumentIdEncrypted: documentIdEncrypted,
+                FaxNumber: _faxNumber,
+                Email: emailAddress,
+                //PhysicianId: _physicianId
+            }),
+            dataType: 'json',
+            contentType: "application/json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                $("#divRefaxPharmacyDocConfirm").data("kendoWindow").close();
+                alert(data.message);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        //}
+    }
+</script>
+
+<style>
+    #gridPharmacyDocuments tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

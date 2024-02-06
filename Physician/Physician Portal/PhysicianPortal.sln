@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicianPortal.Web", "PhysicianPortal.Web\PhysicianPortal.Web.csproj", "{E0D97F1E-7BD4-48E4-92BB-43F853288D52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicianPortal.Core", "PhysicianPortal.Core\PhysicianPortal.Core.csproj", "{6843208F-3CF1-414E-BE5C-731BCF12CFCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicianPortal.Trulioo", "PhysicianPortal.Trulioo\PhysicianPortal.Trulioo.csproj", "{79F38B97-8A67-4F52-9019-4E417A94FB30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicianPortal.PokitDokIntegration", "PhysicianPortal.PokitDokIntegration\PhysicianPortal.PokitDokIntegration.csproj", "{3C214C12-72E5-428B-8979-73EADF86D26F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0D97F1E-7BD4-48E4-92BB-43F853288D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0D97F1E-7BD4-48E4-92BB-43F853288D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0D97F1E-7BD4-48E4-92BB-43F853288D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0D97F1E-7BD4-48E4-92BB-43F853288D52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6843208F-3CF1-414E-BE5C-731BCF12CFCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6843208F-3CF1-414E-BE5C-731BCF12CFCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6843208F-3CF1-414E-BE5C-731BCF12CFCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6843208F-3CF1-414E-BE5C-731BCF12CFCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79F38B97-8A67-4F52-9019-4E417A94FB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F38B97-8A67-4F52-9019-4E417A94FB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79F38B97-8A67-4F52-9019-4E417A94FB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79F38B97-8A67-4F52-9019-4E417A94FB30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C214C12-72E5-428B-8979-73EADF86D26F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C214C12-72E5-428B-8979-73EADF86D26F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C214C12-72E5-428B-8979-73EADF86D26F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C214C12-72E5-428B-8979-73EADF86D26F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://modernhealthinc.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PhysicianPortal.Core\\PhysicianPortal.Core.csproj
+		SccProjectName1 = PhysicianPortal.Core
+		SccLocalPath1 = PhysicianPortal.Core
+		SccProjectUniqueName2 = PhysicianPortal.PokitDokIntegration\\PhysicianPortal.PokitDokIntegration.csproj
+		SccProjectName2 = PhysicianPortal.PokitDokIntegration
+		SccLocalPath2 = PhysicianPortal.PokitDokIntegration
+		SccProjectUniqueName3 = PhysicianPortal.Trulioo\\PhysicianPortal.Trulioo.csproj
+		SccProjectName3 = PhysicianPortal.Trulioo
+		SccLocalPath3 = PhysicianPortal.Trulioo
+		SccProjectUniqueName4 = PhysicianPortal.Web\\PhysicianPortal.Web.csproj
+		SccProjectName4 = PhysicianPortal.Web
+		SccLocalPath4 = PhysicianPortal.Web
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Home Compact";
+}
+
+<div class="container padding0" style="padding-top: 15px;">
+    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <a href="@Url.Action("Index", "Patients")" class="btn btn-primary btn-lg homeButton">
+            <img src="~/Content/images/search-icon.png">
+            Search Patients
+        </a>
+
+        <a href="@Url.Action("Index", "Home")" class="btn btn-warning btn-lg homeButton">
+            <img src="~/Content/images/message-icon.png">
+            Message Pharmacy <span id="communicationsNumber" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+        </a>
+
+        <a href="@Url.Action("Refills", "Home")" class="btn btn-danger btn-lg homeButton">
+            <img src="~/Content/images/refill-icon.png">
+            Action Required <span id="refillsNumber" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+        </a>
+    </div>
+
+    <div class="col-lg-4 col-md-4 visible-lg visible-md padding0">
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <a href="@Url.Action("Index", "Patients")" class="btn btn-info btn-lg homeButton">
+            <img src="~/Content/images/group-icon.png">
+            View My Patients <span id="myPatientsNumber" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+        </a>
+
+        <a href="@Url.Action("PatientsList", "Patients")" class="btn btn-success btn-lg homeButton">
+            <img src="~/Content/images/group-half-add.png">
+            Start New Prescription <span id="patientsNumber" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+        </a>
+
+        <a href="@Url.Action("Index", "Reports")" class="btn btn-danger btn-lg homeButton">
+            <img src="~/Content/images/reports-icon.png">
+            Reports @*<span id="reportsNumber" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>*@
+        </a>
+    </div>
+</div>
+
+<style type="text/css">
+    .homeButton {
+        width: 100%;
+        height: 100px;
+        box-shadow: 5px 5px 5px #ccc;
+        padding-top: 30px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<script type="text/javascript">
+    $.ajax({
+        url: '@Url.Action("GetMyPatientsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#myPatientsNumber").text(data.message);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    $.ajax({
+        url: '@Url.Action("GetPatientsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#patientsNumber").text(data.message);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    $.ajax({
+        url: '@Url.Action("GetRefillsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#refillsNumber").text(data.message);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    $.ajax({
+        url: '@Url.Action("GetCommunicationsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#communicationsNumber").text(data.message);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+</script>

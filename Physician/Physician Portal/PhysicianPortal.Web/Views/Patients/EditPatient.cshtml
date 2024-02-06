@@ -1,0 +1,389 @@
+﻿@model PhysicianPortal.Web.Models.AddPatientViewModel
+@{
+    ViewBag.Title = "Edit Patient";
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+
+    List<SelectListItem> languages = new List<SelectListItem>();
+    languages.Add(new SelectListItem() { Text = "English", Value = "English" });
+    languages.Add(new SelectListItem() { Text = "French", Value = "French" });
+    languages.Add(new SelectListItem() { Text = "Spanish", Value = "Spanish" });
+    languages.Add(new SelectListItem() { Text = "Mandarin", Value = "Mandarin" });
+
+    var statesList = unitOfWork.StateRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Name, Value = t.Abbreviation });
+}
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<fieldset>
+    <legend>Patient Information</legend>
+
+    @*@using (Html.BeginForm("EditPatient", "Patients", FormMethod.Post, new { id = "EditPatientForm", @class = "form-inline col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" }))*@
+    @using (Ajax.BeginForm("EditPatient", "Patients", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSuccessEditPatient" }, new { id = "EditPatientForm", autocomplete = "off" }))
+    {
+        @Html.AntiForgeryToken()
+        @(Html.HiddenFor(m => m.PhysicianPortalPatientId,new { @id= "PhysicianPortalPatientId11" }))
+        @(Html.HiddenFor(m => m.PhysicianPortalPatientIdEncrypted, new { @id = "PhysicianPortalPatientIdEncrypted1" }))
+        @Html.HiddenFor(m => m.IsEligibilityValueExist)
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <div class="validation-summary col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 padding0">
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.FirstName)
+                    @(Html.Kendo().TextBoxFor(m => m.FirstName)
+                        .Name("FirstName")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "First Name", required = "required", validationmessage = "Enter First Name", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.LastName)
+                    @(Html.Kendo().TextBoxFor(m => m.LastName)
+                        .Name("LastName")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Last Name", required = "required", validationmessage = "Enter Last Name", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.DateOfBirth)
+                    @(Html.Kendo().DatePickerFor(m => m.DateOfBirth)
+                        .Name("DateOfBirth")
+                        .Max(DateTime.UtcNow)
+                        .Format("MM/dd/yyyy")
+                        .HtmlAttributes(new { style = "width: 100%;" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.Email)
+                    @(Html.Kendo().TextBoxFor(m => m.Email)
+                        .Name("Email")
+                        .HtmlAttributes(new { style = "width: 100%", type = "email", placeholder = "Email", validationmessage = "Entered email is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                @if (User.IsInRole("SuperAdmin"))
+                {
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        @Html.LabelFor(m => m.PokitDok_TradingPartnerId)
+
+                        @(Html.Kendo().DropDownListFor(m => m.PokitDok_TradingPartnerId)
+                          .Name("PokitDok_TradingPartnerId")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Filter("contains")
+                          .HtmlAttributes(new { style = "width: 100%;" })
+                          .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("GetPokitDok_TradingPartnerList", "Patients");
+                              })
+                              .ServerFiltering(false);
+                          })
+                        )
+                    </div>
+                }
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 padding0">
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.Gender)
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="height: 30px;">
+                        @(Html.Kendo().RadioButtonFor(m => m.Gender)
+                            .Name("Gender")
+                            .Value("M")
+                            .Label("Male")
+                        )
+                        @(Html.Kendo().RadioButtonFor(m => m.Gender)
+                            .Name("Gender")
+                            .Value("F")
+                            .Label("Female")
+                        )
+                    </div>
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.PreferredLanguage)
+                    @Html.DropDownListFor(m => m.PreferredLanguage, languages, new { style = "width: 100%;" })
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.PhoneNumber)
+                    @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                        .Name("PhoneNumber")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Phone Number", required = "required", validationmessage = "Entered Phone number is not of correct format", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.SSN)
+                    @(Html.Kendo().MaskedTextBoxFor(m => m.SSN)
+                        .Name("SSN")
+                         .Mask("000-00-0000")
+                        .HtmlAttributes(new { @id = "ssnField", style = "width: 100%", placeholder = "SSN #", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+
+            <!-- Add clearfix for only the required viewport -->
+            <div class="clearfix visible-sm"></div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 padding0">
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.Address)
+                    @(Html.Kendo().TextBoxFor(m => m.Address)
+                        .Name("Address")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Address", required = "required", validationmessage = "Enter Address", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.City)
+                    @(Html.Kendo().TextBoxFor(m => m.City)
+                        .Name("City")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "City", required = "required", validationmessage = "Enter City", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.GroupNumber)
+                    @(Html.Kendo().TextBoxFor(m => m.City)
+                        .Name("GroupNumber")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Group Number", validationmessage = "Enter Group Number", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.State)
+                    @Html.DropDownListFor(m => m.State, statesList, new { style = "width: 100%;" })
+                </div>
+
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 padding0">
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.Zip)
+                    @(Html.Kendo().TextBoxFor(m => m.Zip)
+                        .Name("Zip")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Zip", required = "required", validationmessage = "Enter Zip Code", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <label for="physicianId">Select Provider</label>
+                    @(Html.DropDownListFor(m => m.physicianId,
+                        Model.PhysiciansList,
+                        new { required = "required", validationmessage = "Select a physician", @style = "width: 100%;" })
+                    )
+                </div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    @Html.LabelFor(m => m.PolicyNumber)
+                    @(Html.Kendo().TextBoxFor(m => m.PolicyNumber)
+                        .Name("PolicyNumber")
+                        .HtmlAttributes(new { style = "width: 100%", placeholder = "Policy Number", validationmessage = "Enter Group Number", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                    )
+                </div>
+
+
+            </div>
+        </div>
+    }
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+        @if (User.IsInRole("SuperAdmin"))
+        {
+            <button type="button" onclick="CheckPatientEligibility(); return false;" class="btn btn-primary login-form-field">Check Eligibility</button>
+        }
+        <div class="visible-xs" style="padding: 2px;"></div>
+        <button type="submit" onclick="submitNewPatientForm(this);" class="btn btn-primary login-form-field">Save</button>
+        <div class="visible-xs" style="padding: 2px;"></div>
+        <a href="@Url.Action("PatientsList", "Patients")" class="btn btn-danger">Cancel</a>
+        <a id="btnDelete" style="float:right;" onclick="deletePatient(this);" class="btn btn-danger">Delete</a>
+    </div>
+</fieldset>
+
+<div id="divCheckPatientEligibility"></div>
+
+<script>
+
+    var tempSSN = 0;
+    $(document).ready(function () {
+        var physid = '@ViewBag.patientportalid';
+        $('#PhysicianPortalPatientId11').val(physid);
+        $("#PhoneNumber").mask("(999) 999-9999");
+        $("#Zip").mask("99999");
+        $("#DateOfBirth").mask("99/99/9999");
+
+        tempSSN = $("#ssnField").val();
+
+        if ($("#ssnField").val() != null) {
+            $("#ssnField").val("*******" + $("#ssnField").val().substring(7));
+        }
+
+        $("#ssnField").focusin(function () {
+            if ($(this).val() != "") {
+                $("#ssnField").val(tempSSN);
+            }
+            else {
+                $("#ssnField").val("");
+            }
+        });
+
+        $("#ssnField").focusout(function () {
+            if ($(this).val() != "") {
+                tempSSN = $("#ssnField").val();
+                $("#ssnField").val("*******" + $("#ssnField").val().substring(7));
+            }
+            else {
+                $("#ssnField").val("");
+            }
+        });
+
+        @if (User.IsInRole("SuperAdmin")) {
+            <text>
+        if ($("#IsEligibilityValueExist").val() == "True") {
+            CheckPatientEligibility();
+        }
+        </text>
+        }
+        CheckPatientDeleteStatus();
+    });
+
+    function submitNewPatientForm(button) {
+        debugger;
+        if ($("#ssnField").val() != null) {
+            $("#ssnField").val(tempSSN);
+        }
+
+        var userForm = $("#EditPatientForm");
+        kendo.init(userForm);
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            userForm.submit();
+            $("#ssnField").val("*******" + $("#ssnField").val().substring(7));
+            return false;
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+            return false;
+        }
+    }
+
+    function OnSuccessEditPatient(result) {
+
+        if (result.success) {
+            $.notifyBar({ html: result.message, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: result.message, cssClass: 'error', position: 'top' });
+        }
+    }
+
+    function CheckPatientEligibility() {
+        $.ajax({
+            url: '@Url.Action("CheckPatientEligibility", "Patients")',
+            data: { PatientId: $("#PhysicianPortalPatientId11").val(), PokitDok_TradingPartnerId: $("#PokitDok_TradingPartnerId").val(), IsPhysicianPortalPatient: true },
+            cache: true,
+            type: "GET",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#divCheckPatientEligibility").html(data);
+            },
+            error: function (xhr) {
+                //alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function CheckPatientDeleteStatus() {
+
+        $.ajax({
+            url: '@Url.Action("CheckPatientDeleteStatus", "Patients")',
+            data: JSON.stringify({ PhysicianPortalPatientId: '@Model.PhysicianPortalPatientIdEncrypted'}),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $("#btnDelete").hide();
+                } else {
+                    $("#btnDelete").show();
+                }
+                //$("#InsuranceDetailId").html(data);
+                //$("#InsuranceDetailId").show();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function deletePatient() {
+        if (confirm("Are you sure you want to delete this Patient?")) {
+            $.ajax({
+                url: '@Url.Action("deletePatient", "Patients")',
+                data: JSON.stringify({ PhysicianPortalPatientId: '@Model.PhysicianPortalPatientIdEncrypted' }),
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                success: function (data, textStatus, XMLHttpRequest) {
+                    if (data.hasOwnProperty("d")) {
+                        data = data.d;
+                    }
+                    if (data.success) {
+                        window.location.href = '@Url.Content("~/Patients/PatientsList")';
+                    }
+                    else {
+
+                    }
+                    //$("#InsuranceDetailId").html(data);
+                    //$("#InsuranceDetailId").show();
+                },
+                error: function (xhr) {
+                    alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+        }
+    }
+
+
+
+</script>
+
+<style>
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+
+    input[type=date]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        display: none;
+    }
+
+    .k-radio:checked + .k-radio-label:after {
+        content: "";
+        width: 13px;
+        height: 13px;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+</style>
+
+@{Html.RenderPartial("ReferralForms");}

@@ -1,0 +1,145 @@
+﻿@*,[RefillsAllowed]
+      ,[RefillNumber]
+      ,[RefillsRemaining]
+      ,[DaysSupplied]
+      ,[FillDate]
+      ,[DoseStartDate]
+      ,[NextFillDate]
+      ,[ExpiryDate]*@
+
+
+
+@(Html.Kendo().Grid<PhysicianPortal.Core.Data.vwPrescription>()
+    .Name("gridPatientPrescription")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.RxDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Rx Date");
+        columns.Bound(c => c.RxNumber).Title("Rx #");
+        //columns.Bound(c => c.FillsAllowed).Title("Allowed");
+        //columns.Bound(c => c.FillsRemaining).Title("Remaining");
+        columns.Bound(c => c.OrderItemName).Title("Name");
+        //columns.Bound(c => c.DaysSupplied).Title("Days Supplied");
+        //columns.Bound(c => c.LastOrderEvent).Title("Last Event");
+        columns.Bound(c => c.RefillsAllowed).Title("Refills Allowed");
+        columns.Bound(c => c.RefillNumber).Title("Refill Number");
+        columns.Bound(c => c.RefillsRemaining).Title("Refills Remaining");
+        columns.Bound(c => c.DaysSupplied).Title("DaysSupplied");
+        columns.Bound(c => c.FillDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Fill Date");
+        columns.Bound(c => c.DoseStartDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Dose Start Date");
+        columns.Bound(c => c.NextFillDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Next Fill Date");
+        columns.Bound(c => c.ExpiryDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Expiry Date");
+
+    })
+    .Selectable()
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPrescriptions", "Patients", Model))
+        //.Sort(sort => sort.Add("CreateDate").Descending())
+        .PageSize(10)
+    )
+    //.Events(e => e.Change("onPrescriptionChange"))
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+<script>
+    var data;
+    function onPrescriptionChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+    $(document).ready(function () {
+        $("#gridPatientPrescription").click(function (event) {
+
+            var tempGrid1 = $("#gridPatientPrescription").data("kendoGrid");
+            data = tempGrid1.dataItem(tempGrid1.select());
+
+        })
+
+        $("#gridPatientPrescription").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                showPrescriptionPopup(data);
+            }
+        });
+        $("#gridPatientPrescription").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                showPrescriptionPopup(data);
+            }
+        });
+
+        $("#prescriptionKendoWindow").kendoWindow({
+            modal: true,
+            width: "80%",
+            height: "70%",
+            maxWidth: 1000,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Patient Prescriptions",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("#gridPatientPrescription").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#prescriptionKendoWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#prescriptionKendoWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow");
+
+        $(".k-dropdown-operator").hide();
+    });
+
+    function showPrescriptionPopup(arg) {
+        $.ajax({
+            url: '@Url.Action("ShowPrescriptionInfo", "Patients")',
+            data: JSON.stringify({ PrescriptionID: arg.PrescriptionId }),
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                var dialog = $("#prescriptionKendoWindow").data("kendoWindow");
+                dialog.close();
+                dialog.content(data);
+                dialog.center();
+                dialog.open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+</script>
+
+<style>
+    #gridPatientPrescription tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

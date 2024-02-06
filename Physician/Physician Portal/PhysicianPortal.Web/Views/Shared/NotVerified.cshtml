@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = "Not Verified";
+}
+
+<div class="loginPageBody">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        <div id="loginContainer" class="loginPage">
+            <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px">
+                <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>
+                <br />
+                <h4 class="text-center">@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName3"].ToString() representative will contact you soon for your account verification</h4>
+                @*<h4 class="text-center">Your account has not yet been verified. Please contact the system admin to verify yourself.</h4>*@
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Physician Portal</title>
+
+    @Styles.Render("~/Content/css")
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Styles.Render("~/Content/kendo/2017.1.118/css")
+    @*@Scripts.Render("~/bundles/kendo")
+        @Scripts.Render("~/bundles/doubletap")*@
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/doubletap")
+
+    @Styles.Render("~/Content/UserCustomization")
+
+    <script src="~/Scripts/jQueryMasked/jquery.maskedinput.js"></script>
+
+
+
+    @*<script src="~/Scripts/jQueryMasked/jquery.maskedinput.js"></script>*@
+
+    <style type="text/css">
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+            body div#loading-image {
+                /*background-color: #fff;*/
+                height: 100%;
+                position: fixed;
+                text-align: center;
+                width: 100%;
+                /*top: 150px;*/
+                z-index: 99999;
+            }
+
+                body div#loading-image img {
+                    margin-top: 20%;
+                }
+    </style>
+</head>
+<body>
+    <div id="loading-image">
+        <img src="~/Content/Images/ajax-loader.gif" />
+    </div>
+    @{
+        var url = Url.RouteUrl("Default", ((Route)RouteTable.Routes["Default"]).Defaults);
+    }
+    <div style="background-color:#2466a3;height:10px"> </div>
+    <div id="headerTxt" class="row header col-lg-12 col-md-12 col-sm-12 col-xs-12 paddingLeftRight0 text-align-center" style="margin-top: 0px; float:none">
+
+        <table style="width: 100%;">
+            <tbody>
+                <tr>
+                    <td style="width: 239px;">
+                        <a href='@url'>
+                            <table>
+                                <tr>
+                                    <td style="padding-right: 20px;">
+                                        <img src="~/Content/images/KrogerLogo.png" class="kroggerLogo" />
+                                    </td>
+                                    <td>
+                                        <h3>Specialty<br />Pharmacy</h3>
+                                    </td>
+                                </tr>
+                            </table>
+                        </a>
+                    </td>
+                    <td class="visible-lg visible-md visible-sm">
+                        <h4>EXPECT MORE FROM YOUR SPECIALTY PHARMACY</h4>
+                    </td>
+                   
+                </tr>
+            </tbody>
+        </table>
+        @*<div class="headerLogo col-lg-3 col-md-3 col-sm-4 col-xs-12 paddingLeftRight0">
+            </div>
+            <div id="headerTxt" class="col-lg-7 col-md-7 col-sm-5 col-xs-12 paddingLeftRight0 text-align-center">
+            </div>
+            <div id="headerTxt" class="col-lg-2 col-md-2 col-sm-3 col-xs-12 paddingLeftRight0 text-align-center">
+            </div>*@
+    </div>
+
+    <div class="row" style="margin: 0">
+        <div class="navbar-inverse adjustMainMenue" role="banner">
+            <nav role="navigation" class="navbar navbar-inverse navbar-default" style="margin-top: 0px;">
+                @*<div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="mainMenu">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>*@
+            </nav>
+        </div>
+    </div>
+
+    <div class="body-content">
+        @RenderBody()
+        <hr />
+        <footer></footer>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 row footer visible-lg visible-md visible-sm navbar-fixed-bottom">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding0" style="text-align: center;">
+            <p class="copyright">©2017 @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString(). All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding0 flinks" style="text-align: center;">
+            <p>
+                <a href="@Url.Action("About", "Home")">About</a>
+                <a href="@Url.Action("HIPAA", "Home")">HIPAA</a>
+                <a href="@Url.Action("PrivacyPolicy", "Home")">Privacy Policy</a>
+                <a href="@Url.Action("TermsAndConditions", "Home")">Terms &amp; Conditions</a>
+            </p>
+        </div>
+    </div>
+
+    @*@RenderSection("scripts", required: false)*@
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#loading-image").hide();
+
+        $(document).bind("ajaxStop", function () {
+            $("#loading-image").hide();
+        });
+    });
+
+    $('.needHelpImage').mouseover(function () {
+        var source = $(this).attr('src');
+        $(this).attr('src', source.replace('NeedHelp_1.png', 'NeedHelp_2.png'));
+        $(this).css({ height: "83px", width: "148px" });
+        $(this).blur();
+    });
+
+    $('.needHelpImage').mouseout(function () {
+        var source = $(this).attr('src');
+        $(this).attr('src', source.replace('NeedHelp_2.png', 'NeedHelp_1.png'));
+        $(this).css({ height: "83px", width: "148px" });
+    });
+</script>
+
+<style type="text/css">
+    .validation-summary-errors ul {
+        list-style: none;
+        margin-left: -40px;
+    }
+
+    #headerTxt {
+        /*height: 92px;*/
+        line-height: 92px;
+        text-align: center;
+    }
+
+        #headerTxt h4 {
+            display: inline-block;
+            vertical-align: middle;
+            color: #337ab7;
+        }
+</style>

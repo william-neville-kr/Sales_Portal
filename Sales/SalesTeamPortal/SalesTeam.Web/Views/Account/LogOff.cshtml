@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "LogOff";
+    //Layout = null;
+}
+@Scripts.Render("~/bundles/jquery")
+<h1>
+    You have been logged out
+    <a type="button" class="btn btn-primary" href="@Url.RouteUrl("Default", ((Route)RouteTable.Routes["Default"]).Defaults)" style="width:auto;">Click here to Login</a>
+</h1>
+
+<script>
+
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("ForceLogout", "Account", new { id = "-10129391"})',
+            type: 'POST',
+            username: "xyz123asdkjasd",
+            password: "xyz123basdahsd",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function () {
+                alert('logged off');
+            },
+            error: function (xhr) {
+                alert("You have been logged off");
+            }
+        });
+    });
+</script>

@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTeam.Web", "SalesTeam.Web\SalesTeam.Web.csproj", "{3A59502C-04AF-49EF-8ED2-3803113D218C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTeam.Core", "SalesTeam.Core\SalesTeam.Core.csproj", "{56D324D1-3528-4E7A-8F22-45785F24220D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A59502C-04AF-49EF-8ED2-3803113D218C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A59502C-04AF-49EF-8ED2-3803113D218C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A59502C-04AF-49EF-8ED2-3803113D218C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A59502C-04AF-49EF-8ED2-3803113D218C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D324D1-3528-4E7A-8F22-45785F24220D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D324D1-3528-4E7A-8F22-45785F24220D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D324D1-3528-4E7A-8F22-45785F24220D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D324D1-3528-4E7A-8F22-45785F24220D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://modernhealthinc.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SalesTeam.Core\\SalesTeam.Core.csproj
+		SccProjectName1 = SalesTeam.Core
+		SccLocalPath1 = SalesTeam.Core
+		SccProjectUniqueName2 = SalesTeam.Web\\SalesTeam.Web.csproj
+		SccProjectName2 = SalesTeam.Web
+		SccLocalPath2 = SalesTeam.Web
+	EndGlobalSection
+EndGlobal

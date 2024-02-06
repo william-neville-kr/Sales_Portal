@@ -1,0 +1,711 @@
+﻿@model PhysicianPortal.Web.Models.OfficeUsersViewModel
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<div style="margin-bottom:10px">
+    <button onclick="addNewUser(this);" class="btn btn-primary">Add User</button>
+</div>
+@Html.Partial("UsersList", Model)
+
+
+
+<div id='AddUserWindow'></div>
+<div id='EditUserWindow'></div>
+<div id="divAlertDialog"></div>
+
+<div id='AddTermsAndConditionWindow'></div>
+
+
+<script>
+    var officeIdVar = @Model.OfficeId;
+    var isEmailValid = false;
+    var selectedPhysicianForNewUser;
+
+    function termsAndConditions() 
+    {
+
+        $("#AddTermsAndConditionWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/TermsAndCondition")"
+            //async: true
+            //data: {id: 100}
+        },
+        modal: true,
+        width: "70%",
+        height: "90%",
+        maxWidth: 800,
+        maxHeight: 800,
+        minWidth: 300,
+        minHeight: 300,
+        title: "Terms and Conditions",
+        visible: false,
+        resizable: false,
+        draggable: false,
+        actions: ["Close"],
+        open: function (e) {
+            $("body").css("overflow", "hidden");
+        },
+        close: function (e) {
+            //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+            $("body").css("overflow", "");
+        }
+        
+    }).data("kendoWindow").center().open();
+    }
+
+    function addNewUser(addButton) {
+        $("#AddUserWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/AddNewUser")"
+                //async: true
+                //data: {id: 100}
+            },
+            modal: true,
+            width: "70%",
+            height: "90%",
+            maxWidth: 800,
+            maxHeight: 800,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Add User",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+
+            },
+            refresh: function () {
+                // Add Masking
+                $("#phonenumberAddUser").mask("(999) 999-9999");
+
+                var dropdownListContainer = document.getElementById("autocompletePhysicianContainerAddUser");
+                if (dropdownListContainer == undefined || dropdownListContainer == null) {
+                    return;
+                }
+
+                var officeListAddUser = document.getElementById("officeListAddUser");
+                if (officeListAddUser == undefined || officeListAddUser == null) {
+                    return;
+                }
+                var officeList = $("#OfficeListAddUser").data("kendoMultiSelect");
+                //var physicianList = $("#PhysicianListAddUser").data("kendoMultiSelect");
+                var selectedRole = document.getElementById("RoleIdAddUser").value;
+                var npiContainer = document.getElementById("npiContainerAddUser");
+                var joinDateContainerAddUser = document.getElementById("joinDateContainerAddUser");
+                var signatureContainer = document.getElementById("physicianSignatureAddUser");
+
+                if (selectedRole == "1") {
+                    dropdownListContainer.style.display = "none";
+                    officeListAddUser.style.display = "inherit";
+                    npiContainer.style.display = "none";
+                    joinDateContainerAddUser.style.display = "none";
+                    signatureContainer.style.display = "none";
+                    officeList.options.maxSelectedItems = 1;//only one items could be selected
+                    if (officeList.value().length > 0) {
+                        officeList.value(officeList.value()[0]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+                else if (selectedRole == "2") {
+                    dropdownListContainer.style.display = "inherit";
+                    officeListAddUser.style.display = "inherit";
+                    npiContainer.style.display = "inherit";
+                    joinDateContainerAddUser.style.display = "inherit";
+                    signatureContainer.style.display = "inherit";
+                    officeList.options.maxSelectedItems = null;//many items could be selected
+                    //physicianList.options.maxSelectedItems = 1; //only one physician can be selected
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value(physicianList.value()[0]);
+                    //}
+                }
+                else if (selectedRole == "3") {
+                    dropdownListContainer.style.display = "inherit";
+                    officeListAddUser.style.display = "inherit";
+                    npiContainer.style.display = "none";
+                    joinDateContainerAddUser.style.display = "none";
+                    signatureContainer.style.display = "none";
+                    officeList.options.maxSelectedItems = 1;//only one items could be selected
+                    //physicianList.options.maxSelectedItems = null; // more than one physicians can be selected
+                    if (officeList.value().length > 0) {
+                        officeList.value(officeList.value()[0]);
+                    }
+                }
+                else if (selectedRole == "4") {
+                    dropdownListContainer.style.display = "none";
+                    officeListAddUser.style.display = "none";
+                    npiContainer.style.display = "none";
+                    joinDateContainerAddUser.style.display = "none";
+                    signatureContainer.style.display = "none";
+                    if (officeList.value().length > 0) {
+                        officeList.value([]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+                else if (selectedRole == "5") {
+                    dropdownListContainer.style.display = "none";
+                    officeListAddUser.style.display = "none";
+                    npiContainer.style.display = "none";
+                    joinDateContainerAddUser.style.display = "none";
+                    signatureContainer.style.display = "none";
+                    if (officeList.value().length > 0) {
+                        officeList.value([]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+
+                if (officeIdVar > 0)
+                {
+                    //If the AddNewScreen was accessed from the Usersist of some office, hide the office selection list and set its default value to the officeId of the current office
+                    officeListAddUser.style.display = "none";
+                    officeList.value([officeIdVar]);
+                }
+
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddUserWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#AddUserWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function roleDropdownChangedEditUser(x) {
+
+        
+        dataChanged();
+
+        var dropdownListContainer = document.getElementById("autocompletePhysicianContainerEditUser");
+        var joinDateContainerEditUser = document.getElementById("joinDateContainerEditUser");
+        //var signatureContainerEditUser = document.getElementById("physicianSignatureEditUser");
+        if (dropdownListContainer == undefined || dropdownListContainer == null) {
+            return;
+        }
+        var officeListEditUser = document.getElementById("officeListEditUser");
+        if (officeListEditUser == undefined || officeListEditUser == null) {
+            return;
+        }
+        var officeList = $("#OfficeList").data("kendoMultiSelect");
+        //var physicianList = $("#PhysicianListEditUser").data("kendoMultiSelect");
+        var selectedRole = document.getElementById("RoleIdEditUser").value;
+        var npiContainer = document.getElementById("npiContainerEditUser");
+
+        if (selectedRole == "1") {
+            dropdownListContainer.style.display = "none";
+            officeListEditUser.style.display = "inherit";
+            npiContainer.style.display = "none";
+            joinDateContainerEditUser.style.display = "none";
+            //signatureContainerEditUser.style.display = "none";
+            officeList.options.maxSelectedItems = 1;//only one items could be selected
+            if (officeList.value().length > 0) {
+                officeList.value(officeList.value()[0]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value([]);
+            //}
+        }
+        else if (selectedRole == "2") {
+            dropdownListContainer.style.display = "none";
+            officeListEditUser.style.display = "inherit";
+            npiContainer.style.display = "inherit";
+            joinDateContainerEditUser.style.display = "inherit";
+            //signatureContainerEditUser.style.display = "inherit";
+            officeList.options.maxSelectedItems = null;//only one items could be selected
+            //physicianList.options.maxSelectedItems = 1;//only one physician can be selected
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value(physicianList.value()[0]);
+            //}
+        }
+        else if (selectedRole == "3") {
+            dropdownListContainer.style.display = "inherit";
+            officeListEditUser.style.display = "inherit";
+            npiContainer.style.display = "none";
+            joinDateContainerEditUser.style.display = "none";
+            //signatureContainerEditUser.style.display = "none";
+            officeList.options.maxSelectedItems = 1;//only one items could be selected
+            //physicianList.options.maxSelectedItems = null;//multiple physicians can be selected
+            if (officeList.value().length > 0) {
+                officeList.value(officeList.value()[0]);
+            }
+        }
+        else if (selectedRole == "4") {
+            dropdownListContainer.style.display = "none";
+            officeListEditUser.style.display = "none";
+            npiContainer.style.display = "none";
+            joinDateContainerEditUser.style.display = "none";
+            //signatureContainerEditUser.style.display = "none";
+            if (officeList.value().length > 0) {
+                officeList.value([]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value(physicianList.value()[0]);
+            //}
+        }
+        else if (selectedRole == "5") {
+            dropdownListContainer.style.display = "none";
+            officeListEditUser.style.display = "none";
+            npiContainer.style.display = "none";
+            joinDateContainerEditUser.style.display = "none";
+            //signatureContainerEditUser.style.display = "none";
+            if (officeList.value().length > 0) {
+                officeList.value([]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value(physicianList.value()[0]);
+            //}
+        }
+
+        if (officeIdVar > 0)
+        {
+            //If the AddNewScreen was accessed from the Userslist of some office, hide the office selection list
+            officeListEditUser.style.display = "none";
+        }
+
+        refreshGrid();
+    }
+
+    function validateEmail(arg) {
+        $.ajax({
+            url: '@Url.Action("ValidateEmail", "Admin")',
+            data: JSON.stringify({ email: $("#emailAddUser").val() }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                $("#loading-image").hide();
+                var status = $(".validation-summary");
+                if (data.success == true) {
+                    status.text("")
+                    isEmailValid = true;
+                }
+                else {
+                    status.text(data.message)
+                        .removeClass("valid")
+                        .addClass("invalid");
+                    isEmailValid = false;
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function roleDropdownChangedAddUser(x) {
+
+        
+        var dropdownListContainer = document.getElementById("autocompletePhysicianContainerAddUser");
+        if (dropdownListContainer == undefined || dropdownListContainer == null) {
+            return;
+        }
+        var officeListAddUser = document.getElementById("officeListAddUser");
+        if (officeListAddUser == undefined || officeListAddUser == null) {
+            return;
+        }
+        var officeList = $("#OfficeListAddUser").data("kendoMultiSelect");
+        //var physicianList = $("#PhysicianListAddUser").data("kendoMultiSelect");
+        var selectedRole = document.getElementById("RoleIdAddUser").value;
+        var npiContainer = document.getElementById("npiContainerAddUser");
+        var joinDateContainerAddUser = document.getElementById("joinDateContainerAddUser");
+        var signatureContainer = document.getElementById("physicianSignatureAddUser");
+
+        if (selectedRole == "1") {
+            dropdownListContainer.style.display = "none";
+            officeListAddUser.style.display = "inherit";
+            npiContainer.style.display = "none";
+            joinDateContainerAddUser.style.display = "none";
+            signatureContainer.style.display = "none";
+            officeList.options.maxSelectedItems = 1;//only one items could be selected
+            if (officeList.value().length > 0) {
+                officeList.value(officeList.value()[0]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value([]);
+            //}
+        }
+        else if (selectedRole == "2") {
+            dropdownListContainer.style.display = "none";
+            officeListAddUser.style.display = "inherit";
+            npiContainer.style.display = "inherit";
+            joinDateContainerAddUser.style.display = "inherit";
+            signatureContainer.style.display = "inherit";
+            officeList.options.maxSelectedItems = null;//many items could be selected
+            //physicianList.options.maxSelectedItems = 1;//only one physician can be selected
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value(physicianList.value()[0]);
+            //}
+        }
+        else if (selectedRole == "3") {
+            dropdownListContainer.style.display = "inherit";
+            officeListAddUser.style.display = "inherit";
+            npiContainer.style.display = "none";
+            joinDateContainerAddUser.style.display = "none";
+            signatureContainer.style.display = "none";
+            officeList.options.maxSelectedItems = 1;//only one items could be selected
+            //physicianList.options.maxSelectedItems = null;//multiple physicians can be selected
+            if (officeList.value().length > 0) {
+                officeList.value(officeList.value()[0]);
+            }
+        }
+        else if (selectedRole == "4") {
+            dropdownListContainer.style.display = "none";
+            officeListAddUser.style.display = "none";
+            npiContainer.style.display = "none";
+            joinDateContainerAddUser.style.display = "none";
+            signatureContainer.style.display = "none";
+            if (officeList.value().length > 0) {
+                officeList.value([]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value([]);
+            //}
+        }
+        else if (selectedRole == "5") {
+            dropdownListContainer.style.display = "none";
+            officeListAddUser.style.display = "none";
+            npiContainer.style.display = "none";
+            joinDateContainerAddUser.style.display = "none";
+            signatureContainer.style.display = "none";
+            if (officeList.value().length > 0) {
+                officeList.value([]);
+            }
+            //if (physicianList.value().length > 0) {
+            //    physicianList.value([]);
+            //}
+        }
+
+        if (officeIdVar > 0) {
+            //If the AddNewScreen was accessed from the Usersist of some office, hide the office selection list and set its default value to the officeId of the current office
+            officeListAddUser.style.display = "none";
+            officeList.value([officeIdVar]);
+        }
+
+        refreshGrid();
+    }
+
+    function refreshGrid() 
+    {
+        if ($("#gridPhysicianAdd").data("kendoGrid") != undefined)
+        {
+            $("#gridPhysicianAdd").data("kendoGrid").dataSource.read();
+        }
+        if ($("#gridPhysicianEdit").data("kendoGrid") != undefined)
+        {
+            $("#gridPhysicianEdit").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function submitNewUserForm(button) {
+        var userForm = $("#addUserForm");
+        var validator = userForm.kendoValidator(
+            {
+                //adding custom rule to the kendo validator for NPI field, NPI field is only required when a new physician is created
+                rules: {
+                    npivalidation: function (input){
+                        if (input.hasClass("npifieldclass") && selectedRole == 2) {
+                            if (input.val() == "" || input.val() == null ||  $("#PhysicianListAddUser").val() == "")
+                                return false;
+                            return true;
+                        }
+                        return true;
+                    }
+                }
+            }
+        ).data("kendoValidator");
+        var status = $(".validation-summary");
+        var selectedRole = document.getElementById("RoleIdAddUser").value;
+
+
+
+
+        if (isEmailValid == false) {
+            validator.validate()
+            return false;
+        }
+
+        if (validator.validate()) {
+
+
+            if (selectedRole != 1 && selectedRole != 4 && selectedRole != 5) {
+                var dropdownListContainer = document.getElementById("autocompletePhysicianContainerAddUser");
+                if (dropdownListContainer != undefined && dropdownListContainer != null) {
+                    if ($("#PhysicianListAddUser").val() == null || $("#PhysicianListAddUser").val() == undefined) {
+                        $("#PhysicianListAddUser").val([])
+                        status.text("Plese select a physician.")
+                             .removeClass("valid")
+                             .addClass("invalid");
+                        return false;
+                    }
+                }
+            }
+            if (selectedRole != 4 && selectedRole != 5) {
+                var officeListEditUser = document.getElementById("officeListAddUser");
+                if (officeListEditUser != undefined && officeListEditUser != null) {
+                    if ($("#OfficeListAddUser").val() == null || $("#OfficeListAddUser").val() == undefined) {
+                        status.text("Plese select a office.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+                        return false;
+                    }
+                }
+            }
+            var password = document.getElementById("passwordField").value;
+            var confirmPassword = document.getElementById("confirmPasswordField").value;
+            if (password === confirmPassword) {
+                status.text("User added successfully.")
+                    .removeClass("invalid")
+                    .addClass("valid");
+                userForm.submit();
+            }
+            else {
+                status.text("Passwords do not match. Please try again.")
+                .removeClass("valid")
+                .addClass("invalid");
+            }
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+
+    }
+
+    function onAddUserSuccess(arg) {
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#AddUserWindow").data("kendoWindow").close();
+
+        if ($("#Signature") != undefined)
+        {
+            $("#Signature").val("");
+        }
+    }
+
+    function submitEditUserForm(button) {
+        var userForm = $("#editUserForm");
+        var validator = userForm.kendoValidator(
+            {
+                //adding custom rule to the kendo validator for NPI field, NPI field is only required when a new physician is created
+                rules: {
+                    npivalidation: function (input){
+                        if (input.hasClass("npifieldclass") && selectedRole == 2) {
+                            if (input.val() == "" || input.val() == null ||  $("#PhysicianListEditUser").val() == "")
+                                return false;
+                            return true;
+                        }
+                        return true;
+                    }
+                }
+            }
+        ).data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+
+            var selectedRole = document.getElementById("RoleIdEditUser").value;
+            if (selectedRole != 1 && selectedRole != 4 && selectedRole != 5) {
+                var dropdownListContainer = document.getElementById("autocompletePhysicianContainerEditUser");
+                if (dropdownListContainer != undefined && dropdownListContainer != null) {
+                    if ($("#PhysicianListEditUser").val() == null || $("#PhysicianListEditUser").val() == undefined) {
+                        status.text("Plese select a physician.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+                        return false;
+
+                    }
+                }
+            }
+            if (selectedRole != 4 && selectedRole != 5) {
+                var officeListEditUser = document.getElementById("officeListEditUser");
+                if (officeListEditUser != undefined && officeListEditUser != null) {
+                    if ($("#OfficeList").val() == null || $("#OfficeList").val() == undefined) {
+                        status.text("Plese select a office.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+                        return false;
+                    }
+                }
+            }
+
+            status.text("User edited successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            selectedPhysicianForNewUser = undefined;
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+
+    }
+
+    function verifyUser(button, userId) {
+
+        $.ajax({
+            url: '@Url.Action("VerifyUser", "Admin")',
+            data: JSON.stringify({ userId: userId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+
+                if (data.success == true) {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    $("#EditUserWindow").data("kendoWindow").close();
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                }
+                else {
+                    $.notifyBar({ html: "Failed to logout user", cssClass: 'error', position: 'top' });
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function unverifiedUser(button, userId) {
+
+        $.ajax({
+            url: '@Url.Action("UnverifiedUser", "Admin")',
+            data: JSON.stringify({ userId: userId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+
+                if (data.success == true) {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    $("#EditUserWindow").data("kendoWindow").close();
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                }
+                else {
+                    $.notifyBar({ html: "Failed to logout user", cssClass: 'error', position: 'top' });
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function impersonateUser(button, userId) {
+
+        $.ajax({
+            url: '@Url.Action("ImpersonateUser", "Admin")',
+            data: JSON.stringify({ userId: userId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+
+                if (data.success == true) {
+                    window.location.href = '@Url.Content("~/Home/HomeDetail")';
+                }
+                else {
+                    $.notifyBar({ html: "Failed to logout user", cssClass: 'error', position: 'top' });
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    //function onEditUserSuccess(arg) {
+    //    var success = arg.success;
+    //    var alertMessage = arg.message;
+
+    //    if (success) {
+    //        $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+    //    }
+    //    else {
+    //        $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+    //    }
+    //    //Reloading the grid here
+    //    $(".k-grid").each(function () {
+    //        $(this).data("kendoGrid").dataSource.read();
+    //    });
+    //    $("#EditUserWindow").data("kendoWindow").close();
+    //}
+ 
+    function logoutUserFromAllDevices() {
+        var idToLogout = $("#UserId").val();
+
+        $.ajax({
+            url: '@Url.Action("LogoutOtherUser", "Admin")',
+            data: JSON.stringify({ userId: idToLogout }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+
+                if (data.success == true) {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    $("#EditUserWindow").data("kendoWindow").close();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: 'error', position: 'top' });
+                }
+            },
+            error: function (xhr) {
+                $.notifyBar({ html: "Failed to logout user", cssClass: 'error', position: 'top' });
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+</script>

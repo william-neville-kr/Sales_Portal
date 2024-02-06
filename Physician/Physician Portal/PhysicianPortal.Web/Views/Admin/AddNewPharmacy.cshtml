@@ -1,0 +1,247 @@
+﻿@model PhysicianPortal.Core.Models.PharmacyViewModel
+@{
+    Layout = null;
+
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+    var statesList = unitOfWork.StateRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Name, Value = t.Abbreviation });
+}
+
+@using (Ajax.BeginForm("AddNewPharmacy", "Admin", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSuccessPharmacy", OnFailure = "OnFailurePharmacy" }, htmlAttributes: new { id = "PharmacyForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.PharmacyId)
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger validation-summary", style = "padding: 20px; height: auto;" })
+        <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.ERPCode, "ERP Code", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.ERPCode, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ERPCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.PharmacyName, "Pharmacy Name", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.PharmacyName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PharmacyName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.RecordSourceId, "Record Source Id", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.RecordSourceId, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.RecordSourceId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.CompanyCode, "Company Code", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.CompanyCode, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.CompanyCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.NABP, "NABP", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.NABP, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.NABP, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.DEANumber, "DEA", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.DEANumber, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DEANumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.NationalProviderIdentifier, "NPI", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.NationalProviderIdentifier, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.NationalProviderIdentifier, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.AddressLine1, "Address Line 1", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.AddressLine1, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.AddressLine1, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.AddressLine2, "Address Line 2", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.AddressLine2, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.AddressLine2, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.City, "City", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.County, "County", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.County, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.County, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.StateProvince, "State", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @*@Html.DropDownListFor(m => m.State, statesList, new { @id = "stateField" })*@
+                    @*@Html.EditorFor(model => model.StateProvince, statesList, new { htmlAttributes = new { @class = "form-control" } })*@
+
+
+                    @*@(Html.Kendo().DropDownListFor(model => model.StateProvince)
+                        .Name("StateProvince") //The name of the DropDownList is mandatory. It specifies the "id" attribute of the widget.
+                        .DataTextField("Name") //Specify which property of the Product to be used by the DropDownList as a text.
+                        .DataValueField("Abbreviation") //Specify which property of the Product to be used by the DropDownList as a value.
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetStates", "Admin"); //Set the Action and Controller names.
+                            })
+                            .ServerFiltering(true); //If true, the DataSource will not filter the data on the client.
+                        })
+                        .SelectedIndex(0) //Select the first item.
+                    )*@
+
+
+                    @Html.DropDownListFor(model => model.StateProvince, statesList, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.StateProvince, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.Country, "Country", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.Country, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.PostalCode, "ZIP", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.PostalCode, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PostalCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.PhoneNumber, "Phone Number", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @*@(Html.Kendo().MaskedTextBoxFor(model => model.PhoneNumber)
+                          .Name("PhoneNumber")
+                          .Mask("(999) 000-0000")
+                          .HtmlAttributes(new { @class = "form-control text-box single-line box-sizing-border-box" } )
+                        )*@
+                    @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0">
+                @Html.LabelFor(model => model.FaxNumber, "Fax Number", htmlAttributes: new { @class = "control-label col-lg-4 col-md-4 col-sm-4 col-xs-12 box-sizing-border-box padding-right0" })
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 box-sizing-border-box">
+                    @Html.EditorFor(model => model.FaxNumber, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.FaxNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group box-sizing-border-box text-align-center">
+            @if (Model.PharmacyId == 0)
+            {
+                <button type="submit" onclick="submitPharmacy(); return false;" class="btn btn-primary login-form-field">Add Pharmacy</button>
+            }
+            else
+            {
+                <button type="submit" onclick="submitPharmacy(); return false;" class="btn btn-primary login-form-field">Edit Pharmacy</button>
+            }
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function OnSuccessPharmacy(result) {
+        if (result.success) {
+            $.notifyBar({ html: result.message, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: result.message, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#AddPharmacyWindow").data("kendoWindow").close();
+    }
+
+    function OnFailurePharmacy(result) {
+        if (!result.success) {
+            $.notifyBar({ html: result.message, cssClass: 'error', position: 'top' });
+        }
+    }
+
+    $(document).ready(function () {
+
+        $("#PostalCode").mask("99999");
+        $("#PhoneNumber").mask("(999) 999-9999");
+        $("#FaxNumber").mask("(999) 999-9999");
+    });
+
+    function submitPharmacy() {
+        var pharmacyForm = $("#PharmacyForm");
+        kendo.init(pharmacyForm);
+        var validator = pharmacyForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            status.text("Pharmacy added successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            pharmacyForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+            //return false;
+        }
+    }
+</script>

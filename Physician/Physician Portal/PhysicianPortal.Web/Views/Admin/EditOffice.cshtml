@@ -1,0 +1,139 @@
+﻿@model PhysicianPortal.Web.Models.AddOfficeModel
+@{
+    ViewBag.Title = "Edit Office";
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+    var statesList = unitOfWork.StateRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Name, Value = t.Name });
+}
+<fieldset>
+    <legend>Edit Office</legend>
+    @using (Html.BeginForm("EditOffice", "Admin", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "editOfficeForm", style = "display: inline-block;" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("OfficeId", Model.OfficeId)
+
+        <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.OfficeTitle, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @*@Html.TextBoxFor(m => m.OfficeTitle, "", new { @id = "officeTitleEditOffice", placeholder = "Title", required = "required", validationmessage = "Enter Office Title", @class = "k-textbox form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })*@
+                        @(Html.Kendo().TextBoxFor(m => m.OfficeTitle)
+                        .Name("OfficeTitle")
+                        .HtmlAttributes(new { @id = "officeTitleEditOffice", placeholder = "Title", required = "required", validationmessage = "Enter Office Title", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                        .Name("PhoneNumber")
+                        .HtmlAttributes(new { @id = "phonenumberEditOffice", placeholder = "Phone Number", required = "required", validationmessage = "Entered Phone number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.FaxNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.FaxNumber)
+                        .Name("FaxNumber")
+                        .HtmlAttributes(new { @id = "faxnumberEditOffice", placeholder = "Fax Number", required = "required", validationmessage = "Entered Fax number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.SubmitChecklistDocumentPath, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.SubmitChecklistDocumentPath)
+                        .Name("SubmitChecklistDocumentPath")
+                        .HtmlAttributes(new { placeholder = "Document Path", @class = "form-control email login-form-field dissmiss-keyboard-ipad" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Address, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.TextAreaFor(m => m.Address, new { @id = "addressEditOffice", placeholder = "Address", @class = "k-textbox max-width-field", rows = 4, style = "max-width: 100%; width: 100%; resize: none; padding-bottom: 10px;" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.City, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.City)
+                        .Name("City")
+                        .HtmlAttributes(new { @id = "cityEditOffice", placeholder = "City", required = "required", validationmessage = "Enter City", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.State, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.DropDownListFor(m => m.State, statesList, new { @id = "stateEditOffice" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Zip, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.Zip)
+                        .Name("Zip")
+                        .HtmlAttributes(new { @id = "zipEditOffice", placeholder = "Zip", required = "required", validationmessage = "Enter Zip Code", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+                <button id="btnSubmitEditOffice" type="submit" class="btn btn-primary login-form-field">Save</button>
+                <a type="button" class="btn btn-danger login-form-field" href="@Url.Action("ManageOffices", "Admin")">Cancel</a>
+            </div>
+        </div>
+    }
+
+    @Html.Partial("ManageUsers", new PhysicianPortal.Web.Models.OfficeUsersViewModel { OfficeId = Model.OfficeId })
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Add Masking
+        $("#phonenumberEditOffice").mask("(999) 999-9999");
+        $("#faxnumberEditOffice").mask("(999) 999-9999");
+        $("#zipEditOffice").mask("99999");
+
+        $("#btnSubmitEditOffice").click(function () {
+
+            var editOfficeForm = $("#editOfficeForm");
+            var validator = editOfficeForm.kendoValidator().data("kendoValidator");
+            var status = $(".validation-summary");
+
+            if (validator.validate()) {
+                status.text("Office edited successfully.")
+                    .removeClass("invalid")
+                    .addClass("valid");
+                editOfficeForm.submit();
+            }
+            else {
+                status.text("Please enter valid data in the fields.")
+                    .removeClass("valid")
+                    .addClass("invalid");
+            }
+        });
+    });
+</script>

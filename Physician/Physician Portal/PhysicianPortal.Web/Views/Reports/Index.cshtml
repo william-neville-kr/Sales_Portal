@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Reports";
+}
+
+<fieldset>
+    <legend>Reports</legend>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Web.Models.ReportViewModel>()
+        .Name("gridReportsList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.ReportName).Title("Report Name");
+            columns.Command(command => command.Custom("View").Click("viewReport").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+        })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetReportsList", "Reports"))
+            .PageSize(10)
+        )
+        .NoRecords(n => n.Template("No records to display"))
+        .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+        .Sortable()
+    )
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+
+    function viewReport(e)
+    {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "";
+
+        if (dataItem.IsPowerBI) {
+            url = '@Url.Action("ReportPowerBI", "Reports")' + '?ReportName=' + dataItem.ReportName + '&IsPowerBI=' + dataItem.IsPowerBI + '&ReportURL=' + dataItem.ReportURL;
+        }
+        else
+        {
+            url = '@Url.Action("Report", "Reports")' + '?ReportName=' + dataItem.ReportName;
+        }
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+</script>

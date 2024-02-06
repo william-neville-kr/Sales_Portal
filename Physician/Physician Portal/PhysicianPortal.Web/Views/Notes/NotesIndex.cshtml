@@ -1,0 +1,99 @@
+﻿@using PhysicianPortal.Core.Data;
+@{
+    ViewBag.Title = "My Notes";
+}
+
+<fieldset>
+    <legend>Search Patient Notes</legend>
+    <div id="autocompleteContainer" class="k-content" style="margin-bottom:20px">
+        @(Html.Kendo().AutoComplete()
+          .Name("autoComPatientFullName")
+          .Placeholder("Enter Patient Name")
+          .DataTextField("FullName")
+          .Filter("contains")
+          .MinLength(2)
+          .HtmlAttributes(new { style = "width:80%;" })
+          .ClearButton(true)
+          .DataSource(source =>
+              source.Read(read => read.Action("GetPatientNameList", "Patients").Data("GetPatientNameFun"))
+              .ServerFiltering(true)
+          )
+        .Events(e => e.Select("onSelectAutoComPatientFullName"))
+        )
+    </div>
+</fieldset>
+<fieldset>
+    <div id="PatientDetailId"> </div>
+</fieldset>
+
+<fieldset>
+    <div id="PatientNotesId" style="display:none">
+        @Html.Partial("_PhysicianNotes", new vwPhysicianNote { PhysicianIdEncrypted = null, PatientIdEncrypted =  null })
+    </div>
+</fieldset>
+
+<script>
+    function onSelectAutoComPatientFullName(e) {
+        
+        var dataItem = this.dataItem(e.item.index());
+        getNotes(dataItem.PhysicianIdEncrypted, dataItem.PatientIdEncrypted);
+    }
+
+
+    function getNotes(physicianId, patientId) {
+        $("#PhysicianIdEncrypted").val(physicianId);
+        $("#PatientIdEncrypted").val(patientId);
+        $("#gridPhysicianNotes").data("kendoGrid").dataSource.read();
+        $("#PatientNotesId").show();
+
+        $.ajax({
+            url: '@Url.Action("PatientSearch", "Notes")',
+            data: JSON.stringify({ PatientId: patientId }),
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#PatientDetailId").html(data);
+                $("#PatientDetailId").show();
+            }
+        });
+    }
+
+    function GetPatientNameFun() {
+        return {
+            searchPatientName: $("#autoComPatientFullName").val()
+        }
+    }
+
+    $(document).ready(function () {
+
+        //Here we get the reference to the 'X' button inside the autocomplete list and attach a click event to it
+        var autocompleteCloseButton = $("#autocompleteContainer .k-i-close");
+        autocompleteCloseButton.click(function () {
+
+            $("#autoComPatientFullName").val("");
+            $("#autoComPatientFullName").data("kendoAutoComplete").close();
+            $("#gridPhysicianNotes").data("kendoGrid").dataSource.data([]);
+            $("#PhysicianId").val("");
+            $("#PatientId").val("");
+            $("#PatientDetailId").css("display", "none");
+            $("#PatientNotesId").css("display", "none");
+        });
+
+        if (localStorage.getItem("phyId") != null && localStorage.getItem("patId") != null && localStorage.getItem("phyId") != "" && localStorage.getItem("patId") != "") {
+            getNotes(localStorage.getItem("phyId"), localStorage.getItem("patId"));
+            localStorage.setItem("phyId", "");
+            localStorage.setItem("patId", "");
+        }
+        $("#hdPatientNotes").css("display", "");
+    });
+
+    
+</script>

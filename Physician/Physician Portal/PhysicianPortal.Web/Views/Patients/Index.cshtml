@@ -1,0 +1,491 @@
+﻿@{
+    ViewBag.Title = "Patients Search";
+}
+
+<fieldset>
+    <legend>Patient Search</legend>
+    <div id="divSearch" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+        <div id="divTxtBoxSearchPatient" class="col-lg-9 col-md-8 col-sm-7 col-xs-6" style="padding: 10px 10px 10px 0; display: flex;">
+            <span id="spanSearchTxt" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 k-widget k-autocomplete k-header k-state-default" style="display: flex;border: 1px solid #ccc; border-radius: 4px; width: 100%;">
+                <input class="textBox dissmiss-keyboard-ipad" id="TxtBoxSearchPatient" name="TxtBoxSearchPatient" placeholder="Search through Patient Name/Provider Name/Physician City/MRN/Status/Drug or State" style="padding: 6px 12px;max-width: 100%;width: 100%;border: 0px;" type="text" value="">
+                <span style="height: 100%; background-color: white; display: table-cell; vertical-align: middle; padding-right: 10px;">
+                    <img id="ClearSearchButton" src="~/Content/images/close.png" onclick="ClearSearchPatientFunc(); return false;" style="width: 10px; height: 10px; vertical-align: -webkit-baseline-middle;" />
+                </span>
+            </span>
+        </div>
+        <div id="divBtnSearchPatient" class="pull-left" style="padding: 10px;">
+            <img id="BtnSearchPatient" src="~/Content/images/search.png" onclick="BtnSearchPatientFunc(); return false;" style="width: 30px; " />
+        </div>
+
+        @if (!User.IsInRole("Pharmacist"))
+        {
+            <div class="pull-right" style="padding: 10px;">
+                <a href="@Url.Action("AddPatient", "Patients")" class="btn btn-primary" style="width: auto;">Add New Referral</a>
+            </div>
+        }
+    </div>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.vwPatient>()
+    .Name("gridPatients")
+    .HtmlAttributes(new { @style = "display:inline-block; width: 100%" })
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.ReferralDateId).Title("Ref").Format("{0:MM/dd/yyyy}").Width(125).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PatientCode).Title("MRN").Width(100).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.FirstName).Title("First");
+        columns.Bound(c => c.LastName).Title("Last");
+        columns.Bound(c => c.PhysicianName).Title("Provider");
+        columns.Bound(c => c.PhyCity).Title("City");
+        columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.LastOrderEvent).Title("Status");
+        columns.Bound(c => c.DrugShortName).Title("Drug");
+        columns.Bound(c => c.ActivityStatus).Title("Stage").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.NeedMoreInfoStr).Title("Need More Info").Width(118).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.IsQueuedStr).Title("Queue").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Command(command => command.Custom("R").Click("createAsNewPatient").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Referral" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+        //columns.Command(command => command.Custom("N").Text("N <span id='notesNumber' class='badge'></span>").Click("showNotesPopup").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+        columns.Command(command => command.Custom("N").Click("showNotesPopup").Text("N <span id='notesNumber' class='badge'></span>").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+        //columns.Command(command => command.Custom("N").Text("N <span id='notesNumber' class='badge'></span>").Click("showNotesPopup").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+        columns.Command(command => command.Custom("Q").Click("showAddQueuesConfirmation").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Queue" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+    })
+    .ToolBar(tools => tools.Excel())
+    .Excel(excel => excel
+        .FileName("Patients Search.xlsx")
+        .Filterable(true)
+        .AllPages(true)
+    )
+    .Selectable()
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+            .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPatients", "Patients").Data("SearchPatientFunc"))
+        .Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChangePatient")
+        .DataBound("onDataBoundPatient")
+        )
+    )
+
+
+
+</fieldset>
+
+<div id="divNotesPopup"></div>
+
+<div id="divAddQueuesConfirm" style="display: none;">
+    <p>
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        Do you really want to <span id="lblConfirmAddDeletePatientQueue">add</span> selected patient into patients queue?
+    </p>
+    <input id="QueuePhysicianId" type="hidden" />
+    <input id="QueuePatientId" type="hidden" />
+
+    <div class="text-align-center" style="border-top: 1px solid #dddddd; padding-top: 10px;">
+        <button id="btnAddDeletePatientQueue" class="btn btn-success" onclick="addDeletePatientQueue();">Yes</button>
+        <button class="btn btn-default" onclick="cancelQueueConfirmation();">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function BtnSearchPatientFunc() {
+        if ($("#TxtBoxSearchPatient").val() != "") {
+            $("#gridPatients").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function ClearSearchPatientFunc() {
+        $("#TxtBoxSearchPatient").val("");
+        $(".k-filtercell span button").trigger("click");
+    }
+
+    $("#TxtBoxSearchPatient").focusout(function () {
+        if ($("#TxtBoxSearchPatient").val() != "") {
+            $("#gridPatients").data("kendoGrid").dataSource.read();
+        }
+    });
+
+    function SearchPatientFunc() {
+        return {
+            sreachString: $("#TxtBoxSearchPatient").val()
+        }
+    }
+
+    $("#TxtBoxSearchPatient").bind("keypress", function (e) {
+        if (e.keyCode == 13) {
+            if ($("#TxtBoxSearchPatient").val() != "") {
+                $("#gridPatients").data("kendoGrid").dataSource.read();
+            }
+            $(this).blur();
+        }
+    });
+
+    function onDataBoundPatient(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridPatients").data("kendoGrid").dataItem(this);
+            if (dataItem.NeedMoreInfo == true) {
+                this.className += " needMoreInfoClass";
+            }
+
+            var index1 = 'notesNumber_PatientId__' + dataItem.PatientIdEncrypted + "_PhysicianId__" + dataItem.PhysicianIdEncrypted;
+            $("#notesNumber").attr('id', index1).text(dataItem.NotesCount);
+
+
+        });
+    }
+
+    var data;
+    function onChangePatient(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    var data1;
+    function onChangeIsProcessed(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data1 = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    function onDataBoundIsProcessed(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridPatientsIsProcessed").data("kendoGrid").dataItem(this);
+            if (dataItem.NeedMoreInfo == true) {
+                this.className += " needMoreInfoClass";
+            }
+            var index1 = 'notesNumberIsProcessed_PatientId__' + dataItem.PatientIdEncrypted + "_PhysicianId__" + dataItem.PhysicianIdEncrypted;
+            $("#notesNumberIsProcessed").attr('id', index1).text(dataItem.NotesCount);
+        });
+    }
+
+
+    $(document).ready(function () {
+        //if ($("#TxtBoxSearchPatient").val() != "") {
+        //$("#gridPatients").data("kendoGrid").dataSource.read();
+        //}
+
+        $("#ClearSearchButton").hide();
+
+        $("#TxtBoxSearchPatient").on('blur', function () {
+            $("#spanSearchTxt").removeClass("k-state-focused");
+            $("#ClearSearchButton").hide();
+        }).on('focus', function () {
+            $("#spanSearchTxt").addClass("k-state-focused");
+            $("#ClearSearchButton").show();
+        }).on('mouseenter', function () {
+            $("#spanSearchTxt").addClass("k-state-hover");
+            $("#ClearSearchButton").show();
+        }).on('mouseleave', function () {
+            $("#spanSearchTxt").removeClass("k-state-hover");
+            if ($("#TxtBoxSearchPatient").is(":focus") || $("#ClearSearchButton").is(":hover")) {
+
+            }
+            else {
+                $("#ClearSearchButton").hide();
+            }
+        });
+
+        $("#gridPatients").on("dblclick", "tr.k-state-selected", function () {
+            debugger;
+            if (data != undefined) {
+                window.location.href = '@Url.Content("~/Patients/PatientDetails")' + "?phyId=" + encodeURIComponent(data.PhysicianIdEncrypted) + "&patId=" + encodeURIComponent(data.PatientIdEncrypted);
+            }
+        });
+        $("#gridPatients").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Content("~/Patients/PatientDetails")' + "?phyId=" + encodeURIComponent(data.PhysicianIdEncrypted) + "&patId=" + encodeURIComponent(data.PatientIdEncrypted);
+            }
+        });
+        $(".k-dropdown-operator").hide();
+
+
+
+
+    });
+
+
+    function createAsNewPatient(e) {
+
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+
+
+
+        $.ajax({
+            url: '@Url.Action("CheckIfCPRPatientAlreadyAdded", "Patients")',
+            data: { patientId: data.PatientIdEncrypted },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (dataItem, textStatus, XMLHttpRequest) {
+                if (dataItem.hasOwnProperty("d")) {
+                    dataItem = dataItem.d;
+                }
+                if (dataItem.success) {
+
+                    if (dataItem.added == true) {
+                        var _url = '@Url.Action("EditPatient", "Patients")' + '?PhysicianPortalPatientId=' + encodeURIComponent(dataItem.PhysicianPortalPatientId);
+                        location.href = _url;
+                    }
+                    else {
+                        //var newPatientModel = {
+                        //    physicianId: data.PhysicianId,
+                        //    FirstName: data.FirstName,
+                        //    LastName: data.LastName,
+                        //    PhoneNumber: data.PhoneNumber,
+                        //    DateOfBirth: data.DateOfBirth,
+                        //    Gender: data.Gender,
+                        //    PreferredLanguage: data.PreferredLanguage,
+                        //    Address: data.AddressLine1,
+                        //    City: data.City,
+                        //    State: data.StateProvince,
+                        //    Zip: data.PostalCode,
+                        //    SSN: "",
+                        //    PolicyNumber: "",
+                        //    GroupNumber: "",
+                        //    PhysiciansList: data.PhysicianId,
+                        //    PatientId: data.PatientId
+                        //};
+                        debugger;
+                        $.ajax({
+                            url: '@Url.Action("AddCPRPatientToPhysicianPortal", "Patients")',
+                            data: {
+                                PhysicianIdEncrypted: data.PhysicianIdEncrypted,
+                                FirstName: data.FirstName,
+                                LastName: data.LastName,
+                                PhoneNumber: data.PhoneNumber,
+                                DateOfBirth: data.DateOfBirth.toISOString(),
+                                Gender: data.Gender,
+                                PreferredLanguage: data.PreferredLanguage,
+                                Address: data.AddressLine1,
+                                City: data.City,
+                                State: data.StateProvince,
+                                Zip: data.PostalCode,
+                                SSN: "",
+                                PolicyNumber: "",
+                                GroupNumber: "",
+                                //PhysiciansList: data.PhysicianId,
+                                PatientIdEncrypted: data.PatientIdEncrypted
+                            },
+                            cache: false,
+                            type: "POST",
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#loading-image").show();
+                            },
+                            success: function (data1, textStatus, XMLHttpRequest) {
+                                if (data1.hasOwnProperty("d")) {
+                                    data1 = data1.d;
+                                }
+                                if (data1.success) {
+                                    $.notifyBar({ html: data1.message, cssClass: "success", position: "top" });
+
+                                    var _url = '@Url.Action("EditPatient", "Patients")' + '?PhysicianPortalPatientId=' + data1.PhysicianPortalPateintId;
+                                    location.href = _url;
+                                }
+                                //$("#gridPatients").data("kendoGrid").dataSource.read();
+                                //$("#divAddQueuesConfirm").data("kendoWindow").close();
+                            },
+                            error: function (xhr) {
+                                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                            }
+                        });
+                    }
+                }
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+    }
+
+
+    function showNotesPopup(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#divNotesPopup").kendoWindow({
+            content: {
+                url: "@Url.Action("PatientNotes", "Notes")",
+                data: { PhysicianIdEncrypted: dataItem.PhysicianIdEncrypted, PatientIdEncrypted: dataItem.PatientIdEncrypted },
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                complete: function () {
+                    $("#hdPatientNotes").css("display", "none");
+                }
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "My Notes",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divNotesPopup").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divNotesPopup").data("kendoWindow").center();
+                });
+            }
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    //Show Queue confrimation in kendo window
+    function showAddQueuesConfirmation(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        if (dataItem.IsQueued) {
+            $("#btnAddDeletePatientQueue").removeClass("btn-success");
+            $("#btnAddDeletePatientQueue").addClass("btn-danger");
+            $("#lblConfirmAddDeletePatientQueue").text("delete");
+        }
+        else {
+            $("#btnAddDeletePatientQueue").addClass("btn-success");
+            $("#btnAddDeletePatientQueue").removeClass("btn-danger");
+            $("#lblConfirmAddDeletePatientQueue").text("add");
+        }
+
+        $("#QueuePhysicianId").val(dataItem.PhysicianIdEncrypted);
+        $("#QueuePatientId").val(dataItem.PatientIdEncrypted);
+
+        $("#divAddQueuesConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    //Add or delete patient from PatientQueue
+    function addDeletePatientQueue() {
+        $.ajax({
+            url: '@Url.Action("AddDeletePatientQueue", "Patients")',
+            data: { PhysicianId: $("#QueuePhysicianId").val(), PatientId: $("#QueuePatientId").val() },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                }
+                $("#gridPatients").data("kendoGrid").dataSource.read();
+                $("#divAddQueuesConfirm").data("kendoWindow").close();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function cancelQueueConfirmation() {
+        $("#divAddQueuesConfirm").data("kendoWindow").close();
+    }
+</script>
+
+<style type="text/css">
+    #gridPatients tbody tr:hover {
+        cursor: pointer;
+    }
+
+    #BtnSearchPatient:hover {
+        cursor: pointer;
+    }
+
+    #TxtBoxSearchPatient:focus {
+        outline: none;
+    }
+
+    #ClearSearchButton:focus {
+        outline: none;
+    }
+
+    #ClearSearchButton:hover {
+        cursor: pointer;
+    }
+
+    input[type=search]::-webkit-search-cancel-button {
+        -webkit-appearance: searchfield-cancel-button;
+    }
+
+    .badge-notify {
+        background: red;
+        position: relative;
+        top: -6px;
+        left: -35px;
+    }
+
+    .badge {
+        display: inline-block;
+        min-width: 10px;
+        /* padding: 2px 5px; */
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        background-color: #777;
+        border-radius: 10px;
+        padding-top: 1px;
+        padding-right: 5px;
+        padding-bottom: 2px;
+        padding-left: 5px;
+    }
+</style>

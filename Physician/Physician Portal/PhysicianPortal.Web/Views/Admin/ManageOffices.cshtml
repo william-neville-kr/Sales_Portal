@@ -1,0 +1,236 @@
+﻿@model PhysicianPortal.Web.Models.OfficesListModel
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Manage Offices";
+}
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<div id='AddOfficeWindow'></div>
+@*<div id='EditOfficeWindow'></div>*@
+<div id="divAlertDialog"></div>
+
+<fieldset>
+    <legend>Manage Offices</legend>
+
+
+    <div style="margin-bottom:40px">
+        <button onclick="addNewOffice(this);" class="btn btn-primary pull-right">Add Office</button>
+    </div>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Web.Models.OfficesListModel>()
+        .Name("gridOffices")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.OfficeTitle).Title("Title").Width(200);
+            columns.Bound(c => c.Address).Title("Address");
+            columns.Bound(c => c.City).Title("City");
+            columns.Bound(c => c.State).Title("State").Width(120);
+            columns.Bound(c => c.PostalCode).Title("Zip").Width(80);
+            columns.Bound(c => c.PhoneNumber).Title("Phone Number").Width(120);
+            columns.Bound(c => c.FaxNumber).Title("Fax Number").Width(120);
+            columns.Command(command => command.Custom("Edit").Click("editOffice").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+            columns.Command(command => command.Custom("Delete").Click("deleteOffice").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+        })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+            )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetOfficesList", "Admin"))
+            .PageSize(10)
+        //.Sort(srt => srt.Add("Pending").Descending())
+        )
+        .NoRecords(n => n.Template("No records to display"))
+            //.Selectable()
+            //.Filterable()
+            // .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+            //.Sortable()
+            //.Events(e => e.Change("onChange").DataBound("onDataBound"))
+    )
+</fieldset>
+
+
+<script>
+
+    function addNewOffice(addButton) {
+        $("#AddOfficeWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/AddNewOffice")"
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Add Office",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                // Add Masking
+                $("#phonenumberAddOffice").mask("(999) 999-9999");
+                $("#faxnumberAddOffice").mask("(999) 999-9999");
+
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddOfficeWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#AddOfficeWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+
+    function submitNewOfficeForm(arg) {
+
+        var userForm = $("#addOfficeForm");
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            status.text("Office added successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+    }
+
+    function onAddOfficeSuccess(arg) {
+
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#AddOfficeWindow").data("kendoWindow").close();
+    }
+
+    function editOffice(e) {
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        @*window.location.href = "@Url.Action("EditOffice", "Admin", new { selectedOfficeId = dataItem.OfficeId })";*@
+        window.location.href = "@Url.Content("~/Admin/EditOffice")?selectedOfficeId=" + dataItem.OfficeId;
+    }
+
+    @*function editOffice(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#EditOfficeWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/EditOffice")",
+                data: { selectedOfficeId: dataItem.OfficeId }
+                //async: true
+
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Edit Office",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                // Add Masking
+                $("#phonenumberEditOffice").mask("(999) 999-9999");
+                $("#faxnumberEditOffice").mask("(999) 999-9999");
+
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#EditOfficeWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#EditOfficeWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function submitEditOfficeForm(arg) {
+
+        var userForm = $("#editOfficeForm");
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            status.text("Office edited successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+    }
+
+    function onEditOfficeSuccess(arg) {
+
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#EditOfficeWindow").data("kendoWindow").close();
+    }*@
+
+
+    function deleteOffice(e) {
+    }
+</script>
+
+<style>
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+</style>

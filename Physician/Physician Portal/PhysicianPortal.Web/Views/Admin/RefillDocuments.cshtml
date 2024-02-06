@@ -1,0 +1,108 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Refills documents";
+}
+
+
+@(Html.Kendo().Grid<PhysicianPortal.Web.Models.RefillDocumentModel>()
+                    .Name("gridRefillDocuments")
+
+                        .Columns(columns =>
+                        {
+                            columns.Bound(c => c.PatientFullName).Title("Patient Name");
+                            columns.Bound(c => c.PhysicianFullName).Title("Provider Name");
+                            columns.Bound(c => c.NationalProviderIdentifier).Title("NPI #").Width(100);
+                            columns.Bound(c => c.DocumentName).Title("Document Name")
+                            .ClientTemplate(
+                 String.Format(
+                    @"<div class='document-icon'
+                        style='background-image: url({0});'></div>
+                    <div class='document-name'>#: DocumentName #</div>", Url.Content("~/Content/Images/pdf_logo.png")));
+                            //columns.Bound(c => c.CreatedOn).Format("{0:MM/dd/yyyy}").Title("Created").Width(150);
+                            columns.Bound(c => c.SentOn).Format("{0:MM/dd/yyyy}").Title("Submitted Date").Width(60);
+                            columns.Command(command => command.Custom("Submit").Click("submitRefillDocument").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+
+                        })
+                    .Filterable(ftb => ftb
+                            .Mode(GridFilterMode.Row)
+                            .Extra(true)
+                            .Operators(o => o
+                            .ForString(s => s
+                                .Clear()
+                                .Contains("Contains")
+                            )
+                        )
+                    )
+                    .Selectable()
+                    .Sortable()
+                    .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        )
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Read(read => read.Action("GetRefillsDocuments", "Home", Model))
+                        .PageSize(10)
+                    )
+                    .NoRecords(n => n.Template("No records to display"))
+                    .Events(e => e.Change("onChangeRefillDocuments"))
+
+
+)
+
+
+<script type="text/javascript">
+    var data;
+    var isFileSelected = false;
+
+    function onChangeRefillDocuments(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridRefillDocuments").on("dblclick", "tr.k-state-selected", function () {
+            previewPatientDocuments(data,3);
+        });
+        $("#gridRefillDocuments").on("doubletap", "tr.k-state-selected", function () {
+            previewPatientDocuments(data,3);
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    function submitRefillDocument(e) {
+
+        var data2 = this.dataItem($(e.currentTarget).closest("tr"));
+
+        var request = JSON.stringify({
+            documentIdEncrypted: data2.DocumentIdEncrypted,
+            physicianIdEncrypted: data2.PhysicianIdEncrypted
+        });
+
+        $.ajax({
+            url: '@Url.Action("ReSubmitRefillFax", "Admin")',
+            type: "POST",
+            data: request,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
+</script>

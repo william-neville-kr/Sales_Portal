@@ -1,0 +1,231 @@
+﻿<div style="padding: 10px;">
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Referral Date From</label>
+        @(Html.Kendo().DatePicker()
+              .Name("dpReferralDateFrom")
+              .Events(e => e.Change("dpReferralDateFrom_change"))
+              .HtmlAttributes(new { style = "width: 100%" })
+        )
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Referral Date To</label>
+        @(Html.Kendo().DatePicker()
+              .Name("dpReferralDateTo")
+              .Events(e => e.Change("dpReferralDateTo_change"))
+              .HtmlAttributes(new { style = "width: 100%" })
+        )
+    </div>
+</div>
+
+<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; padding-bottom: 15px; display: inline-block;">
+    <div class="col-lg-10 col-md-7 col-sm-7 col-xs-6" style="padding: 10px; display: inline-flex;">
+        @Html.TextBox("TxtBoxSearchSalesTeamPatientsPhysician", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; ", @placeholder = "Enter Physician Name For Search", @type = "text" })
+    </div>
+    <div style="padding: 10px; float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="BtnSearchSalesTeamPatientsReferralDateFunc(); return false;"> Search</button>
+    </div>
+    <div style="padding: 10px;float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="ClearSearchSalesTeamPatientsReferralDateFunc(); return false;">Clear Search</button>
+    </div>
+</div>
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPatient>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.PatientViewModel>()
+    .Name("gridSearchSalesTeamPatientsReferralDate")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PatientId).Title("PatientId").Visible(false);
+        columns.Bound(c => c.ReferralDateId).Title("Ref").Format("{0:MM/dd/yyyy}").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PatientCode).Title("MRN").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.FirstName).Title("First");
+        columns.Bound(c => c.LastName).Title("Last");
+        columns.Bound(c => c.PhysicianName).Title("Physician");
+        columns.Bound(c => c.PhyCity).Title("City");
+        //columns.Bound(c => c.StateProvince).Title("State");
+        columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.DrugShortName).Title("Drug");
+        columns.Bound(c => c.ActivityStatus).Title("Status").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.OriginatingPharmacy).Title("Pharmacy");
+        columns.Command(command => command.Custom("N").Click("showNotesPopup")).Title("N").HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Command(command => command.Custom("Q").Click("showAddQueuesConfirmation")).Title("Q").HtmlAttributes(new { @class = "padding2 text-align-center" });
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+        .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getSalesTeamPatientsRecordsWithReferralDate", "SalesTeamPatient", Model).Data("SearchSalesTeamPatientsReferralDateFunc"))
+        .Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChange")
+        .DataBound("onDataBoundPatientsReferralDate")
+    )
+    .AutoBind(false)
+)
+
+
+@*<div id='divNotesPopup'></div>
+
+<input id="SalesTeamId" type="hidden" />
+<input id="PhysicianId" type="hidden" />
+<input id="PatientId" type="hidden" />*@
+
+<script>
+    function BtnSearchSalesTeamPatientsReferralDateFunc() {
+    }
+
+    function ClearSearchSalesTeamPatientsReferralDateFunc() {
+        $("#dpReferralDateFrom").val("");
+        $("#dpReferralDateTo").val("");
+        $("#TxtBoxSearchSalesTeamPatientsPhysician").val("");
+        $(".k-filtercell span button").trigger("click");
+        $('#gridSearchSalesTeamPatientsReferralDate').data("kendoGrid").dataSource.read();
+    }
+
+    function SearchSalesTeamPatientsReferralDateFunc() {
+        return {
+            sreachStringReferralDateFrom: $("#dpReferralDateFrom").val(),
+            sreachStringReferralDateTo: $("#dpReferralDateTo").val(),
+            sreachStringPhysician: $("#TxtBoxSearchSalesTeamPatientsPhysician").val()
+        }
+    }
+
+    $("#TxtBoxSearchSalesTeamPatientsPhysician").focusout(function () {
+        $('#gridSearchSalesTeamPatientsReferralDate').data("kendoGrid").dataSource.read();
+    });
+
+    $("#TxtBoxSearchSalesTeamPatientsPhysician").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            $('#gridSearchSalesTeamPatientsReferralDate').data("kendoGrid").dataSource.read();
+            $(this).blur();
+        }
+    });
+
+    @*function showNotesPopup(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#SalesTeamId").val(dataItem.SalesTeamId);
+        $("#PhysicianId").val(dataItem.PhysicianId);
+        $("#PatientId").val(dataItem.PatientId);
+
+        $.ajax({
+            url: '@Url.Action("ShowNotes", "SalesTeamNote")',
+            data: { PatientId: dataItem.PatientId, PhysicianId: dataItem.PhysicianId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                //$("#divNotesPopup").html(data);
+                //$("#NotesPopup").data("kendoWindow").center().open();
+
+                $("#divNotesPopup").kendoWindow({
+                    minWidth: 700,
+                    width: "50%",
+                    minHeight: 700,
+                    height: "50%",
+                    title: "Pharmacy Notes",
+                    visible: false,
+                    actions: ["Close"]
+                }).data("kendoWindow").content(data).center().open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function addPatientQueue(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            url: '@Url.Action("AddPatientQueue", "SalesTeamPatient")',
+            data: { PhysicianId: dataItem.PhysicianId, SalesTeamId: dataItem.SalesTeamId, PatientId: dataItem.PatientId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                alert("Patient added in Patients Queue Successfully.");
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+    }
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }*@
+
+    function onDataBoundPatientsReferralDate(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridSearchSalesTeamPatientsReferralDate").data("kendoGrid").dataItem(this);
+            if (dataItem.NeedMoreInfo == true) {
+                this.className += " needMoreInfoClass";
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridSearchSalesTeamPatientsReferralDate").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $("#gridSearchSalesTeamPatientsReferralDate").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+
+        $("#dpReferralDateFrom").attr("placeholder", "Select date");
+        $("#dpReferralDateTo").attr("placeholder", "Select date");
+        $(".k-dropdown-operator").hide();
+    });
+
+    function dpReferralDateFrom_change() {
+        //kendoConsole.log("Change :: " + kendo.toString(this.value(), 'd'));
+        if ($("#dpReferralDateTo").val() != "") {
+            //$("#dpReferralDateFrom").val(this.value());
+            $('#gridSearchSalesTeamPatientsReferralDate').data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function dpReferralDateTo_change() {
+        //kendoConsole.log("Change :: " + kendo.toString(this.value(), 'd'));
+        if ($("#dpReferralDateFrom").val() != "") {
+            //$("#dpReferralDateTo").val(this.value());
+            $('#gridSearchSalesTeamPatientsReferralDate').data("kendoGrid").dataSource.read();
+        }
+    }
+</script>

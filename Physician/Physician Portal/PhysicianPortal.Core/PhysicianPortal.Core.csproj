@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6843208F-3CF1-414E-BE5C-731BCF12CFCD}</ProjectGuid>
+    <ProjectTypeGuids>{32f31d43-81cc-4c15-9de6-3fc5453562b6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PhysicianPortal.Core</RootNamespace>
+    <AssemblyName>PhysicianPortal.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="RestSharp, Version=105.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.2\lib\net452\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Twilio.Api, Version=3.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Twilio.4.7.2\lib\3.5\Twilio.Api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data.ORTF\ORTFModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ORTFModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data.ORTF\ORTFModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ORTFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data.ORTF\ORTFModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ORTFModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data.ORTF\sp_parameters_data.cs">
+      <DependentUpon>ORTFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ApplicationSetting.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\AuditOperationType.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\AuditTrail.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DimDrug.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Disease.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ErrorLog.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\FeedbackRelated.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\FeedbackStatu.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\HomePage.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\InsuranceEligibilityInfo.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Message.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\NewRefill.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Office.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PatientDocument.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PatientPicture.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PatientQueue.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Pharmacy.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianNote.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalDBModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhysicianPortalDBModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalDBModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalDBModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhysicianPortalDBModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalFeedback.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalPatient.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalPatientChecklistRelationship.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalPatient_ReferralForm_Relationship.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianPortalPrescription.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhysicianSignature.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PokitDok_TradingPartner.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ReferralForm.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ReferralFormCategory.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ReferralFormChecklistRelationship.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormBloodModifyingAgent.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormCardiovascular.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormCysticFibrosi.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormDermatology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormGastroenterology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormGeneralintake.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormGrowthHormone.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormHepatology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormHivAid.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormImmunology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormNeurology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormNolaOncology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormOncology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormOncologyInfusion.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormOncology_1.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormOncology_2.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormOsteoporosi.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormPediatricGastoenterology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormRemicade.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormRheumatology.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormTCA_AIandPI.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormTransplant.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefFormTransplant1.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefillFaxReportLog.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RefillStatu.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Role.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SpGetSalesTeamPatients_Result.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\spICD10Diseases_Result.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\spPatientChecklist_Result.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sp_helpdiagramdefinition_Result.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sp_helpdiagrams_Result.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\State.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\User.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\User1.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\UserClaim.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\UserPhysicianRelationship.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\User_Office_Relationship.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwAuditTrail.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwDocument.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwDocument1.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwDocumentsUploadLog.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwGetPhysicianPortalPatientMRN.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwLastThreadMessage.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwMessage.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwNotificationAlert.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPatient.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPatientInsurance.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPharmacyNote.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPhysician.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPhysicianNote.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPhysicianPortalFeedback.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwPrescription.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwReferralDocument.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwReferralForm.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwRefillFaxDocument.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwRefillFaxReportLog.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vwWorkflow.cs">
+      <DependentUpon>PhysicianPortalDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\AuditLogger.cs" />
+    <Compile Include="Helpers\CommonHelper.cs" />
+    <Compile Include="Helpers\Logger.cs" />
+    <Compile Include="Helpers\SecurityHelper.cs" />
+    <Compile Include="Helpers\SettingManager.cs" />
+    <Compile Include="Models\PhysicianPortalFeedback.cs" />
+    <Compile Include="Models\PharmacyViewModel.cs" />
+    <Compile Include="Models\PhysicianNote.cs" />
+    <Compile Include="Models\UserMetaData.cs" />
+    <Compile Include="Models\vwDocument.cs" />
+    <Compile Include="Models\vwDocument1.cs" />
+    <Compile Include="Models\vwPatient.cs" />
+    <Compile Include="Models\vwPharmacyNote.cs" />
+    <Compile Include="Models\vwPhysician.cs" />
+    <Compile Include="Models\vwPhysicianNote.cs" />
+    <Compile Include="Models\vwPrescription.cs" />
+    <Compile Include="Models\vwWorkflow.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\GenericRepository.cs" />
+    <Compile Include="Repository\UnitOfWork.cs" />
+    <Compile Include="UserStore\UserStoreService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <EntityDeploy Include="Data\PhysicianPortalDBModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>PhysicianPortalDBModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="Data.ORTF\ORTFModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ORTFModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Data.ORTF\ORTFModel.edmx.diagram">
+      <DependentUpon>ORTFModel.edmx</DependentUpon>
+    </None>
+    <None Include="Data\PhysicianPortalDBModel.edmx.diagram">
+      <DependentUpon>PhysicianPortalDBModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data.ORTF\ORTFModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ORTFModel.edmx</DependentUpon>
+      <LastGenOutput>ORTFModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data.ORTF\ORTFModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ORTFModel.edmx</DependentUpon>
+      <LastGenOutput>ORTFModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\PhysicianPortalDBModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PhysicianPortalDBModel.edmx</DependentUpon>
+      <LastGenOutput>PhysicianPortalDBModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\PhysicianPortalDBModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PhysicianPortalDBModel.edmx</DependentUpon>
+      <LastGenOutput>PhysicianPortalDBModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

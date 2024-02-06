@@ -1,0 +1,10 @@
+﻿@model PhysicianPortal.Web.Models.ErrorModel
+
+@{
+    ViewBag.Title = "Error";
+    Layout = Model?.Layout == null ? "~/Views/Shared/_Layout.cshtml" : Model?.Layout;
+}
+
+<h1 class="text-danger">@Model.ErrorTitle</h1>
+<h2 class="text-danger">@Model.ErrorReason</h2>
+

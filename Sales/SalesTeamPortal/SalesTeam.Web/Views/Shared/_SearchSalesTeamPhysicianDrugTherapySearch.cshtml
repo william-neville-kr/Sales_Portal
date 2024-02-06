@@ -1,0 +1,131 @@
+﻿<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; padding-bottom: 15px; display: inline-block;">
+    <div class="col-lg-10 col-md-7 col-sm-7 col-xs-6" style="padding: 10px; display: inline-flex;">
+        <lable class="col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0">City Name</lable>
+        <lable class="col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0">Disease State Name</lable>
+        <lable class="col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0">Therapy Name</lable>
+    </div>
+    <div class="col-lg-10 col-md-7 col-sm-7 col-xs-6" style="padding: 10px; display: inline-flex;">
+        @Html.TextBox("TxtBoxSalesTeamPhysicianDrugTherapySearch1", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; margin-right: 5px;", @placeholder = "Enter City Name For Search", @type = "text" })
+        @Html.TextBox("TxtBoxSalesTeamPhysicianDrugTherapySearch2", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; margin-right: 5px;", @placeholder = "Enter Disease State Name For Search", @type = "text" })
+        @Html.TextBox("TxtBoxSalesTeamPhysicianDrugTherapySearch3", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; ", @placeholder = "Enter Therapy Name For Search", @type = "text" })
+    </div>
+    <div style="padding: 10px; float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="BtnSalesTeamPhysicianDrugTherapySearch(); return false;">Search</button>
+    </div>
+    <div style="padding: 10px;float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="ClearSalesTeamPhysicianDrugTherapySearch(); return false;">Clear</button>
+    </div>
+</div>
+
+@* vwSalesTeamPhysicianDrugTherapySearch *@
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPhysicianDrugTherapySearch>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.SalesTeamPhysicianDrugTherapySearchViewModel>()
+    .Name("gridSalesTeamPhysicianDrugTherapySearch")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.LastPatientReferralDateId).Title("Ref").Format("{0:MM/dd/yyyy}").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PhysicianFullName).Title("Physician");
+        columns.Bound(c => c.City).Title("City");
+        columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        //columns.Bound(c => c.DrugShortName).Title("Drug");
+        columns.Bound(c => c.DiseaseState).Title("Disease State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.CoreTherapyDrugShortName).Title("Therapy Drug");
+        columns.Bound(c => c.LastTherepyReferralDate).Title("Therapy Referral Date").Format("{0:MM/dd/yyyy}").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+        .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetSalesTeamPhysicianDrugTherapySearch", "SalesTeamPhysician").Data("SalesTeamPhysicianDrugTherapySearchFunc"))
+        .Sort(sort => sort.Add("LastPatientReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChange")
+    )
+    .AutoBind(false)
+)
+
+<script>
+    function BtnSalesTeamPhysicianDrugTherapySearch() {
+    }
+
+    function ClearSalesTeamPhysicianDrugTherapySearch() {
+        $("#TxtBoxSalesTeamPhysicianDrugTherapySearch1").val("");
+        $("#TxtBoxSalesTeamPhysicianDrugTherapySearch2").val("");
+        $("#TxtBoxSalesTeamPhysicianDrugTherapySearch3").val("");
+        $(".k-filtercell span button").trigger("click");
+        $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+    }
+
+    function SalesTeamPhysicianDrugTherapySearchFunc() {
+        return {
+            sreachString1: $("#TxtBoxSalesTeamPhysicianDrugTherapySearch1").val(),
+            sreachString2: $("#TxtBoxSalesTeamPhysicianDrugTherapySearch2").val(),
+            sreachString3: $("#TxtBoxSalesTeamPhysicianDrugTherapySearch3").val()
+        }
+    }
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch1").focusout(function () {
+        $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+    });
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch2").focusout(function () {
+        $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+    });
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch3").focusout(function () {
+        $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+    });
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch1").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+            $(this).blur();
+        }
+    });
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch2").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+            $(this).blur();
+        }
+    });
+
+    $("#TxtBoxSalesTeamPhysicianDrugTherapySearch3").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            $('#gridSalesTeamPhysicianDrugTherapySearch').data("kendoGrid").dataSource.read();
+            $(this).blur();
+        }
+    });
+
+    $(document).ready(function () {
+        $("#gridSalesTeamPhysicianDrugTherapySearch").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $("#gridSalesTeamPhysicianDrugTherapySearch").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+</script>

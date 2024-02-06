@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html style="height: 100%;">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Physician Portal</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/doubletap")
+    @Styles.Render("~/Content/UserCustomization")
+
+    <link href="~/Content/jQueryNotifyBar/jquery.notifyBar.css" rel="stylesheet" />
+    <script src="~/Scripts/jQueryNotifyBar/jquery.notifyBar.js"></script>
+</head>
+<body style="height: inherit;">
+    <div class="" style="height: inherit;">
+        @RenderBody()
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 row footer visible-lg visible-md visible-sm navbar-fixed-bottom">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding0" style="text-align: center;">
+            <p class="copyright">©2017 @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString(). All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding0 flinks" style="text-align: center;">
+            <p>
+                <a href="@Url.Action("About", "Home")">About</a>
+                <a href="@Url.Action("HIPAA", "Home")">HIPAA</a>
+                <a href="@Url.Action("PrivacyPolicy", "Home")">Privacy Policy</a>
+                <a href="@Url.Action("TermsAndConditions", "Home")">Terms &amp; Conditions</a>
+            </p>
+        </div>
+    </div>
+
+    @RenderSection("scripts", required: false)
+
+    <style>
+        .validation-summary-errors ul {
+            list-style: none;
+            margin-left: -40px;
+        }
+
+        input, select, textarea {
+            max-width: 80%;
+        }
+    </style>
+</body>
+</html>

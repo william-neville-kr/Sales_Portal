@@ -1,0 +1,281 @@
+﻿@model PhysicianPortal.Web.Models.RegisterViewModel
+@{
+    Layout = "~/Views/Shared/_ErrorLayout.cshtml";
+    ViewBag.Title = "Register";
+}
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+@using (Ajax.BeginForm("Register", "Account", new AjaxOptions { HttpMethod = "POST", OnBegin = "OnBeginRegister", OnSuccess = "OnSuccessRegister" }, new { id = "addPhysicianForm", autocomplete = "off" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div style="clear: both;">
+        <fieldset>
+            <legend>Provider information</legend>
+            <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.Email, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.Email)
+                                .HtmlAttributes(new { type = "email", placeholder = "Email", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.FirstName, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.FirstName)
+                                .HtmlAttributes(new { placeholder = "First Name", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.LastName, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.LastName)
+                                .HtmlAttributes(new { placeholder = "Last Name", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.DateOfBirth, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().DatePickerFor(m => m.DateOfBirth)
+                                .Name("DateOfBirth")
+                                .Max(DateTime.UtcNow)
+                                .Format("MM/dd/yyyy")
+                            )
+                            <span class="k-invalid-msg clearfix" data-for="DateOfBirth" style="margin-top: 5px;"></span>
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        @Html.HiddenFor(m => m.SSN)
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.Label("SSNTemp", "SSN", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().MaskedTextBox()
+                              .Name("SSNTemp")
+                              .Mask("000-00-0000")
+                              .HtmlAttributes(new { placeholder = "SSN", required = "required", validationmessage = "The SSN field is required.", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.DrivingLicenseNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.DrivingLicenseNumber)
+                                .HtmlAttributes(new { placeholder = "Driving License", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                                .HtmlAttributes(new { placeholder = "Cell Number", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.NPI, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @(Html.Kendo().TextBoxFor(m => m.NPI)
+                                .HtmlAttributes(new { placeholder = "NPI", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.Password, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.PasswordFor(m => m.Password, new { placeholder = "Password", @class = "k-textbox form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        </div>
+                    </div>
+                    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { placeholder = "Confirm Password", @class = "k-textbox form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+        <strong>Note: </strong>
+        While submitting this form you must agree to the terms and conditions listed below
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+        <button type="submit" onclick="submitNewPhysicianForm(); return false;" class="btn btn-primary login-form-field" tabindex="3">Submit</button>
+        <a href="@Url.RouteUrl("Default", ((Route)RouteTable.Routes["Default"]).Defaults)" class="btn btn-danger">Cancel</a>
+    </div>
+}
+
+<div class="container text-align-justify" property="content:encoded">
+    <h3>Terms and conditions</h3>
+    <p>Welcome to our website. If you continue to browse and use this website, you are agreeing to comply with and be bound by the following terms and conditions of use, which together with our privacy policy govern [business name]'s relationship with you in relation to this website. If you disagree with any part of these terms and conditions, please do not use our website.</p>
+    <p>The term '[business name]' or 'us' or 'we' refers to the owner of the website whose registered office is [address]. Our company registration number is [company registration number and place of registration]. The term 'you' refers to the user or viewer of our website.</p>
+    <p>The use of this website is subject to the following terms of use:</p>
+    <ul>
+        <li>The content of the pages of this website is for your general information and use only. It is subject to change without notice.</li>
+        <li>This website uses cookies to monitor browsing preferences. If you do allow cookies to be used, the following personal information may be stored by us for use by third parties: [insert list of information].</li>
+        <li>Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials found or offered on this website for any particular purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law.</li>
+        <li>Your use of any information or materials on this website is entirely at your own risk, for which we shall not be liable. It shall be your own responsibility to ensure that any products, services or information available through this website meet your specific requirements.</li>
+        <li>This website contains material which is owned by or licensed to us. This material includes, but is not limited to, the design, layout, look, appearance and graphics. Reproduction is prohibited other than in accordance with the copyright notice, which forms part of these terms and conditions.</li>
+        <li>All trade marks reproduced in this website which are not the property of, or licensed to, the operator are acknowledged on the website.</li>
+        <li>Unauthorised use of this website may give rise to a claim for damages and/or be a criminal offence.</li>
+        <li>From time to time this website may also include links to other websites. These links are provided for your convenience to provide further information. They do not signify that we endorse the website(s). We have no responsibility for the content of the linked website(s).</li>
+        <li>Your use of this website and any dispute arising out of such use of the website is subject to the laws of England, Northern Ireland, Scotland and Wales.</li>
+    </ul>
+</div>
+
+<div id="divConfirm" style="display: none;">
+    <div class="alert" style="min-height: 34px; margin-bottom: 0;">
+        <p id="innerContent">
+            A verification email has been sent to you
+            <br />
+            Please click on the link that has been sent to you to verify your account
+        </p>
+    </div>
+
+    <div class="pull-right">
+        <button class="btn btn-success" onclick="closeKendoWindow(); return false;" style="margin: .5em .4em .5em 0;">Ok</button>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $("#PhoneNumber").mask("(999) 999-9999");
+        $("#DateOfBirth").mask("99/99/9999");
+        $("#DateOfBirth").attr("placeholder", "Date of Birth");
+
+        $("#SSNTemp").blur(function () {
+            if ($(this).val().indexOf("_") == -1 && $(this).val() != "") {
+                $("#SSN").val($(this).val());
+                $(this).val("*******" + $(this).val().substring(7));
+            }
+            else {
+                $(this).val("");
+            }
+        });
+        $("#SSNTemp").focusin(function () {
+
+            if ($(this).val() != "") {
+                $(this).val($("#SSN").val());
+            }
+            else {
+                $("#SSN").val("");
+            }
+        });
+    });
+
+    function submitNewPhysicianForm() {
+        var userForm = $("#addPhysicianForm");
+        kendo.init(userForm);
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+            return false;
+        }
+    }
+
+    function OnSuccessRegister(result) {
+        var success = result.success;
+        var alertMessage = result.message;
+        var title = result.title;
+
+        $("#innerContent").html(alertMessage);
+
+        if (title.indexOf("Alert") != -1) {
+
+            $("#divConfirm .alert").addClass("alert-danger");
+            $("#divConfirm .alert").removeClass("alert-success");
+        }
+        else {
+            $("#divConfirm .alert").addClass("alert-success");
+            $("#divConfirm .alert").removeClass("alert-danger");
+        }
+
+        if (success) {
+            $("#divConfirm").kendoWindow({
+                modal: true,
+                width: 400,
+                title: title,
+                visible: false,
+                resizable: false,
+                draggable: false,
+                actions: {}
+            })
+                .data("kendoWindow")
+                .center()
+                .open();
+            //$.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+    }
+
+    function OnBeginRegister() {
+        $("#loading-image").show();
+    }
+
+    function closeKendoWindow() {
+        $("#divConfirm").data("kendoWindow").close();
+    }
+</script>
+
+<style>
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+
+    input[type=date]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        display: none;
+    }
+
+    .k-radio:checked + .k-radio-label:after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+    }
+</style>

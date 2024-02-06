@@ -1,0 +1,45 @@
+﻿<div style="padding:10px;  border: 1px solid;">
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.vwPrescription>()
+    .Name("gridPrescriptions")
+    .Columns(columns =>
+    {
+        //columns.Bound(c => c.FillNumber).Title("Fill #").Visible(true);
+        //columns.Bound(c => c.FillsAllowed).Title("Alwd");
+        //columns.Bound(c => c.FillsRemaining).Title("Left");
+        //columns.Bound(c => c.OrderItemName).Title("Drug");
+        //columns.Bound(c => c.RxDate).Title("Fill Dt.");
+        //columns.Bound(c => c.DaysSupplied).Title("Days Supld");
+        //columns.Bound(c => c.TherapyStatus).Title("Therapy Status");
+
+        columns.Bound(c => c.RxDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Rx Date");
+        columns.Bound(c => c.RxNumber).Title("Rx #");
+        columns.Bound(c => c.OrderItemName).Title("Name");
+
+        columns.Bound(c => c.RefillsAllowed).Title("Alwd");
+        columns.Bound(c => c.RefillNumber).Title("Refill #");
+        columns.Bound(c => c.RefillsRemaining).Title("Remaining");
+        columns.Bound(c => c.DaysSupplied).Title("Days");
+        columns.Bound(c => c.FillDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Fill Date");
+        columns.Bound(c => c.DoseStartDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Dose Start");
+        columns.Bound(c => c.NextFillDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Next Fill");
+        columns.Bound(c => c.ExpiryDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Expiry");
+    })
+    //.Selectable()
+    //.Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    //.Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPrescriptions", "Patients", Model))
+        //.Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    //.Events(e => e.Change("onChange"))
+    )
+</div>
+
+

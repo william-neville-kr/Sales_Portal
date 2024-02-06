@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Feedback";
+}
+
+<h3>Feedback</h3>
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group padding0" style="display: inline-block;">
+    <a href="@Url.Action("AddEdit", "Feedback")" class="btn btn-primary pull-right">Add Feedback</a>
+</div>
+
+@*@(Html.Kendo().Grid<SalesTeam.Web.Models.FeedbackViewModel>()*@
+@(Html.Kendo().Grid<SalesTeam.Core.Data.vwFeedback>()
+    .Name("gridFeedbacks")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.Subject).Width(200).HtmlAttributes(new { style = "max-width: 150px;" });
+        columns.Bound(c => c.Description).Encoded(false);
+        columns.Bound(c => c.SalesRepresentativeFullName).Title("CreatedBy").Width(130).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.CreatedOn).Format("{0:MM/dd/yyyy}").Width(110).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Command(command => command.Custom("Edit").Click("editFeedback").HtmlAttributes(new { @class = "btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);//btn-primary
+    })
+    .Selectable()
+    .Sortable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("Feedbacks_Read", "Feedback"))
+        .Sort(sort => sort.Add("CreatedOn").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChange_gridFeedbacks")
+        .DataBound("onDataBound_gridFeedbacks")
+    )
+)
+
+<hr />
+<div class="text-align-center">
+    <ul class="list-inline">
+        @foreach (var feedback in new SalesTeam.Core.Repository.UnitOfWork().FeedbackStatusRepository.GetAsQuerable(t => !string.IsNullOrEmpty(t.Name)))
+        {
+            <li style="width: 90px;" class="@feedback.ClassName">@feedback.Name</li>
+        }
+    </ul>
+</div>
+
+<script type="text/javascript">
+    var data;
+    function onChange_gridFeedbacks(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridFeedbacks").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("AddEdit", "Feedback")/' + data.FeedbackId;
+            }
+        });
+        $("#gridFeedbacks").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("AddEdit", "Feedback")/' + data.FeedbackId;
+            }
+        });
+
+        $(".k-dropdown-operator").hide();
+    });
+
+    function editFeedback(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        window.location.href = '@Url.Action("AddEdit", "Feedback")/' + dataItem.FeedbackId;
+    }
+
+    function onDataBound_gridFeedbacks(e) {
+        var items = e.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridFeedbacks").data("kendoGrid").dataItem(this);
+            this.className = dataItem.ClassName;
+        });
+    }
+</script>

@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "My Notes";
+}
+
+@*<div>
+    <label>Record Updated On</label>
+    <label>@ViewBag.LatestNotesTime</label>
+</div>*@
+
+<h3>Sales Team Notes</h3>
+@Html.Partial("_SalesTeamNotes")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#BtnAddNotes").css("display", "none");
+    });
+</script>

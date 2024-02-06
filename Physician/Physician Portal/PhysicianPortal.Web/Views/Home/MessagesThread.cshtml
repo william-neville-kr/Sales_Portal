@@ -1,0 +1,325 @@
+﻿@using PhysicianPortal.Web.Models
+@model MessageThreadViewModel
+@{
+    Layout = null;
+
+    PhysicianPortal.Core.Data.User currentUser = ViewBag.currentUser;
+    List<GridMessageViewModel> messagesList = new List<GridMessageViewModel>();
+
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+
+    foreach (var message in unitOfWork.vwMessagesRepository.GetAsQuerable(t => t.MessageId == Model.ThredId || t.PreMessageId == Model.ThredId).OrderBy(t => t.CreatedOn))
+    {
+        messagesList.Add(new GridMessageViewModel
+        {
+            MessageId = message.MessageId,
+            PreMessageId = message.PreMessageId,
+            PatientId = message.PatientId,
+            PhysicianId = message.PhysicianId,
+            PatientName = message.PatientName,
+            PhysicianName = message.PhysicianName,
+            MessageBody = message.MessageBody,
+            CreatedOn = message.CreatedOn.Value.ToLocalTime().ToString("M/d/yyyy, hh:mm:ss tt"),
+            SentBy = message.SentBy,
+            IsRead = message.IsRead,
+            CreatedBy = message.CreatedBy,
+            SenderName = message.SenderName
+        });
+    }
+}
+@Styles.Render("~/Content/css")
+<div style="height: inherit; overflow-y: hidden; overflow-x: hidden">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="height: 80%; padding: 0px 10px 0px 0px">
+        <div id="threadMessagesContainer" style="display: block; overflow: auto; overflow-y: scroll; height: 100%; padding-right: 5px;">
+            @foreach (GridMessageViewModel message in messagesList)
+            {
+                if (message.CreatedBy == currentUser.UserId)
+                {
+                    //show messaage on right
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="float: right;">
+                            <div style="float: right; text-align: right;">
+                                <div class="talk-bubble tri-right round right-in">
+                                    <div class="talktext">
+                                        <p style="white-space: pre-wrap;">@message.MessageBody</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>@message.CreatedOn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    //show message on left
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="float: left;">
+                            <div style="float: left; text-align: left;">
+                                <div class="talk-bubble tri-right round left-in">
+                                    <div class="talktext">
+                                        <p>@message.MessageBody</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>@message.SenderName</span>
+                                    <br />
+                                    <span>@message.CreatedOn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <div id="newMessageContainer">
+        <table style="width: 100%; height: 20%;">
+            <tbody style="height: 20%">
+                <tr>
+                    <td rowspan="2" style="height: 100%;">
+                        @Html.TextAreaFor(m => m.ReplyMessageBody, new { @class = "k-textbox max-width-field dissmiss-keyboard-ipad", rows = 4, style = "height: 100%; resize: none;" })
+                    </td>
+                    <td style="width: 20%; text-align: center;">
+                        <img src="~/Content/images/send.png" title="Send" onclick="submitReply(this, @Model.ThredId)" width="45" style="cursor: pointer" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; text-align: center;">
+                        <button class="btn btn-danger" onclick="setMessageCompleted(); return false;">Complete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="resumeMessageContainer" style="display: none;">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: center;">
+            <button class="btn btn-success" onclick="continueMessageThread(); return false;">Resume</button>
+        </div>
+    </div>
+
+
+    @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="height: 20%; display: table;">
+            <div style="height: 100%; display: table-cell;">
+                @if (Model.IsCompleted ?? false)
+                {
+                    @Html.TextAreaFor(m => m.ReplyMessageBody, new { @class = "k-textbox max-width-field dissmiss-keyboard-ipad", @disabled = true, rows = 4, style = "height: 100%; resize: none;" })
+                }
+                else
+                {
+                    @Html.TextAreaFor(m => m.ReplyMessageBody, new { @class = "k-textbox max-width-field dissmiss-keyboard-ipad", rows = 4, style = "height: 100%; resize: none;" })
+                }
+            </div>
+            <div style="text-align: center; height: 100%; width: 130px; display: table-cell;">
+                <img src="~/Content/images/send.png" title="Send" onclick="submitReply(this, @Model.ThredId)" width="45" style="cursor: pointer" />
+                <button class="btn btn-danger" onclick="setMessageCompleted(); return false;">Complete</button>
+            </div>
+        </div>*@
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        @if (Model.IsCompleted.HasValue && Model.IsCompleted == true)
+        {
+            <text>
+        $("#newMessageContainer").hide();
+        $("#resumeMessageContainer").show();
+        </text>
+        }
+
+    });
+
+
+    function setMessageCompleted() {
+        $.ajax({
+            url: '@Url.Action("SetMessageCompleted", "Home")',
+            type: 'POST',
+            data: JSON.stringify({ MessageId: "@Model.ThredId" }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                    $("#gridMessages").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+                $("#MessageThreadWindow").data("kendoWindow").close();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function continueMessageThread() {
+        $.ajax({
+            url: '@Url.Action("ContinueMessageThread", "Home")',
+            type: 'POST',
+            data: JSON.stringify({ MessageId: "@Model.ThredId" }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+
+                    $("#newMessageContainer").show();
+                    $("#resumeMessageContainer").hide();
+                    $("#gridMessages").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+</script>
+
+<style>
+    .message-container {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .message-title-label {
+        font-weight: bold;
+        color: #337ab7;
+        font-size: medium;
+        width: 150px;
+    }
+
+    .message-time {
+        float: right;
+        font-style: italic;
+        font-weight: lighter;
+    }
+
+    .message-body-container {
+        overflow: hidden;
+        border-width: 1px;
+        border-color: #337ab7;
+        border-style: solid;
+        padding: 10px;
+        overflow: hidden;
+    }
+
+    hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+    }
+
+
+    /* CSS talk bubble */
+    .talk-bubble {
+        margin: 5px;
+        display: inline-block;
+        position: relative;
+        width: auto;
+        height: auto;
+        background-color: #337ab7;
+    }
+
+    /* General CSS Setup */
+
+    .round {
+        border-radius: 15px;
+        -webkit-border-radius: 15px;
+        -moz-border-radius: 15px;
+    }
+
+    /* talk bubble contents */
+    .talktext {
+        padding: 1em;
+        text-align: left;
+        line-height: 1.5em;
+    }
+
+        .talktext p {
+            /* remove webkit p margins */
+            color: white;
+            -webkit-margin-before: 0em;
+            -webkit-margin-after: 0em;
+        }
+
+
+    /* Right triangle, left side slightly down */
+    .tri-right.border.left-in:before {
+        content: ' ';
+        position: absolute;
+        width: 0;
+        height: 0;
+        left: -40px;
+        right: auto;
+        top: 11px;
+        bottom: auto;
+        border: 20px solid;
+        border-color: #337ab7 #337ab7 transparent transparent;
+    }
+
+    .tri-right.left-in:after {
+        content: ' ';
+        position: absolute;
+        width: 0;
+        height: 0;
+        left: -20px;
+        right: auto;
+        top: 11px;
+        bottom: auto;
+        border: 12px solid;
+        border-color: #337ab7 #337ab7 transparent transparent;
+    }
+
+    /* Right triangle, right side slightly down*/
+    .tri-right.border.right-in:before {
+        content: ' ';
+        position: absolute;
+        width: 0;
+        height: 0;
+        left: auto;
+        right: -40px;
+        top: 11px;
+        bottom: auto;
+        border: 20px solid;
+        border-color: #337ab7 transparent transparent #337ab7;
+    }
+
+    .tri-right.right-in:after {
+        content: ' ';
+        position: absolute;
+        width: 0;
+        height: 0;
+        left: auto;
+        right: -20px;
+        top: 11px;
+        bottom: auto;
+        border: 12px solid;
+        border-color: #337ab7 transparent transparent #337ab7;
+    }
+</style>

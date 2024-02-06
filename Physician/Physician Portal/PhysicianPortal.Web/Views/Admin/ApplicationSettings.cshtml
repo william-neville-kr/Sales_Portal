@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "App Settings";
+}
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<fieldset>
+    <legend>Application Settings</legend>
+    <div style="display: -webkit-box; text-align: -webkit-right;margin-bottom: 10px;">
+        <button onclick="addNewSetting(this);" class="btn btn-primary">Add Setting</button>
+    </div>
+    @Html.Partial("AppSettingsList")
+
+
+</fieldset>
+
+
+
+<div id='AddSettingWindow'></div>
+<div id="divAlertDialog"></div>
+<div id='EditSettingWindow'></div>
+
+<script>
+    function addNewSetting(addButton) {
+        $("#AddSettingWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/AddNewSetting")"
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Add Setting",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+
+            }, refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddSettingWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#AddSettingWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function submitNewSetting(button) {
+        var userForm = $("#addSettingForm");
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+
+            status.text("User added successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            userForm.submit();
+
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+    }
+
+    function onAddSettingSuccess(arg) {
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#AddSettingWindow").data("kendoWindow").close();
+    }
+
+    function submitEditSettingForm(button) {
+        var userForm = $("#editSettingForm");
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            status.text("Setting edited successfully.")
+                .removeClass("invalid")
+                .addClass("valid");
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+        }
+    }
+</script>

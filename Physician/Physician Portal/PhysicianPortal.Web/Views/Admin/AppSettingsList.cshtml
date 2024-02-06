@@ -1,0 +1,170 @@
+﻿
+@(Html.Kendo().Grid<PhysicianPortal.Core.Data.ApplicationSetting>()
+    .Name("gridAppSetting")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.Name).Title("Name");
+        columns.Bound(c => c.Value).Title("Value");// To Do .Encoded(false);
+        columns.Command(command => command.Custom("Edit").Click("editSetting").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+        columns.Command(command => command.Custom("Delete").Click("deleteSetting").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+    })
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetAppSettings", "Admin"))
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+<div id="divDeleteSettingConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                Are you sure you want to delete selected user?
+            </span>
+        </p>
+    </div>
+    <div style="float: right;">
+        <button class="k-button delete-user-btton btn-danger btn-dialog" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="k-button close-delete-dialog-button btn-dialog" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function editSetting(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#EditSettingWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/EditSetting")",
+                data: { ApplicationSettingId: dataItem.ApplicationSettingId }
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Edit New Setting",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#EditSettingWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#EditSettingWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    var settingToDelete = null;
+    function deleteSetting(e) {
+        e.preventDefault();
+        settingToDelete = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#divDeleteSettingConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divDeleteSettingConfirm").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divDeleteSettingConfirm").data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    $(".delete-user-btton").click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DeleteSetting", "Admin")',
+            data: JSON.stringify({ ApplicationSettingId: settingToDelete.ApplicationSettingId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+
+                    //Reloading the grid here
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                    //$("#divRefaxDocConfirm").data("kendoWindow").close();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+        $("#divDeleteSettingConfirm").data("kendoWindow").close();
+    });
+
+    $(".close-delete-dialog-button").click(function () {
+        $("#divDeleteSettingConfirm").data("kendoWindow").close();
+    });
+
+    function onEditSettingSuccess(arg) {
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#EditSettingWindow").data("kendoWindow").close();
+    }
+
+</script>

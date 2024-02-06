@@ -1,0 +1,229 @@
+﻿@{
+    ViewBag.Title = "Pharmacies";
+}
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<fieldset>
+    <legend>Pharmacies</legend>
+    <div style="margin-bottom: 10px;">
+        <button onclick="addNewPharmacy();" class="btn btn-primary">Add Pharmacy</button>
+    </div>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.Pharmacy>()
+        .Name("gridPharmacies")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.PharmacyName).Title("Name");
+            columns.Bound(c => c.CompanyCode).Title("Company Code");
+            columns.Bound(c => c.NABP).Title("NABP").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Bound(c => c.DEANumber).Title("DEA").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Bound(c => c.NationalProviderIdentifier).Title("NPI").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Bound(c => c.AddressLine1).Title("Address Line 1");
+            columns.Bound(c => c.City).Title("City");
+            columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Bound(c => c.Country).Title("Country");
+            columns.Bound(c => c.PostalCode).ClientTemplate(
+                                            "# if (PostalCode != null && PostalCode != \"\") { #" +
+                                                "#= PostalCode.substring(0, 5)#" +
+                                            "# } #"
+                                        )
+                                        .Title("Zip").Width(70).HtmlAttributes(new { @class = "PostalCode padding2 text-align-center" });
+            columns.Bound(c => c.PhoneNumber).Title("Phone").Width(100).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Bound(c => c.FaxNumber).Title("Fax").Width(100).HtmlAttributes(new { @class = "padding2 text-align-center" });
+            columns.Command(command => command.Custom("Edit").Click("editPharmacy").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+            columns.Command(command => command.Custom("Delete").Click("deletePharmacy").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+        })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetPharmaciesList", "Admin"))
+            .PageSize(10)
+        //.Sort(srt => srt.Add("Pending").Descending())
+        )
+        //.Mobile(MobileMode.Phone)
+        .NoRecords(n => n.Template("No records to display"))
+        //.Selectable()
+        //.Filterable()
+        .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+        .Sortable()
+    //.Events(e => e.Change("onChange").DataBound("onDataBound"))
+    )
+
+    @*@Html.Partial("AppPharmacysList")*@
+</fieldset>
+
+<div id="AddPharmacyWindow"></div>
+@*<div id="divAlertDialog"></div>*@
+<div id="EditPharmacyWindow"></div>
+
+<div id="divDeletePharmacyConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                Are you sure you want to delete selected Pharmacy?
+            </span>
+        </p>
+    </div>
+    <div style="float: right;">
+        <button class="k-button delete-Pharmacy-btton btn-danger btn-dialog" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="k-button close-delete-dialog-button btn-dialog" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function addNewPharmacy() {
+        $("#AddPharmacyWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/AddNewPharmacy")"
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Add Pharmacy",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+
+            }, refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddPharmacyWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#AddPharmacyWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function editPharmacy(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#AddPharmacyWindow").kendoWindow({
+            content: {
+                url: "@Url.Action("AddNewPharmacy", "Admin")" + "?PharmacyId=" + dataItem.PharmacyId
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Edit Pharmacy",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+
+            }, refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddPharmacyWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#AddPharmacyWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    var pharmacyToDelete = null;
+    function deletePharmacy(e) {
+        e.preventDefault();
+        pharmacyToDelete = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#divDeletePharmacyConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divDeletePharmacyConfirm").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divDeletePharmacyConfirm").data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    $(".delete-Pharmacy-btton").click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DeletePharmacy", "Admin")',
+            data: JSON.stringify({ PharmacyId: pharmacyToDelete.PharmacyId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+
+                    //Reloading the grid here
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+        $("#divDeletePharmacyConfirm").data("kendoWindow").close();
+    });
+
+    $(".close-delete-dialog-button").click(function () {
+        $("#divDeletePharmacyConfirm").data("kendoWindow").close();
+    });
+
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+</script>

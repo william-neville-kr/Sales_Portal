@@ -1,0 +1,51 @@
+﻿@using PhysicianPortal.Web.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="loginPageBody" style="height: inherit;">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", autocomplete = "off", style = "margin: 0px;" }))
+            {
+            <div id="loginContainer" class="loginPage">
+                <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px;">
+                    @Html.AntiForgeryToken()
+                    <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                    <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                    <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>
+                    <span class="validation-summary-errors">@Html.ValidationSummary(true, "", new { @class = "text-danger" })</span>
+
+                    <div class="form-group row">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control email login-form-field", placeholder = "Email", autocomplete = "off" })
+                        <div style="text-align: center;">
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control login-form-field", placeholder = "Password", autocomplete = "off" })
+                        <div style="text-align: center;">
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="login-form-field" style="max-width: 80%;">
+                            <input type="submit" class="btn btn-primary" value="Login">
+                            or
+                            <a class="btn-link" href="@Url.Action("Register", "Account")">
+                                Register
+                            </a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        @Html.LabelFor(m => m.RememberMe)
+                        @Html.ActionLink("Forgot Password?", "ForgotPassword", "Account", null, new { @style = "float: right;" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,35 @@
+﻿@model PhysicianPortal.Web.Models.SendCodeViewModel
+@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = "Verification Code";
+}
+<div class="loginPageBody">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        @using (Html.BeginForm("SendCode", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", style = "margin: 0px;" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("rememberMe", @Model.RememberMe)
+            <div id="loginContainer" class="loginPage">
+                <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px">
+                    <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                    <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                    <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>
+                    <br />
+                    <h4 class="text-center">Send verification code</h4>
+                    <div>
+                        <div class="text-center">
+                            Select Verification Method:
+                            @Html.DropDownListFor(model => model.SelectedProvider, Model.Providers)
+                            <br />
+                            <br />
+                            <input type="submit" value="Submit" class="btn btn-primary btn-block login-form-field" />
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

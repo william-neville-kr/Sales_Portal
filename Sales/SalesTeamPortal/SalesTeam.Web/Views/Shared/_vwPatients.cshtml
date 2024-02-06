@@ -1,0 +1,237 @@
+﻿<div id="checkBoxContainer">
+    <input type="checkbox" id="moreInfoCheckbox" onclick="moreInfoChanged(this);">Show Patients Only With Tag "Need More Info"<br>
+</div>
+
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPatient>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.PatientViewModel>()
+    .Name("gridPatient")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PatientId).Title("PatientId").Visible(false);
+        columns.Bound(c => c.ReferralDateId).Title("Ref").Format("{0:MM/dd/yyyy}").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PatientCode).Title("MRN").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.FirstName).Title("First");
+        columns.Bound(c => c.LastName).Title("Last");
+        columns.Bound(c => c.PhysicianName).Title("Physician");
+        columns.Bound(c => c.PhyCity).Title("City");
+        //columns.Bound(c => c.StateProvince).Title("State");
+        columns.Bound(c => c.StateProvince).Title("St").Width(30).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.DrugShortName).Title("Drug");
+        columns.Bound(c => c.ActivityStatus).Title("Status").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.OriginatingPharmacy).Title("Pharmacy");
+        columns.Command(command => command.Custom("N").Click("showNotesPopup")).Title("N").HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Command(command => command.Custom("Q").Click("showAddQueuesConfirmation")).Title("Q").HtmlAttributes(new { @class = "padding2 text-align-center" });
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+        .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPatients", "SalesTeamPatient", Model).Data("SearchPatientFunc"))
+        .Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChange")
+        .DataBound("onDataBoundPatient")
+    )
+//.AutoBind(false)
+)
+
+<div id="divNotesPopup"></div>
+
+<div id="divAddQueuesConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span id="lblConfirm">
+                Do you really want to add selected patient into patients queue?
+            </span>
+        </p>
+    </div>
+    <input id="DataPhysicianId" type="hidden" />
+    <input id="DataSalesTeamId" type="hidden" />
+    <input id="DataPatientId" type="hidden" />
+
+    <div style="float: right;">
+        <button class="btn btn-success" onclick="addPatientQueue()" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="btn btn-default" onclick="cancelQueueConfirmation()" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function SearchPatientFunc() {
+        var moreInfoCheckBox = document.getElementById("moreInfoCheckbox");
+
+        if (moreInfoCheckBox != null) {
+            return {
+                NeedMoreInfo: moreInfoCheckBox.checked
+            }
+        }
+    }
+    function moreInfoChanged(cb) {
+        $("#gridPatient").data("kendoGrid").dataSource.read();
+    }
+
+    function showNotesPopup(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            url: '@Url.Action("ShowNotes", "SalesTeamNote")',
+            data: { SalesTeamId: dataItem.SalesTeamId, PatientId: dataItem.PatientId, PhysicianId: dataItem.PhysicianId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                //$("#divNotesPopup").html(data);
+                //$("#NotesPopup").data("kendoWindow").center().open();
+
+                $("#divNotesPopup").kendoWindow({
+                    modal: true,
+                    width: "70%",
+                    height: "70%",
+                    maxWidth: 800,
+                    maxHeight: 600,
+                    minWidth: 300,
+                    minHeight: 300,
+                    title: "Pharmacy Notes",
+                    visible: false,
+                    resizable: false,
+                    draggable: false,
+                    actions: ["Close"],
+                    open: function (e) {
+                        $("body").css("overflow", "hidden");
+                    },
+                    close: function (e) {
+                        //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                        $("body").css("overflow", "");
+                    }
+                }).data("kendoWindow").content(data).center().open();
+            },
+            error: function (xhr) {
+                debugger;
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function addPatientQueue() {
+        //e.preventDefault();
+        //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            url: '@Url.Action("AddPatientToQueue", "SalesTeamPatient")',
+            data: { PhysicianId: $("#DataPhysicianId").val(), SalesTeamId: $("#DataSalesTeamId").val(), PatientId: $("#DataPatientId").val() },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $(".k-grid").each(function () {
+                    $(this).data("kendoGrid").dataSource.read();
+                });
+
+                $("#divAddQueuesConfirm").data("kendoWindow").close();
+                //var msg = JSON.parse(data);
+                //alert(msg.message);
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+
+    function cancelQueueConfirmation() {
+        $("#divAddQueuesConfirm").data("kendoWindow").close();
+    }
+
+    function showAddQueuesConfirmation(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#DataPhysicianId").val(dataItem.PhysicianId);
+        $("#DataSalesTeamId").val(dataItem.SalesTeamId);
+        $("#DataPatientId").val(dataItem.PatientId);
+
+        $("#divAddQueuesConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function onDataBoundPatient(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridPatient").data("kendoGrid").dataItem(this);
+            if (dataItem.NeedMoreInfo == true) {
+                this.className += " needMoreInfoClass";
+            }
+        });
+    }
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridPatient").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $("#gridPatient").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+</script>
+
+<style>
+    #gridPatient tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

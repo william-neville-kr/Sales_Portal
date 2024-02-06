@@ -1,0 +1,287 @@
+﻿@using PhysicianPortal.Core.Data;
+
+@model vwPhysicianNote
+
+<script type="text/javascript">
+    function PhysicianNotesFunc() {
+        
+        return {
+            PhysicianIdEncrypted: $("#PhysicianIdEncrypted").val(),
+            PatientIdEncrypted: $("#PatientIdEncrypted").val()
+        }
+    }
+
+    var data;
+    //var textNote = $("#txtPhysicianNote");
+    function onNotesChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    function BtnAddNotesFunc() {
+        if ($("#PhysicianId").val() != "" && $("#PatientId").val() != "") {
+            var myWindow = $("#windowNotes");
+
+            myWindow.kendoWindow({
+                //modal: true,
+                width: "70%",
+                height: "70%",
+                maxWidth: 800,
+                maxHeight: 600,
+                minWidth: 300,
+                minHeight: 300,
+                title: "Enter a Note",
+                visible: false,
+                actions: ["Close"],
+                draggable: false,
+                resizable: false,
+                open: function (e) {
+                    $("body").css("overflow", "hidden");
+                },
+                close: function (e) {
+                    //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                    $("body").css("overflow", "");
+                },
+                refresh: function () {
+                    //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                    myWindow.bind("orientationchange", function (event) {
+                        var x = document.activeElement;
+                        if (x != undefined && x != null) {
+                            x.blur();
+                        }
+                        myWindow.data("kendoWindow").center();
+                    });
+                }
+            })
+            .data("kendoWindow")
+            .center()
+            .open();
+        }
+        else if ($("#PhysicianId").val() == "" && $("#PatientId").val() == "") {
+            alert("Please select patient first to add notes.");
+        }
+    }
+
+    function CancelButton() {
+
+        if ($("#txtPhysicianNote").val() != "") {
+            if (confirm("Do you really want to cancel the Note?")) {
+                $("#txtPhysicianNote").val("");
+
+                $("#windowNotes").kendoWindow({
+                }).data("kendoWindow").close();
+                $("body").css("overflow", "");
+            }
+
+        }
+        else {
+            $("#windowNotes").kendoWindow({
+            }).data("kendoWindow").close();
+            $("body").css("overflow", "");
+        }
+    }
+
+    function CreateNote() {
+        debugger;
+        var request = {
+            PhysicianNote1: escapeHTML($("#txtPhysicianNote").val()), PhysicianIdEncrypted: $("#PhysicianIdEncrypted").val(), PatientIdEncrypted: $("#PatientIdEncrypted").val()
+        };
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(request),
+            url: '@Url.Content("~/Notes/CreateNote")',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (msg) {
+                var data;
+                if (msg.hasOwnProperty("d")) {
+                    data = msg.d;
+                }
+                else
+                    data = msg;
+
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    success_check = true
+
+                    $("#windowNotes").data("kendoWindow").close();
+
+                    $("#gridPhysicianNotes").data("kendoGrid").dataSource.read();
+                    $("#txtPhysicianNote").val("");
+                }
+                else {
+                    alert("Error: " + data.message);
+                }
+            },
+        });
+    }
+
+    function escapeHTML(text) {
+        var replacements = { "<": "&lt;", ">": "&gt;", "&": "&amp;", "\"": "&quot;", '"': "&#34;", "'": "&#39;", ",": "&#44;", ":": "&#58;" };
+        if (text != "" && text != "null" && text != null) {
+            return text.replace(/[<>&"']/g, function (character) {
+                return replacements[character];
+            });
+        }
+        return "";
+    }
+
+    function deleteNotes(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#PhysicianNoteId").val(dataItem.PhysicianNoteId);
+
+        $("#divDeleteNotesConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divDeleteNotesConfirm").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divDeleteNotesConfirm").data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        }).data("kendoWindow")
+            //.content(data)
+            .center()
+            .open();
+    }
+</script>
+
+@*<input id="PhysicianId" name="PhysicianId" type="hidden" value="491" />
+    <input id="PatientId" name="PatientId" type="hidden" value="155" />*@
+
+@Html.HiddenFor(m => m.PhysicianIdEncrypted)
+@Html.HiddenFor(m => m.PatientIdEncrypted)
+
+<legend id="hdPatientNotes">Patient Notes</legend>
+<div style="display: -webkit-box; text-align: -webkit-right;">
+    <button id='BtnAddNotes' type='button' class='btn btn-primary' style='margin-bottom: 15px;' onclick='BtnAddNotesFunc(); return false;'> Add Notes</button>
+</div>
+
+@(Html.Kendo().Grid<vwPhysicianNote>()
+    .Name("gridPhysicianNotes")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PhysicianNoteId).Visible(false);
+        columns.Bound(c => c.CreateDate).Width(125).Format("{0:MM/dd/yyyy}").Title("Created");
+        columns.Bound(c => c.FullName).Title("Patient");
+        columns.Bound(c => c.PhysicianName).Title("Provider");
+        columns.Bound(c => c.PhysicianNote).Title("Notes").HtmlAttributes(new { @style = "width: 60%;" });
+        //columns.Command(command => command.Custom("X").Click("deleteNotes").HtmlAttributes(new { @class = "btn-danger" })).Title("X");
+        columns.Command(command => command.Custom("X").Click("deleteNotes").HtmlAttributes(new { @class = "btn-danger btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+    })
+    //.Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetNotes", "Notes").Data("PhysicianNotesFunc"))
+        .Sort(sort => sort.Add("CreateDate").Descending())
+        .PageSize(10)
+    )
+    //.Events(e => e.Change("onNotesChange"))
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+@* Create new Notes window *@
+<div id="windowNotes" class="col-lg-12 col-md-12 col-sm-12" style="display:none">
+    <form id="form" style="height:inherit;">
+        <p>Provider Note</p>
+        @Html.TextArea("PhysicianNote", "", new { @id = "txtPhysicianNote", @type = "text", @class = "form-control dissmiss-keyboard-ipad", @style = "height:200px; height: 80% ;width: 98%; max-width: 100%;" })
+        <br />
+        <button type="submit" class="btn btn-success" onclick="CreateNote(); return false;">Save</button>
+        <button type="submit" class="btn btn-danger" onclick="CancelButton(); return false;">Cancel</button>
+        <br />
+    </form>
+</div>
+
+@* Delete Notes Confrim window *@
+<div id="divDeleteNotesConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                Are you sure to delete selected note?
+            </span>
+        </p>
+    </div>
+    <input id="PhysicianNoteId" type="hidden" />
+    <div style="float: right;">
+        <button class="k-button delete-button-divDeleteNotesConfirm btn-danger btn-dialog" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="k-button close-button-divDeleteNotesConfirm btn-dialog" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //$("#gridPhysicianNotes").on("dblclick", "tr.k-state-selected", function () {
+        //    if (data != undefined) {
+        //        showPhysicianNotesPopup(data);
+        //    }
+        //});
+        //$("#gridPhysicianNotes").on("doubletap", "tr.k-state-selected", function () {
+        //    if (data != undefined) {
+        //        showPhysicianNotesPopup(data);
+        //    }
+        //});
+
+        $(".k-dropdown-operator").hide();
+
+        $(".delete-button-divDeleteNotesConfirm").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("DeleteNotes", "Notes")',
+                data: JSON.stringify({ PhysicianNoteId: $("#PhysicianNoteId").val() }),
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                success: function (data, textStatus, XMLHttpRequest) {
+                    if (data.hasOwnProperty("d")) {
+                        data = data.d;
+                    }
+                    if (data.success) {
+                        $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                        $("#gridPhysicianNotes").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                    }
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+
+            $("#divDeleteNotesConfirm").data("kendoWindow").close();
+        });
+
+        $(".close-button-divDeleteNotesConfirm").click(function () {
+            $("#divDeleteNotesConfirm").data("kendoWindow").close();
+        });
+    });
+</script>

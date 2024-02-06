@@ -1,0 +1,15 @@
+﻿@model PhysicianPortal.Web.Models.OfficeUsersViewModel
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "User List";
+}
+
+@*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+
+<fieldset>
+    <legend>Manage Users</legend>
+
+    @Html.Partial("ManageUsers", Model, new ViewDataDictionary(new { officeId = Model.OfficeId }))
+</fieldset>
+
+

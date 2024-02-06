@@ -1,0 +1,16 @@
+﻿@model PhysicianPortal.Web.Models.OfficeUsersViewModel
+@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Manage Office Users";
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+    var officeTitle = unitOfWork.OfficeRepository.GetSingle(x => x.OfficeId == Model.OfficeId).OfficeTitle;
+}
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<fieldset>
+    <legend>Manage Users for @officeTitle</legend>
+
+    @Html.Partial("ManageUsers", Model, new ViewDataDictionary(new { officeId = Model.OfficeId }))
+</fieldset>
+

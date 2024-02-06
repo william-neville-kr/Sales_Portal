@@ -1,0 +1,130 @@
+﻿
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 768px !important;
+}
+
+.container {
+    width: auto !important;
+    min-width: 750px !important;
+}
+
+
+
+
+.col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+    float: left !important;
+}
+
+.col-sm-12 {
+    width: 100% !important;
+}
+
+.col-sm-11 {
+    width: 91.66666666666666% !important;
+}
+
+.col-sm-10 {
+    width: 83.33333333333334% !important;
+}
+
+.col-sm-9 {
+    width: 75% !important;
+}
+
+.col-sm-8 {
+    width: 66.66666666666666% !important;
+}
+
+.col-sm-7 {
+    width: 58.333333333333336% !important;
+}
+
+.col-sm-6 {
+    width: 50% !important;
+}
+
+.col-sm-5 {
+    width: 41.66666666666667% !important;
+}
+
+.col-sm-4 {
+    width: 33.33333333333333% !important;
+}
+
+.col-sm-3 {
+    width: 25% !important;
+}
+
+.col-sm-2 {
+    width: 16.666666666666664% !important;
+}
+
+.col-sm-1 {
+    width: 8.333333333333332% !important;
+}
+
+.print-form-fullwidth {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+
+.print-form-field {
+    border-bottom: 1px black solid;
+    height: 21px;
+}
+
+.print-form-field-prescription {
+    border-bottom: 1px black solid;
+    height: 21px;
+    width: 100%;
+}
+
+.form-style {
+    border: none;
+    padding: 0;
+}
+
+.print-form-date {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+    margin-bottom: 0 !important;
+}
+
+.print-form-shiptoother-field {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+    margin: 0 !important;
+    border-bottom: 1px black solid;
+}
+
+label, span, input, div {
+    font-size: 12px !important;
+}
+
+
+    input[type="radio"], input[type="checkbox"] {
+        margin-top: 0 !important;
+        shape-margin: 0 !important;
+    }
+
+#PrescriptionInfoContainer {
+    page-break-before: always !important;
+    overflow: visible !important;
+}
+
+thead {
+    display: table-header-group !important;
+}
+
+tfoot {
+    display: table-row-group !important;
+}
+
+tr {
+    page-break-inside: avoid !important;
+}

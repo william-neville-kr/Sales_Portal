@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "Quick Search";
+}
+
+<h3>Quick Search</h3>
+
+@(Html.Kendo().TabStrip()
+    .Name("tabStripSearchSalesTeamPatients")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+    .Items(tabstrip =>
+    {
+        tabstrip.Add().Text("Patient Search")
+        .HtmlAttributes(new { @class = "k-state-active tabStripTabs" })
+        .Selected(true)
+        .Content(@Html.Partial("_SalesTeamPatients").ToHtmlString());
+
+        tabstrip.Add().Text("Referral Date Search")
+        .HtmlAttributes(new { @class = "tabStripTabs" })
+        .Content(@Html.Partial("_SearchSalesTeamPatientsReferralDate").ToHtmlString());
+
+        tabstrip.Add().Text("Drug Search")
+        .HtmlAttributes(new { @class = "tabStripTabs" })
+        .Content(@Html.Partial("_SearchSalesTeamPatientsDrug").ToHtmlString());
+
+        tabstrip.Add().Text("Therapy Search")
+        .HtmlAttributes(new { @class = "tabStripTabs" })
+        .Content(@Html.Partial("_SearchSalesTeamPhysicianDrugTherapySearch").ToHtmlString());
+    })
+)

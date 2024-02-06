@@ -1,0 +1,64 @@
+﻿@model PhysicianPortal.Web.Models.AddSignatureViewModel
+@{
+    ViewBag.Title = "AddSignature";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Signature</h2>
+
+@using (Html.BeginForm("AddSignature", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <h4>Add a Signature</h4>
+    <hr />
+    <div style="padding-left:40px !important">
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.Signature, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            <div id="divSignatures" style="display: inline-block;"></div>
+            <input type="hidden" id="Signature" name="Signature" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-primary" value="Save" />
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.getScript('@Url.Content("~/Scripts/jSignature/jSignature.min.js")', function () {
+            var sigDiv = $("#divSignatures");
+            var hidSig = $("#Signature");
+
+            addSignature(sigDiv, hidSig);
+        });
+    });
+
+    function addSignature(elementTemp, contentItemTemp) {
+        $(elementTemp).html("");
+        var sig = $("<div class='tableGrid' id='signature' style='height:400px; width: 900px; border: black 1px solid;'></div>");
+        sig.appendTo($(elementTemp));
+
+        setTimeout(function () {
+            //Initialize and start capturing
+            sig.jSignature();
+
+            // Listen for changes made via the custom control and update the content item whenever it changes.
+
+            sig.bind("change", function (e) {
+                var img = sig.jSignature("getData", "image");
+                if (img != null) {
+                    if (contentItemTemp.val() != img[1]) {
+                        contentItemTemp.val(img[1]);
+                    }
+                }
+            });
+        }, 0);
+    }
+</script>

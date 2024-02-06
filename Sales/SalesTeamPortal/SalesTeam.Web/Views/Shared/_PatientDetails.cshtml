@@ -1,0 +1,139 @@
+﻿<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Patient Code</label>
+                <span>
+                    @Model.PatientCode
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Gender</label>
+                <span>
+                    @Model.Gender
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Address</label>
+                <span>
+                    @Model.AddressLine1
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Zip</label>
+                <span>
+                    @Model.PostalCode
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>First Name</label>
+                <span>
+                    @Model.FirstName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Preferred Language</label>
+                <span>
+                    @Model.PreferredLanguage
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>City</label>
+                <span>
+                    @Model.City
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Physician Name</label>
+                <span>
+                    @Model.PhysicianName
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Last Name</label>
+                <span>
+                    @Model.LastName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Phone Number</label>
+                <span>
+                    @Model.PhoneNumber
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>State</label>
+                <span>
+                    @Model.StateProvince
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Disease State</label>
+                <span>
+                    @Model.DiseaseState
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Date Of Birth</label>
+                <span>
+                    @(Model.DateOfBirth != null ? String.Format("{0:MM/yyyy}", Model.DateOfBirth) : "")
+                    @*@String.Format("{0:MM/yyyy}", Model.DateOfBirth)*@
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Activity Status</label>
+                <span>
+                    @Model.ActivityStatus
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label></label>
+                <span>
+                    @*@Model.StateProvince*@
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Originating Pharmacy</label>
+                <span>
+                    @Model.OriginatingPharmacy
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

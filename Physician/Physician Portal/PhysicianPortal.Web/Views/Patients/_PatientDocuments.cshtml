@@ -1,0 +1,420 @@
+﻿@using Kendo.Mvc.UI;
+@{
+    Layout = null;
+}
+
+<div style="margin-bottom:10px; display: inline-block; width: 100%;">
+    <b>Choose and Upload a Document File</b>
+    @*@using (Ajax.BeginForm("UploadDocument", "Patients", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onDocumentUplaodSuccess" }, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))*@
+    @using (Html.BeginForm("UploadDocument", "Patients", FormMethod.Post, new { @class = "form-horizontal", id = "UploadDocumentForm", enctype = "multipart/form-data" }))
+    {
+
+        <input type="hidden" name="PatientId" id="PatientId" value="@Model.PatientIdEncrypted" />
+        <input type="hidden" name="PhysicianId" id="PhysicianId" value="@Model.PhysicianIdEncrypted" />
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing_border-box">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 box-sizing_border-box ">
+                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 box-sizing_border-box padding0">
+                    <label for="DocumentDescription" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" style="float: left;">Document Description</label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-8 col-xs-12 box-sizing_border-box padding0">
+                    @(Html.Kendo().TextBox()
+                        .Name("DocumentDescription")
+                        .HtmlAttributes(new { type = "text", placeholder = "Document Description", required = "required", validationmessage = "Document Description is requried.", @class = "form-control", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 box-sizing_border-box">
+                @(Html.Kendo().Upload()
+                    .Name("files")
+                    .HtmlAttributes(new { @class = "btn btn-primary", accept = ".tif, .pdf", @style = "max-width: 100%;" })
+                    .Events(e =>
+                        e.Upload("onUploadDocument")
+                        .Select("onSelectUploadDocument")
+                        .Cancel("onCancelDocument")
+                        .Remove("onRemoveDocument")
+                    )
+                )
+                @*<input id="documentId" type="file" name="file" style="display: none;" />
+                    <input class="btn btn-primary" onclick="$('#documentId').click(); return false;" value="Upload File" />*@
+            </div>
+            @*<input class="btn btn-primary" type="submit" name="Submit" id="Submit" value="Save" />*@
+            <input class="btn btn-primary" type="button" name="uploadDocumentForm" id="uploadDocumentForm" onclick="uploadDocumentFormFunc(); return false;" value="Upload" />
+            <div class="validation-summary" style="padding: 20px; height: auto; display: inline;"></div>
+        </div>
+    }
+</div>
+
+@(Html.Kendo().Grid<PhysicianPortal.Web.Models.PatientDocumentModel>()
+    .Name("gridPatientDocuments")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.DocumentDescription).Title("Document Name").ClientTemplate(
+            String.Format(
+                    @"<div class='document-icon'
+                        style='background-image: url({0});'></div>
+                    <div class='document-name'>#: DocumentDescription #</div>", Url.Content("~/Content/Images/pdf_logo.png")));
+        columns.Bound(c => c.CreatedOn).Width(125).Format("{0:MM/dd/yyyy}").Title("Created");
+        columns.Bound(c => c.SubmittedDate).Width(60).Format("{0:MM/dd/yyyy}").Title("Submitted Date");
+        columns.Command(command => command.Custom("Submit").Click("UploadDocumentToliveServer").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+        .Mode(GridFilterMode.Row)
+        .Extra(true)
+        .Operators(o => o
+            .ForString(s => s.Clear().Contains("Contains"))
+            //.ForDate(dt => dt.Clear().IsGreaterThanOrEqualTo("IsGreaterThanOrEqualTo"))
+            )
+        )
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPatientDocumentsRecords", "Patients", Model))
+        .Sort(sort => sort.Add("CreatedOn").Descending())
+        .PageSize(10)
+    )
+    .Selectable()
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChangePatientDocuments"))
+)
+
+
+
+<script type="text/javascript">
+    var data;
+    var isFileSelected = false;
+    var dialogHeight = 0;
+    var dialogWidth = 0;
+    var count = 0;
+
+    function onChangePatientDocuments(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridPatientDocuments").on("dblclick", "tr.k-state-selected", function () {
+            previewPatientDocuments(data);
+        });
+        $("#gridPatientDocuments").on("doubletap", "tr.k-state-selected", function () {
+            previewPatientDocuments(data);
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+
+    function UploadDocumentToliveServer(e) {
+
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        $.ajax({
+            url: '@Url.Action("UploadDocumentToliveServer", "Patients")',
+            data: { documentIdEncrypted: data.DocumentIdEncrypted },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (dataItem, textStatus, XMLHttpRequest) {
+                if (dataItem.hasOwnProperty("d")) {
+                    dataItem = dataItem.d;
+                }
+                if (dataItem.success) {
+                    $.notifyBar({ html: dataItem.message, cssClass: "success", position: "top" });
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+    }
+
+
+    function getDocumentData(documentId) {
+
+        $.ajax({
+            url: '@Url.Action("GetDocumentData", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: documentId }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    
+                    if (data.filetype == "tif") {
+                        $("#divDocumentViewer").html('<img id="imgDocument" style="width:98%; border:1px solid #000;" src="" >');
+                        $("#imgDocument").attr("src", "data:image/tiff;base64," + data.fileData);
+                    }
+                    else {
+                        var object = "<object data='{FileName}' type='application/pdf' style='width: inherit; height: 1000px;'>";
+                        object += "</object>";
+                        object = object.replace(/{FileName}/g, "data:application/pdf;base64," + data.fileData);
+
+                        $("#divDocumentViewer").html(object);
+                    }
+
+
+                    $("#divPreviewDocument").kendoWindow({
+                        modal: true,
+                        width: 800,
+                        height: 600,
+                        maxWidth: 1200,
+                        maxHeight: 1200,
+                        minWidth: 300,
+                        minHeight: 300,
+                        title: "Patient Documents",
+                        visible: false,
+                        resizable: true,
+                        draggable: true,
+                        actions: ["Close"],
+                        open: function (e) {
+                            $("body").css("overflow", "hidden");
+                            if (count == 1) {
+                                var dialog = $("#divPreviewDocument").data("kendoWindow");
+                                dialog.setOptions({
+                                    height: dialogHeight,
+                                    Width: dialogWidth,
+                                    resize: true
+                                });
+                                $("#divPreviewDocument").data("kendoWindow").center();
+                                count = 0;
+                            }
+                        },
+                        close: function (e) {
+                            $("body").css("overflow", "");
+                        },
+                        refresh: function () {
+                            $("#divPreviewDocument").bind("orientationchange", function (event) {
+                                var x = document.activeElement;
+                                if (x != undefined && x != null) {
+                                    x.blur();
+                                }
+                                $("#divPreviewDocument").data("kendoWindow").center();
+                            });
+                        }
+                    }).data("kendoWindow").center().open();
+
+
+                }
+                else {
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+
+    function previewPatientDocuments(patientDocuments) {
+
+        $("#divPreviewDocument").css("display", "block");
+        
+        getDocumentData(patientDocuments.DocumentIdEncrypted);
+    }
+
+    function cancelPatientRefaxDocConfirmation() {
+        $("#divRefaxPatientDocConfirm").data("kendoWindow").close();
+    }
+
+    
+
+    function refaxPatientDocument() {
+       
+        var documentIdEncrypted = data.DocumentIdEncrypted;
+        var _faxNumber = $("#idFaxNumberPatientDoc").val();
+        //var _physicianId = $("#hidPhysicianId").val();
+        var emailAddress = $("#txtEmailAddressPatientDoc").val();
+
+        $.ajax({
+            url: '@Url.Action("FaxPatietnDocument", "Patients")',
+            type: "POST",
+            data: JSON.stringify({
+                DocumentIdEncrypted: documentIdEncrypted,
+                FaxNumber: _faxNumber,
+                Email: emailAddress,
+                //PhysicianId: _physicianId
+            }),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                    $("#divRefaxPatientDocConfirm").data("kendoWindow").close();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+                //$("#divRefaxPatientDocConfirm").data("kendoWindow").close();
+                //alert(data.message);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        //}
+    }
+
+    // Document
+
+    function onDocumentUplaodSuccess(arg) {
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $("#gridPatientDocuments").data("kendoGrid").dataSource.read();
+        $(".k-upload-files.k-reset").remove();
+        $("#DocumentDescription").val("");
+
+    }
+
+    function onSelectUploadDocument(e) {
+        var files = e.files
+        var acceptedFiles = [".tif", ".pdf"]
+        var isAcceptedImageFormat = ($.inArray(files[0].extension.toLocaleLowerCase(), acceptedFiles)) != -1
+
+        if (!isAcceptedImageFormat) {
+            e.preventDefault();
+            alert("Image must be tif or pdf");
+            isFileSelected = false;
+        }
+        isFileSelected = true;
+        var status = $(".validation-summary");
+        status.text("");
+    }
+
+    function onCancelDocument(e) {
+        isFileSelected = false;
+    }
+
+    function onRemoveDocument(e) {
+        isFileSelected = false;
+    }
+
+    function uploadDocumentFormFunc() {
+
+        //if ($("#DocumentDescription").val() == "") {
+        //    return false;
+        //}
+
+        var form = $('#UploadDocumentForm')[0]; // You need to use standart javascript object here
+        var formData = new FormData(form);
+
+        var validator = $('#UploadDocumentForm').kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (isFileSelected == false) {
+            status.text("Please select a file")
+                        .removeClass("valid")
+                        .addClass("invalid");
+            return false;
+        }
+
+        status.text("");
+
+        if (validator.validate()) {
+            $.ajax({
+                url: '@Url.Action("UploadDocument", "Patients")',
+                data: formData,
+                cache: false,
+                type: "POST",
+                // THIS MUST BE DONE FOR FILE UPLOADING
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                success: function (data, textStatus, XMLHttpRequest) {
+                    if (data.hasOwnProperty("d")) {
+                        data = data.d;
+                    }
+                    var success = data.success;
+                    var alertMessage = data.message;
+
+                    if (success) {
+                        $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+                    }
+                    else {
+                        $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+                    }
+                    //Reloading the grid here
+                    $("#gridPatientDocuments").data("kendoGrid").dataSource.read();
+                    $(".k-upload-files.k-reset").remove();
+                    $("#DocumentDescription").val("");
+                },
+                error: function (xhr) {
+                    
+                    alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function onUploadDocument(e) {
+        var invalidName = false;
+        for (var i = 0; i < e.files.length; i++) {
+            var name = e.files[i].name;
+            if (/^[a-zA-Z0-9-_. ]*$/.test(name) == false) {
+                Notify("File name:" + name + " contain special character(s) which are not allowed.", 'error');
+                invalidName = true;
+            }
+        }
+        if (!invalidName) {
+            e.data = {
+                CallSlipId: $('#CallSlipId').val()
+            };
+        }
+        else
+            e.preventDefault();
+    }
+</script>
+
+<style>
+    #gridPatientDocuments tbody tr:hover {
+        cursor: pointer;
+    }
+
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+    /*.k-window-content {
+        height:auto !important;
+
+    }*/
+</style>
+

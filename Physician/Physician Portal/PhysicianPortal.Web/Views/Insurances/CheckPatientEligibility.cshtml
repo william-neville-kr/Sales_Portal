@@ -1,0 +1,980 @@
+﻿@using PhysicianPortal.Core.Helpers;
+@model PhysicianPortal.PokitDokIntegration.Models.PokitDokModel
+@{
+    ViewBag.Title = "Patient Eligibility";
+    Layout = null;
+}
+
+@if (Model != null)
+{
+    <fieldset>
+    <legend>Patient Eligibility</legend>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Subscriber ID
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @Model.subscriber.id
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Insurance Payer
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @Model.payer.name
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Group Plan
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @Model.coverage.group_description
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Group Number
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @Model.coverage.group_number
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Coverage Level
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @(!string.IsNullOrEmpty(Model.coverage.level) ? Model.coverage.level.Replace("_", " ").ToProperCaseString() : "")
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px 0;">
+                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                    Coverage Active?
+                </label>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                    <span class="form-control-static">
+                        @(Model.coverage.active ? "Yes" : "No")
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="background: #F6F6F6; padding: 5px 15px;">
+            <div class="box-sizing-border-box">
+
+                @* Employee and Spouse Coverage, In Network Plan *@
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        <h5>Employee and Spouse Coverage, In Network Plan</h5>
+                    </div>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                            <label><b>Copayment</b></label>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                            <label><b>Service Types</b></label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                            <span class="form-control-static">
+                                @Model.coverage.copay[0].copayment.Amount_C
+                            </span>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                            <b>@Model.coverage.copay[0].service_types[0].Replace("_", " ").ToProperCaseString()</b>
+                            <br />
+                            @(string.Join("; ", Model.coverage.copay[0].messages.Select(t => t.message)))
+                        </div>
+                    </div>
+                </div>
+
+                @* Employee and Spouse Coverage, Network Not Applicable *@
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        <h5>Employee and Spouse Coverage, Network Not Applicable</h5>
+                    </div>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                            <label><b>Copayment</b></label>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                            <label><b>Service Types</b></label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                            <span class="form-control-static">
+                                @Model.coverage.copay[1].copayment.Amount_C
+                            </span>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                            <b>@Model.coverage.copay[1].service_types[0].Replace("_", " ").ToProperCaseString()</b>
+                            <br />
+                            @(string.Join("; ", Model.coverage.copay[1].messages.Select(t => t.message)))
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <button id="btnShowPatientEligibilityMoreInfo" class="btn btn-primary pull-right" type="button" style="margin-top: 5px;" onclick="showPatientEligibilityMoreInfo(); return false;">Show More</button>
+        <button id="btnhidePatientEligibilityMoreInfo" class="btn btn-danger pull-right hidden" type="button" style="margin-top: 5px;" onclick="hidePatientEligibilityMoreInfo(); return false;">Close</button>
+    </div>
+
+    <div id="divPatientEligibilityMoreInfo" class="hidden">
+        @(Html.Kendo().TabStrip()
+            .Name("tabStripNotes")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+            .Items(tabstrip =>
+            {
+                tabstrip.Add().Text("Coverage")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Selected(true)
+                .Content(
+                    @<text>
+                        <div id="divCoverage" class="box-sizing-border-box">
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Coverage Active?
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @(Model.coverage.active ? "Yes" : "No")
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Coverage Level
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @(!string.IsNullOrEmpty(Model.coverage.level) ? Model.coverage.level.Replace("_", " ") : "")
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Group Description
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.group_description
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Group Number
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.group_number
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Eligibility Begin Date
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.eligibility_begin_date
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Plan Begin Date
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.plan_begin_date
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Plan End Date
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        n/a
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Plan Description
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.plan_description
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Plan Number
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.plan_number
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Service Date
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.coverage.service_date
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row box-sizing-border-box">
+                                <label class="control-label col-lg-3 col-md-3 col-sm-3 col-xs-3 box-sizing-border-box font-weight-bold">
+                                    Correlation ID
+                                </label>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 box-sizing-border-box">
+                                    <span class="form-control-static">
+                                        @Model.correlation_id
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </text>
+                     );
+
+                tabstrip.Add().Text("Out-Of-Pocket")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(
+                    @<text>
+                        <div id="divDeductible" class="box-sizing-border-box">
+
+                            @* Deductible *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                    <h4>Deductible</h4>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        <p class="sub-heading">Individual Coverage</p>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        @(Html.Kendo().Chart()
+                                            .Name("IndividualInNetworkChart")
+                                            .Title(title => title
+                                                .Text(
+                                                    (
+                                                        decimal.Parse(Model.summary.deductible.individual.in_network.applied.amount) / decimal.Parse(Model.summary.deductible.individual.in_network.limit.amount)
+                                                    ).ToString("P0")
+                                                    + " toward In Network Deductible"
+                                                )
+                                                .Position(ChartTitlePosition.Bottom))
+                                            .Legend(legend => legend
+                                                .Visible(false)
+                                            )
+                                            .Series(series =>
+                                            {
+                                                series.Pie(new dynamic[] {
+                                                    new {category="Spent Y-T-D", value = Model.summary.deductible.individual.in_network.applied.amount, color="#60295F"},
+                                                    new {category="Remaining", value = Model.summary.deductible.individual.in_network.remaining.amount, color="#D6BFD7"}
+                                                })
+                                                .StartAngle(90);
+                                            })
+                                        )
+                                    </div>
+
+                                    @* In Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                                        <p>In Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.in_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.in_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.in_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    @* Out Of Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding-top15">
+                                        <p>Out Of Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.out_of_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.out_of_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.individual.out_of_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                    <h4>&nbsp;</h4>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        <p class="sub-heading">Family Coverage</p>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        @(Html.Kendo().Chart()
+                                            .Name("FamilyInNetworkChart")
+                                            .Title(title => title
+                                                .Text(
+                                                    (
+                                                        decimal.Parse(Model.summary.deductible.family.in_network.applied.amount) / decimal.Parse(Model.summary.deductible.family.in_network.limit.amount)
+                                                    ).ToString("P0")
+                                                    + " toward In Network Deductible"
+                                                )
+                                                .Position(ChartTitlePosition.Bottom))
+                                            .Legend(legend => legend
+                                                .Visible(false)
+                                            )
+                                            .Series(series =>
+                                            {
+                                                series.Pie(new dynamic[] {
+                                                    new {category="Spent Y-T-D", value = Model.summary.deductible.family.in_network.applied.amount, color="#60295F"},
+                                                    new {category="Remaining", value = Model.summary.deductible.family.in_network.remaining.amount, color="#D6BFD7"}
+                                                })
+                                                .StartAngle(90);
+                                            })
+                                        )
+                                    </div>
+
+                                    @* In Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                                        <p>In Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.in_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.in_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.in_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>                                    @* Out Of Network *@
+
+                                    @* Out Of Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding-top15">
+                                        <p>Out Of Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.out_of_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.out_of_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.deductible.family.out_of_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Maximum Out-Of-Pocket *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding-top: 25px;">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                    <h4>Maximum Out-Of-Pocket</h4>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        <p class="sub-heading">Individual Coverage</p>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        @(Html.Kendo().Chart()
+                                            .Name("IndividualOOPChart")
+                                            .Title(title => title
+                                                .Text(
+                                                    (
+                                                        decimal.Parse(Model.summary.out_of_pocket.individual.in_network.applied.amount) / decimal.Parse(Model.summary.out_of_pocket.individual.in_network.limit.amount)
+                                                    ).ToString("P0")
+                                                    + " toward In Network Max OOP"
+                                                )
+                                                .Position(ChartTitlePosition.Bottom))
+                                            .Legend(legend => legend
+                                                .Visible(false)
+                                            )
+                                            .Series(series =>
+                                            {
+                                                series.Pie(new dynamic[] {
+                                                    new {category="Spent Y-T-D", value = Model.summary.out_of_pocket.individual.in_network.applied.amount, color="#60295F"},
+                                                    new {category="Remaining", value = Model.summary.out_of_pocket.individual.in_network.remaining.amount, color="#D6BFD7"}
+                                                })
+                                                .StartAngle(90);
+                                            })
+                                        )
+                                    </div>
+
+                                    @* In Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                                        <p>In Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.in_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.in_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.in_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    @* Out Of Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding-top15">
+                                        <p>Out Of Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.out_of_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.out_of_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.individual.out_of_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                    <h4>&nbsp;</h4>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        <p class="sub-heading">Family Coverage</p>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                                        @(Html.Kendo().Chart()
+                                            .Name("FamilyOOPChart")
+                                            .Title(title => title
+                                                .Text(
+                                                    (
+                                                        decimal.Parse(Model.summary.out_of_pocket.family.in_network.applied.amount) / decimal.Parse(Model.summary.out_of_pocket.family.in_network.limit.amount)
+                                                    ).ToString("P0")
+                                                    + " toward In Network Max OOP"
+                                                )
+                                                .Position(ChartTitlePosition.Bottom))
+                                            .Legend(legend => legend
+                                                .Visible(false)
+                                            )
+                                            .Series(series =>
+                                            {
+                                                series.Pie(new dynamic[] {
+                                                    new {category="Spent Y-T-D", value = Model.summary.out_of_pocket.family.in_network.applied.amount, color="#60295F"},
+                                                    new {category="Remaining", value = Model.summary.out_of_pocket.family.in_network.remaining.amount, color="#D6BFD7"}
+                                                })
+                                                .StartAngle(90);
+                                            })
+                                        )
+                                    </div>
+
+                                    @* In Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                                        <p>In Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.in_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.in_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.in_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>                                    @* Out Of Network *@
+
+                                    @* Out Of Network *@
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding-top15">
+                                        <p>Out Of Network</p>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Total Deductible
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.out_of_network.limit.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Spent Y-T-D
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.out_of_network.applied.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                        <label class="control-label col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box font-weight-bold">
+                                            Remaining
+                                        </label>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box">
+                                            <span class="form-control-static">
+                                                @Model.summary.out_of_pocket.family.out_of_network.remaining.Amount_C
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </text>
+                     );
+
+                tabstrip.Add().Text("Coinsurance")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(
+                    @<text>
+                        <div id="divCoinsurance" class="box-sizing-border-box">
+
+                            @* Employee and Spouse Coverage, In Network Plan *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                    <h4>Employee and Spouse Coverage, In Network Plan</h4>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <label><b>Benefit %</b></label>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <label><b>Service Types</b></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <span class="form-control-static">
+                                            @Model.coverage.coinsurance[0].benefit_percent
+                                            <span>%</span>
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <ul>
+                                            <li>
+                                                @Model.coverage.coinsurance[0].service_types[0].Replace("_", " ")
+                                                <br />
+                                                Messages: @(string.Join("; ", Model.coverage.coinsurance[0].messages.Select(t => t.message)))
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Employee and Spouse Coverage, Out of Network Plan *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding-top: 50px;">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                    <h4>Employee and Spouse Coverage, Out of Network Plan</h4>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <label><b>Benefit %</b></label>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <label><b>Service Types</b></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <span class="form-control-static">
+                                            @(Model.coverage.coinsurance[1].benefit_percent * 100)
+                                            <span>%</span>
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <ul>
+                                            <li>
+                                                @Model.coverage.coinsurance[1].service_types[0].Replace("_", " ")
+                                                <br />
+                                                Messages: @(string.Join("; ", Model.coverage.coinsurance[1].messages.Select(t => t.message)))
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </text>
+                     );
+
+                tabstrip.Add().Text("Copay")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(
+                    @<text>
+                        <div id="divCopay" class="box-sizing-border-box">
+
+                            @* Employee and Spouse Coverage, In Network Plan *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                    <h4>Employee and Spouse Coverage, In Network Plan</h4>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <label><b>Copayment</b></label>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <label><b>Service Types</b></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <span class="form-control-static">
+                                            @Model.coverage.copay[0].copayment.Amount_C
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <ul>
+                                            <li>
+                                                @Model.coverage.copay[0].service_types[0].Replace("_", " ")
+                                                <br />
+                                                @(string.Join("; ", Model.coverage.copay[0].messages.Select(t => t.message)))
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Employee and Spouse Coverage, Network Not Applicable *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding-top: 50px;">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                    <h4>Employee and Spouse Coverage, Network Not Applicable</h4>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <label><b>Copayment</b></label>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <label><b>Service Types</b></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <span class="form-control-static">
+                                            @Model.coverage.copay[1].copayment.Amount_C
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <ul>
+                                            <li>
+                                                @Model.coverage.copay[1].service_types[0].Replace("_", " ")
+                                                <br />
+                                                @(string.Join("; ", Model.coverage.copay[1].messages.Select(t => t.message)))
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </text>
+                     );
+
+                tabstrip.Add().Text("Limitations")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(
+                    @<text>
+                        <div id="divLimitations" class="box-sizing-border-box">
+
+                            @* Employee and Spouse Coverage, Network Not Applicable *@
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                                    <h4>Employee and Spouse Coverage, Network Not Applicable</h4>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="border-bottom: 1px #DDDDDD solid;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        <label><b>Benefit Amt</b></label>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <label><b>Service Types</b></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="padding: 15px 0;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 box-sizing-border-box">
+                                        @*<span class="form-control-static">
+                                                @Model.coverage.limitations[0].benefit_amount.Amount_C
+                                            </span>*@
+                                        &nbsp;
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 box-sizing-border-box">
+                                        <ul>
+                                            <li>
+                                                @Model.coverage.limitations[0].service_types[0].Replace("_", " ")
+                                                <br />
+                                                @(string.Join("; ", Model.coverage.limitations[0].messages.Select(t => t.message)))
+                                            </li>
+                                            <li>
+                                                @Model.coverage.limitations[1].service_types[0].Replace("_", " ")
+                                                <br />
+                                                @(string.Join("; ", Model.coverage.limitations[1].messages.Select(t => t.message)))
+                                            </li>
+                                            <li>
+                                                @Model.coverage.limitations[2].service_types[0].Replace("_", " ")
+                                                <br />
+                                                @(string.Join("; ", Model.coverage.limitations[2].messages.Select(t => t.message)))
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </text>
+                     );
+            })
+        )
+    </div>
+</fieldset>
+}
+<style type="text/css">
+    .font-weight-bold {
+        font-weight: bold;
+    }
+
+    #divCoverage .row {
+        margin: 0 0 10px 0;
+    }
+
+    .sub-heading {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        background: #eee;
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+    }
+
+    #divCoinsurance li,
+    #divCopay li,
+    #divLimitations li {
+        padding: 5px 0;
+    }
+
+    #divPatientEligibilityMoreInfo {
+        display: inline-block;
+        width: 100%;
+    }
+</style>
+
+<script type="text/javascript">
+    function hidePatientEligibilityMoreInfo() {
+        $("#divPatientEligibilityMoreInfo").addClass("hidden");
+        $("#btnShowPatientEligibilityMoreInfo").removeClass("hidden");
+        $("#btnhidePatientEligibilityMoreInfo").addClass("hidden");
+        return false;
+    }
+    function showPatientEligibilityMoreInfo() {
+        $("#divPatientEligibilityMoreInfo").removeClass("hidden");
+        $("#btnShowPatientEligibilityMoreInfo").addClass("hidden");
+        $("#btnhidePatientEligibilityMoreInfo").removeClass("hidden");
+        return false;
+    }
+</script>

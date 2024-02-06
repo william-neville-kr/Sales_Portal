@@ -1,0 +1,274 @@
+﻿<div class="col-lg-12 col-md-12 col-sm-12" style="padding: 0; display: inline-block;">
+    <div class="col-lg-10 col-md-7 col-sm-7 col-xs-6" style="padding: 10px; display: inline-flex; padding-left: 0;">
+        @Html.TextBox("TxtBoxSearchPhysician", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; ", @placeholder = "Enter Physician Name For Search", @type = "text" })
+    </div>
+    <div style="padding: 10px; float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%;border-radius: 0;" onclick="BtnSearchPhysicianFunc(); return false;"> Search</button>
+    </div>
+    <div style="padding: 10px;float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%;border-radius: 0;" onclick="ClearSearchPhysicianFunc(); return false;">Clear Search</button>
+    </div>
+</div>
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPhysician>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.PhysicianViewModel>()
+    .Name("gridSalesTeamPhysician")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.FirstName).Title("First");
+        columns.Bound(c => c.LastName).Title("Last");
+        columns.Bound(c => c.AddressLine1).Title("Address");
+        columns.Bound(c => c.City).Title("City");
+        columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PostalCode).Title("Zip").Width(45).HtmlAttributes(new { @class = "PostalCode padding2 text-align-center" });
+        columns.Bound(c => c.NationalProviderIdentifier).Title("NPI").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.Pending).Title("P").Width(37).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.Active).Title("A").Width(37).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.Cancelled).Title("C").Width(37).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        //columns.Bound(c => c.PhysicianId).ClientTemplate(
+        //    "#if(ConsentGranted == true){#" +
+        //  "<button class='k-button k-button-icontext btn-success btn-grid'>Granted</button>" +
+        //  "#} else {#" +
+        //  "<button onclick='showAskForConsentWindow(#:PhysicianId#);' class='k-button k-button-icontext btn-primary btn-grid'>Ask</button>" +
+        //  "# } #").Title("Consent").Width(42).Sortable(false);
+        columns.Command(command => command.Custom("N").Click("showNotesPopup")).Title("N").HtmlAttributes(new { @class = "padding2 text-align-center" });
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getSalesTeamPhysiciansRecords", "SalesTeamPhysician", Model).Data("SearchPhysicianFunc"))
+        .Sort(sort => sort.Add("Pending").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChange").DataBound("onDataBound"))
+    .AutoBind(false)
+)
+@*<div id="notesPopupPhysician"></div>*@
+
+<div id='divNotesPopup'></div>
+<div id="consentWindow" style="display: none;">
+    @Html.Hidden("consentPhysicianId", null, new { id = "consentPhysicianId" })
+    
+    <div>
+        <div style="width: 100%; text-align: center; margin: 20px 0 20px 0;">
+            <p>Please enter the Email of the Physician to ask for consent to view Patient Details</p>
+        </div>
+        <div style="width: 100%; text-align: center; margin: 0 0 20px 0;">
+            <input id="physicianEmailText" name="physicianEmailText" type="text" value="" placeholder="Physician Email" style="width: 200px;">
+        </div>
+        <div style="width: 100%; text-align: center;">
+            <button onclick='submitPhysicianConsentRequest($("#consentPhysicianId").val(), $("#consentSalesTeamId").val());' class='k-button k-button-icontext btn-primary' style="width: 80px;">Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function showAskForConsentWindow(physicianId) {
+
+        $("#consentPhysicianId").val(physicianId);
+
+        $("#consentWindow").kendoWindow({
+            modal: true,
+            width: "40%",
+            height: "30%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Ask Physician to view Patient Details",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+                $("#consentWindow").show();
+            },
+            close: function (e) {
+                //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+                $("#consentWindow").hide();
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function submitPhysicianConsentRequest(physicianId) {
+
+        if ($("#physicianEmailText").val() == '' || $("#physicianEmailText").val() == undefined || isEmail($("#physicianEmailText").val()) == false)
+        {
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("SendPhysicianConsentRequest", "SalesTeamPhysician")',
+            data: {
+                physicianId: physicianId,
+                physicianEmail: $("#physicianEmailText").val()
+            },
+            cache: false,
+            type: "POST",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                if (data.success == true)
+                {
+                    $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+                    $("#consentWindow").data("kendoWindow").close();
+                }
+                else
+                {
+                    alert("Could not complete the operation: " + data.message)
+                }
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function BtnSearchPhysicianFunc() {
+        if ($("#TxtBoxSearchPhysician").val() != "") {
+            $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function ClearSearchPhysicianFunc() {
+        $("#TxtBoxSearchPhysician").val("");
+        $(".k-filtercell span button").trigger("click");
+        $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+    }
+
+    function SearchPhysicianFunc() {
+        return {
+            sreachString: $("#TxtBoxSearchPhysician").val()
+            //,
+            //SalesTeamId: salesTeamId
+        }
+    }
+
+    $("#TxtBoxSearchPhysician").focusout(function () {
+        if ($("#TxtBoxSearchPhysician").val() != "") {
+            $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+
+            $(".PostalCode").each(function () {
+                $(this).text($(this).text().substring(0, 5));
+            });
+        }
+    });
+
+    $("#TxtBoxSearchPhysician").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            if ($("#TxtBoxSearchPhysician").val() != "") {
+                $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+            }
+            $(this).blur();
+        }
+    });
+
+    function showNotesPopup(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            url: '@Url.Action("ShowNotes", "SalesTeamNote")',
+            data: { SalesTeamId: dataItem.SalesTeamId, PatientId: dataItem.PatientId, PhysicianId: dataItem.PhysicianId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                //$("#divNotesPopup").html(data);
+                //$("#NotesPopup").data("kendoWindow").center().open();
+
+                $("#divNotesPopup").kendoWindow({
+                    modal: true,
+                    width: "70%",
+                    height: "70%",
+                    maxWidth: 800,
+                    maxHeight: 600,
+                    minWidth: 300,
+                    minHeight: 300,
+                    title: "Pharmacy Notes",
+                    visible: false,
+                    resizable: false,
+                    draggable: false,
+                    actions: ["Close"],
+                    open: function (e) {
+                        $("body").css("overflow", "hidden");
+                    },
+                    close: function (e) {
+                        //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                        $("body").css("overflow", "");
+                    }
+                }).data("kendoWindow").content(data).center().open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function onDataBound(arg) {
+        //console.log("Grid data bound");
+        $(".PostalCode").each(function () {
+            $(this).text($(this).text().substring(0, 5));
+        });
+    }
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        if ($("#TxtBoxSearchPhysician").val() != "") {
+            $("#gridSalesTeamPhysician").data("kendoGrid").dataSource.read();
+        }
+
+        $("#gridSalesTeamPhysician").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $("#gridSalesTeamPhysician").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    function isEmail(email) {
+        var regex = new RegExp("^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$");
+        return regex.test(email);
+    }
+
+</script>
+
+<style>
+    #gridSalesTeamPhysician tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

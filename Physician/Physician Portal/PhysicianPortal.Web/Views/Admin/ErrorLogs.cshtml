@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewBag.Title = "Error Logs";
+}
+
+<fieldset>
+    <legend>Error Logs</legend>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.ErrorLog>()
+    .Name("gridErrorLogList")
+    .HtmlAttributes(new { @style = "display:inline-block; width: 100%" })
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.ShortMessage).Title("Short Message").Width(160);
+        columns.Bound(c => c.FullMessage).Title("Full Message").Encoded(false); //Encode(false) will be used to decode html code.       
+        columns.Bound(c => c.CreatedOn).Title("Created On").Format("{0:MM/dd/yyyy, hh:mm:ss tt}").Width(160).Filterable(false).Width(160);
+        columns.Bound(c => c.PageUrl).Title("Page URL").Width(160);
+
+    })
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+            .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetErrorLogs", "Admin", Model))
+        .PageSize(10)
+        .Sort(sort => sort.Add("Id").Descending())
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    )
+</fieldset>
+<script>
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+</script>
+
+<style>
+    .k-grid {
+        word-break: break-all;
+    }
+</style>

@@ -1,0 +1,385 @@
+﻿@using Kendo.Mvc.UI
+@model PhysicianPortal.Web.Models.AddPatientViewModel
+@{
+    ViewBag.Title = "Add New Referral";
+
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+
+    List<SelectListItem> languages = new List<SelectListItem>();
+    languages.Add(new SelectListItem() { Text = "English", Value = "English" });
+    languages.Add(new SelectListItem() { Text = "French", Value = "French" });
+    languages.Add(new SelectListItem() { Text = "Spanish", Value = "Spanish" });
+    languages.Add(new SelectListItem() { Text = "Mandarin", Value = "Mandarin" });
+
+    var statesList = unitOfWork.StateRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Name, Value = t.Abbreviation });
+}
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<fieldset>
+    <legend>Add New Referral</legend>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="checkbox">
+            <label><input id="ckExistingPatient" type="checkbox" />Do you want to add existing patient?</label>
+        </div>
+
+        <div id="autocompleteContainer" class="k-content" style="margin-bottom:20px; display: none;">
+            @(Html.Kendo().AutoComplete()
+              .Name("autoComPatientFullName")
+              .Placeholder("Enter Patient Name")
+              .DataTextField("FullName")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:80%;" })
+              .ClearButton(true)
+              .DataSource(source =>
+                  source.Read(read => read.Action("GetPatientNameList", "Patients").Data("GetPatientNameFun"))
+                  .ServerFiltering(true)
+              )
+            .Events(e => e.Select("onSelectAutoComPatientFullName"))
+            )
+        </div>
+    </div>
+
+    @using (Html.BeginForm("AddPatient", "Patients", FormMethod.Post, new { id = "addPatientForm", @class = "display-inline-block" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.PhysicianPortalPatientId)
+        <input  type="hidden" id="SSNTemp"/>
+
+
+        <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0 display-inline-block">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Email, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.Email)
+                                .Name("email")
+                                .HtmlAttributes(new { @id = "emailField", type = "email", placeholder = "Email", validationmessage = "Entered email is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.FirstName, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.FirstName)
+                                .Name("firstname")
+                                .HtmlAttributes(new { @id = "firstnameField", placeholder = "First Name", required = "required", validationmessage = "Enter First Name", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.LastName, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.LastName)
+                                .Name("lastname")
+                                .HtmlAttributes(new { @id = "lastnameField", placeholder = "Last Name", required = "required", validationmessage = "Enter Last Name", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                                .Name("phonenumber")
+                                .HtmlAttributes(new { @id = "phonenumberField", placeholder = "Phone Number", required = "required", validationmessage = "Entered Phone number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.DateOfBirth, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().DatePickerFor(m => m.DateOfBirth)
+                                .Name("DateOfBirth")
+                                .Max(DateTime.UtcNow)
+                                .Format("MM/dd/yyyy")
+                        )
+                        <span class="k-invalid-msg" data-for="DateOfBirth" style="margin-top: 5px;"></span>
+                    </div>
+                </div>
+
+
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.SSN, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @*@(Html.Kendo().TextBoxFor(m => m.SSN)
+                                .Name("SSN")
+                                .HtmlAttributes(new { required = "required", validationmessage = "Enter SSN #", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )*@
+
+                        @(Html.Kendo().MaskedTextBoxFor(m=>m.SSN)
+                        .Name("SSN")
+                        .Mask("000-00-0000")
+                        .HtmlAttributes(new { @id = "ssnField", placeholder = "SSN", @class = "form-control login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.PolicyNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.PolicyNumber)
+                                .Name("PolicyNumber")
+                                .HtmlAttributes(new { validationmessage = "Enter Policy Number", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Gender, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().RadioButtonFor(m => m.Gender)
+                                .Name("Gender")
+                                .Value("M")
+                                .Label("Male")
+                        )
+                        @(Html.Kendo().RadioButtonFor(m => m.Gender)
+                                .Name("Gender")
+                                .Value("F")
+                                .Label("Female")
+                        )
+                        <span class="k-invalid-msg" data-for="Gender" style="margin-top: 5px;"></span>
+                    </div>
+                </div>
+
+                @*<div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.physicianId, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.DropDownListFor(m => m.physicianId,
+                                Model.PhysiciansList,
+                                new { required = "required", validationmessage = "Select a physician", @id = "physicianField", @style = "width: 100%; max-width: 100%;" })
+                        <span class="k-invalid-msg" data-for="physicianField" style="margin-top: 5px;"></span>
+                    </div>
+                </div>*@
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0 display-inline-block">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Address, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.TextAreaFor(m => m.Address, new { @id = "addressField", placeholder = "Address", @class = "k-textbox max-width-field", rows = 4, style = "max-width: 100%; width: 100%; resize: none; padding-bottom: 10px;" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.City, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.City)
+                                .Name("city")
+                                .HtmlAttributes(new { @id = "cityField", placeholder = "City", required = "required", validationmessage = "Enter City", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.State, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.DropDownListFor(m => m.State, statesList, new { @id = "stateField" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Zip, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.Zip)
+                                .Name("zip")
+                                .HtmlAttributes(new { @id = "zipField", placeholder = "Zip", required = "required", validationmessage = "Enter Zip Code", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.GroupNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.GroupNumber)
+                                .Name("GroupNumber")
+                                .HtmlAttributes(new { validationmessage = "Enter Group Number", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.PreferredLanguage, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.DropDownListFor(m => m.PreferredLanguage, languages, new { @id = "languageField" })
+                    </div>
+                </div> 
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box padding0" style="display: inline-block;">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label">Select Provider</label>
+                    </div>
+                    <div id="autocompletePhysician" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+                        @Html.DropDownListFor(m => m.physicianId,
+                                Model.PhysiciansList,
+                                new { required = "required", validationmessage = "Select a physician", @id = "physicianField", @style = "width: 100%; max-width: 100%;" })
+                    </div>
+                    <span class="k-invalid-msg" data-for="physicianField" style="margin-top: 5px;"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+            <button type="submit" onclick="submitNewPatientForm();" class="btn btn-primary login-form-field">Continue</button>
+            <a href="@Url.Action("PatientsList", "Patients")" class="btn btn-danger">Cancel</a>
+        </div>
+    }
+</fieldset>
+
+<script type="text/javascript">
+   
+    
+    $(document).ready(function () {
+
+        $("#ckExistingPatient").click(function () {
+            if ($(this).prop("checked")) {
+                $("#autocompleteContainer").css("display", "block");
+            }
+            else {
+                $("#autocompleteContainer").css("display", "none");
+            }
+        });
+
+        $("#phonenumberField").mask("(999) 999-9999");
+        $("#zipField").mask("99999");
+        $("#DateOfBirth").mask("99/99/9999");
+
+        $("#ckExistingPatient").click(function () {
+            if ($(this).prop("checked")) {
+                $("#autocompleteContainer").css("display", "block");
+            }
+            else {
+                $("#autocompleteContainer").css("display", "none");
+            }
+        });
+
+        $("#SSN").blur(function () {
+            if ($(this).val().indexOf("_") == -1 && $(this).val() != "") {
+                $("#SSN").val($(this).val());
+                $("#SSNTemp").val($("#SSN").val());              
+                $(this).val("*******" + $(this).val().substring(7));
+            }
+            else {
+                $(this).val("");
+            }
+        });
+
+     
+        $("#SSN").focusin(function () {
+
+            if ($(this).val() != "") {
+                $(this).val($("#SSN").val());
+            }
+            else {
+                $("#SSN").val("");
+            }
+        });
+
+
+ 
+    });
+
+    
+
+    function submitNewPatientForm()
+    { 
+
+        if ($("#SSN").val() != null)
+        {
+            $("#SSN").val($("#SSNTemp").val());
+        }
+        var userForm = $("#addPatientForm");
+        kendo.init(userForm);
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+            return false;
+        }
+    }
+
+    function onSelectAutoComPatientFullName(e) {
+        var dataItem = this.dataItem(e.item.index());
+
+        //populate("#addPatientForm", dataItem);
+
+        $("#firstnameField").val(dataItem.FirstName);
+        $("#lastnameField").val(dataItem.LastName);
+        $("#phonenumberField").val(dataItem.PhoneNumber);
+        $("#DateOfBirth").data("kendoDatePicker").value(dataItem.DateOfBirth);
+        //$("#firstnameField").val(dataItem.Gender);
+        if (dataItem.Gender == 'M') {
+            $("#Gender_M").prop("checked", true);
+        }
+        else {
+            $("#Gender_F").prop("checked", true);
+        }
+        $("#addressField").val(dataItem.AddressLine1);
+        $("#cityField").val(dataItem.City);
+        $("#stateField").val(dataItem.StateProvince);
+        $("#zipField").val(dataItem.PostalCode);
+        //$("#languageField").val(dataItem.PreferredLanguage);
+    }
+
+    function GetPatientNameFun() {
+        return {
+            searchPatientName: $("#autoComPatientFullName").val()
+        }
+    }    
+</script>
+
+<style>
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+
+    input[type=date]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        display: none;
+    }
+
+    .k-radio:checked + .k-radio-label:after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+    }
+</style>

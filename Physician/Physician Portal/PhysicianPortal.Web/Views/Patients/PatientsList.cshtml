@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "Patients List";
+}
+
+<fieldset>
+    <legend>Patients List</legend>
+
+    @if (!User.IsInRole("Pharmacist"))
+    {
+        <div style="margin-bottom:10px">
+            <a href="@Url.Action("AddPatient", "Patients")" class="btn btn-primary" style="width: auto;">Add New Referral</a>
+        </div>
+    }
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.PhysicianPortalPatient>()
+        .Name("gridPatientsList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.Email).Title("Email Address");
+            columns.Bound(c => c.FirstName).Title("First Name");
+            columns.Bound(c => c.LastName).Title("Last Name");
+            columns.Bound(c => c.PhoneNumber).Title("Phone Number").Width(100);
+            columns.Bound(c => c.DateOfBirth).Title("Date of Birth").Format("{0:MM/dd/yyyy}").Width(125);
+            columns.Bound(c => c.Gender).Title("Gender").Width(60)
+                                        .ClientTemplate(
+                                            "# if (Gender == 'M') { #" +
+                                                "Male" +
+                                            "# } else if (Gender == 'F'){ #" +
+                                                "Female" +
+                                            "# } #"
+                                        );
+            columns.Bound(c => c.PreferredLanguage).Title("Language").Width(60);
+            columns.Bound(c => c.AddressLine1).Title("Address");
+            columns.Bound(c => c.City).Title("City");
+            columns.Bound(c => c.StateProvince).Title("State").Width(70);
+            columns.Bound(c => c.PostalCode).Title("Zip").Width(60);
+            columns.Command(command => command.Custom("Edit").Click("editPatient").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+            //columns.Command(command => command.Custom("Delete").Click("deletePatient").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+        })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetPatientsList", "Patients"))
+            .PageSize(10)
+        //.Sort(srt => srt.Add("Pending").Descending())
+        )
+        //.Mobile(MobileMode.Phone)
+        .NoRecords(n => n.Template("No records to display"))
+        //.Selectable()
+        //.Filterable()
+        .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+        .Sortable()
+    //.Events(e => e.Change("onChange").DataBound("onDataBound"))
+    )
+
+    <br /><br />
+
+</fieldset>
+<fieldset>
+    <legend>Processed Patients</legend>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.PhysicianPortalPatient>()
+        .Name("gridProcessedPatientsList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.Email).Title("Email Address");
+            columns.Bound(c => c.FirstName).Title("First Name");
+            columns.Bound(c => c.LastName).Title("Last Name");
+            columns.Bound(c => c.PhoneNumber).Title("Phone Number").Width(100);
+            columns.Bound(c => c.DateOfBirth).Title("Date of Birth").Format("{0:MM/dd/yyyy}").Width(125);
+            columns.Bound(c => c.Gender).Title("Gender").Width(60)
+                                        .ClientTemplate(
+                                            "# if (Gender == 'M') { #" +
+                                                "Male" +
+                                            "# } else if (Gender == 'F'){ #" +
+                                                "Female" +
+                                            "# } #"
+                                        );
+            columns.Bound(c => c.PreferredLanguage).Title("Language").Width(60);
+            columns.Bound(c => c.AddressLine1).Title("Address");
+            columns.Bound(c => c.City).Title("City");
+            columns.Bound(c => c.StateProvince).Title("State").Width(70);
+            columns.Bound(c => c.PostalCode).Title("Zip").Width(60);
+            columns.Command(command => command.Custom("Edit").Click("editPatient").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+            //columns.Command(command => command.Custom("Delete").Click("deletePatient").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+        })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetPatientsProcessed", "Patients"))
+            .PageSize(10)
+        //.Sort(srt => srt.Add("Pending").Descending())
+        )
+        //.Mobile(MobileMode.Phone)
+        .NoRecords(n => n.Template("No records to display"))
+        //.Selectable()
+        //.Filterable()
+        .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+        .Sortable()
+    //.Events(e => e.Change("onChange").DataBound("onDataBound"))
+    )
+
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+
+    function editPatient(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        @*var _url = '@Url.Action("AddPatient", "Patients")' + '?PatientId=' + dataItem.PatientId;*@
+        var _url = '@Url.Action("EditPatient", "Patients")' + '?PhysicianPortalPatientId=' + encodeURIComponent(dataItem.PhysicianPortalPatientIdEncrypted);
+        location.href = _url;
+    }
+
+
+
+
+</script>
+

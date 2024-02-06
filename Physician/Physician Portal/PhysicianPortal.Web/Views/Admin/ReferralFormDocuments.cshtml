@@ -1,0 +1,121 @@
+﻿
+@{
+    ViewBag.Title = "Referral From Documents";
+}
+
+
+@(Html.Kendo().Grid<PhysicianPortal.Web.Models.ReferralFormDocumentModel>()
+    .Name("gridReferralDocument")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PatientFullName).Title("Patient Name");
+        columns.Bound(c => c.PhysicianFullName).Title("Provider Name");
+        columns.Bound(c => c.NationalProviderIdentifier).Title("NPI #").Width(100);
+        columns.Bound(c => c.DocumentName).Title("Document Name").ClientTemplate(
+            String.Format(
+                    @"<div class='document-icon'
+                        style='background-image: url({0});'></div>
+                    <div class='document-name'>#: DocumentName #</div>", Url.Content("~/Content/Images/pdf_logo.png")));
+        //columns.Bound(c => c.CreatedOn).Format("{0:MM/dd/yyyy}").Title("Created").Width(150);
+        columns.Bound(c => c.SubmittedDate).Format("{0:MM/dd/yyyy}").Title("Submitted Date").Width(60);
+        columns.Command(command => command.Custom("Submit").Click("POSTReferralFormDATA").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+        .Mode(GridFilterMode.Row)
+        .Extra(true)
+        .Operators(o => o
+            .ForString(s => s.Clear().Contains("Contains"))
+            //.ForDate(dt => dt.Clear().IsGreaterThanOrEqualTo("IsGreaterThanOrEqualTo"))
+            )
+        )
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetAllReferralFormDocuments", "Patients", Model))
+        .Sort(sort => sort.Add("CreatedOn").Descending())
+        .PageSize(10)
+    )
+    .Selectable()
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChangePatientReferralFormDocuments"))
+//.Events(e => e.Change("onChangePatientReferralFormDocuments"))
+)
+
+
+
+<script type="text/javascript">
+    //var data1;
+    var isFileSelected = false;
+
+    function onChangePatientReferralFormDocuments(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridReferralDocument").on("dblclick", "tr.k-state-selected", function () {
+            previewPatientDocuments(data,2);
+        });
+        $("#gridReferralDocument").on("doubletap", "tr.k-state-selected", function () {
+            previewPatientDocuments(data,2);
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+
+    function POSTReferralFormDATA(e) {
+        var data1 = this.dataItem($(e.currentTarget).closest("tr"));
+        var request = {
+            documentIdEncrypted: data1.DocumentIdEncrypted,
+            physicianPortalPatientIdEncrypted: data1.PhysicianPortalPatientIdEncrypted
+        };
+
+        $.ajax({
+            url: '@Url.Action("ReSubmitReferralForm", "Patients")',
+            data: request,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "error", position: "top" });
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }    
+    
+</script>
+
+<style>
+    #gridPatientDocuments tbody tr:hover {
+        cursor: pointer;
+    }
+
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+</style>
+
+ 

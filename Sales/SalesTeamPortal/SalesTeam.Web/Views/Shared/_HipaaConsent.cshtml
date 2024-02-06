@@ -1,0 +1,39 @@
+﻿<div id="divAlertNoResult" class="alert alert-danger hidden">
+    No HIPAA Consent is available.
+</div>
+
+@(Html.Kendo().Grid<SalesTeam.Core.Data.spHIPAAConsent_Result>()
+    .Name("gridHIPAAConsent")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PatientERPCode).Title("Patient Code").Width(90);
+        columns.Bound(c => c.DrugName).Title("Drug Name");
+        columns.Bound(c => c.ConsentTherapy).Title("Consent Therapy");
+        columns.Bound(c => c.ConsentPatient).Title("Consent Patient");
+        columns.Bound(c => c.ConsentDate).Title("Consent Date").Width(60).Format("{0:MM/dd/yyyy}");
+    })
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("HippaConsent_Read", "ViewPatientDetails", Model))
+        .PageSize(10)
+    )
+    .Events(e => e.DataBound("onDataBoundHIPAAConsent"))
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+<script type="text/javascript">
+
+    function onDataBoundHIPAAConsent(arg) {
+        var length = $("#gridHIPAAConsent").data("kendoGrid").dataSource.data().length;
+
+        if (length == 0) {
+            $("#divAlertNoResult").removeClass("hidden");
+        }
+        else {
+            $("#divAlertNoResult").addClass("hidden");
+        }
+    }
+</script>

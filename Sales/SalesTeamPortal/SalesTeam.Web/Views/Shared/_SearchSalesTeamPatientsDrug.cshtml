@@ -1,0 +1,186 @@
+﻿<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; padding-bottom: 15px; display: inline-block;">
+    <div class="col-lg-10 col-md-7 col-sm-7 col-xs-6" style="padding: 10px; display: inline-flex;">
+        @Html.TextBox("TxtBoxSearchSalesTeamPatientsDrug", "", new { @class = "textBox", @style = "padding: 6px 12px; max-width: 100%; width: 100%; ", @placeholder = "Enter Drug Name To Search", @type = "text" })
+    </div>
+    <div style="padding: 10px; float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="BtnSearchSalesTeamPatientsDrugFunc(); return false;">Drug Search</button>
+    </div>
+    <div style="padding: 10px;float: left;">
+        <button type="button" class="btn btn-default" style="width: 100%; border-radius: 0;" onclick="ClearSearchSalesTeamPatientsDrugFunc(); return false;">Clear Drug</button>
+    </div>
+</div>
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPatient>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.PatientViewModel>()
+    .Name("gridSearchSalesTeamPatientsDrug")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.PatientId).Title("PatientId").Visible(false);
+        columns.Bound(c => c.ReferralDateId).Title("Ref").Format("{0:MM/dd/yyyy}").Width(80).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.PhysicianName).Title("Physician");
+        columns.Bound(c => c.PhyCity).Title("City");
+        //columns.Bound(c => c.StateProvince).Title("State");
+        columns.Bound(c => c.StateProvince).Title("State").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.DrugShortName).Title("Drug");
+        columns.Bound(c => c.ActivityStatus).Title("Status").Width(70).HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Bound(c => c.OriginatingPharmacy).Title("Pharmacy");
+        columns.Command(command => command.Custom("N").Click("showNotesPopup")).Title("N").HtmlAttributes(new { @class = "padding2 text-align-center" });
+        columns.Command(command => command.Custom("Q").Click("showAddQueuesConfirmation")).Title("Q").HtmlAttributes(new { @class = "padding2 text-align-center" });
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+        .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getSalesTeamPatientsDrugsRecords", "SalesTeamPatient", Model).Data("SearchSalesTeamPatientsDrugFunc"))
+        .Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e
+        .Change("onChange")
+        .DataBound("onDataBoundPatientsDrug")
+    )
+    .AutoBind(false)
+)
+
+
+@*<div id='divNotesPopup'></div>
+
+    <input id="SalesTeamId" type="hidden" />
+    <input id="PhysicianId" type="hidden" />
+    <input id="PatientId" type="hidden" />*@
+
+<script>
+    function BtnSearchSalesTeamPatientsDrugFunc() {
+    }
+
+    function ClearSearchSalesTeamPatientsDrugFunc() {
+        $("#TxtBoxSearchSalesTeamPatientsDrug").val("");
+        $(".k-filtercell span button").trigger("click");
+        $('#gridSearchSalesTeamPatientsDrug').data("kendoGrid").dataSource.read();
+    }
+
+    function SearchSalesTeamPatientsDrugFunc() {
+        return {
+            sreachString: $("#TxtBoxSearchSalesTeamPatientsDrug").val()
+        }
+    }
+
+    $("#TxtBoxSearchSalesTeamPatientsDrug").focusout(function () {
+        $('#gridSearchSalesTeamPatientsDrug').data("kendoGrid").dataSource.read();
+    });
+
+    $("#TxtBoxSearchSalesTeamPatientsDrug").bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            $('#gridSearchSalesTeamPatientsDrug').data("kendoGrid").dataSource.read();
+            $(this).blur();
+        }
+    });
+
+    @*function showNotesPopup(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#SalesTeamId").val(dataItem.SalesTeamId);
+        $("#PhysicianId").val(dataItem.PhysicianId);
+        $("#PatientId").val(dataItem.PatientId);
+
+        $.ajax({
+            url: '@Url.Action("ShowNotes", "SalesTeamNote")',
+            data: { PatientId: dataItem.PatientId, PhysicianId: dataItem.PhysicianId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                //$("#divNotesPopup").html(data);
+                //$("#NotesPopup").data("kendoWindow").center().open();
+
+                $("#divNotesPopup").kendoWindow({
+                    minWidth: 700,
+                    width: "50%",
+                    minHeight: 700,
+                    height: "50%",
+                    title: "Pharmacy Notes",
+                    visible: false,
+                    actions: ["Close"]
+                }).data("kendoWindow").content(data).center().open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function addPatientQueue(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $.ajax({
+            url: '@Url.Action("AddPatientQueue", "SalesTeamPatient")',
+            data: { PhysicianId: dataItem.PhysicianId, SalesTeamId: dataItem.SalesTeamId, PatientId: dataItem.PatientId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                alert("Patient added in Patients Queue Successfully.");
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+    }
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }*@
+
+    function onDataBoundPatientsDrug(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridSearchSalesTeamPatientsDrug").data("kendoGrid").dataItem(this);
+            if (dataItem.NeedMoreInfo == true) {
+                this.className += " needMoreInfoClass";
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridSearchSalesTeamPatientsDrug").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $("#gridSearchSalesTeamPatientsDrug").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+</script>

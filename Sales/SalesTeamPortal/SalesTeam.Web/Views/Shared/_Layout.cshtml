@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @*<title>@ViewBag.Title - My ASP.NET Application</title>*@
+    <title>@ViewBag.Title - Sales Insight</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/kendoCss")
+    @Scripts.Render("~/bundles/kendoJs")
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    @Styles.Render("~/Content/UserCustomization")
+    <script src='@Url.Content("~/Scripts/DoubleTap.js")'></script>
+
+    <style type="text/css">
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+            body div#loading-image {
+                /*background-color: #fff;*/
+                height: 100%;
+                position: fixed;
+                text-align: center;
+                width: 100%;
+                /*top: 150px;*/
+                z-index: 99999;
+            }
+
+                body div#loading-image img {
+                    margin-top: 20%;
+                }
+    </style>
+</head>
+<body>
+    @*
+        //prevent browser from saving credentials
+        <input type="text" name="username" id="username" autocomplete="on" value="fakeusername" style="display:none;" />
+        <input type="password" name="password" id="password" autocomplete="on" value="fakepassword" style="display:none;" />
+    *@
+
+    <div id="loading-image">
+        <img src="~/Content/Images/ajax-loader.gif" />
+    </div>
+
+    <div class="row header col-lg-12 col-md-12 col-sm-12 col-xs-12 paddingLeftRight0" style="margin-top: 0px;">
+        @{
+            var url = Url.RouteUrl("Default", ((Route)RouteTable.Routes["Default"]).Defaults);
+        }
+        @*<div class="headerLogo col-lg-6 col-md-6 col-sm-6 col-xs-12 paddingLeftRight0">
+                <div class="headerLogo col-lg-6 col-md-6 col-sm-6 col-xs-12 paddingLeftRight0" style="width: 125px; background-color: #3eb0e4; border-radius: 27px; margin-left: 5px;">
+                    <a href="@url" style="font-family: initial; color: white; padding: 22px; font-size: 30px; font-weight: bold; line-height: 2;">
+                        BETA
+                    </a>
+                </div>
+            </div>*@
+        <div class="headerLogo col-lg-6 col-md-6 col-sm-6 col-xs-12 paddingLeftRight0">
+            <a href='@url'>
+                <img alt="" src="~/Content/Images/site-logo.png" />
+            </a>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 paddingLeftRight0">
+            <div class="pull-left">
+                <a href="@Url.Action("Index", "Feedback")" class="btn btn-primary pull-right">Feedback</a>
+            </div>
+            <div class="navbar-header pull-right accountInfo">
+                <ul class="nav ace-nav">
+                    <li class="dark-opaque">
+                        <a data-toggle="dropdown" class="dropdown-toggle noselect">
+                            <span class="user-info">
+                                <small>Welcome,</small>
+                                <b>
+                                    <span id="UserName">
+                                        @User.Identity.Name
+                                    </span>
+                                </b>
+                            </span>
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close" style="z-index: 1001;">
+                            <li>
+                                @*<a href="~/Account/Profile.aspx" title="Manage your account">Profile</a>
+                                    <a href="~/Account/Manage.aspx" title="Manage your account">Change Password</a>*@
+                                @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { @id = "LogOffForm" }))
+                                {
+                                    <a onclick="logOutUser()">Log Off</a>
+                                }
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                @*<div style="float:right; margin-top: 5px;">
+                        <button id="LogOffButton" onclick="logOutUser()"> Log Off </button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin: 0">
+        <div class="navbar-inverse adjustMainMenue" role="banner">
+            <nav role="navigation" class="navbar navbar-inverse navbar-default" style="margin-top: 0px;">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="mainMenu">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse adjustMainMenue" id="mainMenu">
+                    <ul id="MenuControl1" class="nav navbar-nav" style="width: 100%;">
+                        <li>
+                            <a href='@Url.Content("~/DashBoard/Index")' class="" title="">
+                                Dash Board
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/SalesTeamPatient/Index")' class="" title="">
+                                Patients
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/SalesTeamPhysician/Index")' class="" title="">
+                                Physicians
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/SalesTeamNote/Index")' class="" title="">
+                                My Notes
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/SalesTeamQueue/Index")' class="" title="">
+                                My Patients
+                            </a>
+                        </li>
+                        <li>
+                            <a href='@Url.Content("~/SalesTeamInfo/Index")' class="" title="">
+                                Sales Team
+                            </a>
+                        </li>
+                        <li id="quickSearch">
+                            <a href='@Url.Content("~/SearchSalesTeamPatients/Index")' class="" title="">
+                                Quick Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    @*<div class="container body-content">*@
+    <div class="body-content">
+        <div id="navigation" class="" style="float: right;">
+            @*<button id="btnGoForward" class="btn" type="button" onclick="window.history.go(1);" style="background-image: url(../Content/Images/forward.png);">&nbsp;</button>
+                <button id="btnGoBack" class="btn" type="button" onclick="window.history.go(-1);" style="background-image: url(../Content/Images/back.png);">&nbsp;</button>*@
+            <button id="btnGoForward" class="btn" type="button" onclick="window.history.go(1);" style="background-image: url(@Url.Content("~/Content/Images/forward.png"));">&nbsp;</button>
+            <button id="btnGoBack" class="btn" type="button" onclick="window.history.go(-1);" style="background-image: url(@Url.Content("~/Content/Images/back.png"));">&nbsp;</button>
+        </div>
+        <br />
+        @RenderBody()
+        <hr />
+        <footer>
+            @*<p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>*@
+        </footer>
+    </div>
+
+    @RenderSection("scripts", required: false)
+
+    <div id="divDeleteNotesConfirm" style="display: none;">
+        <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+            <p>
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="lblConfirm">
+                    Are you sure to delete selected note?
+                </span>
+            </p>
+        </div>
+        <input id="SalesTeamNoteId" type="hidden" />
+        <div style="float: right;">
+            <button class="k-button delete-button-divDeleteNotesConfirm btn-danger" style="margin: .5em .4em .5em 0;">Yes</button>
+            <button class="k-button close-button-divDeleteNotesConfirm" style="margin: .5em .4em .5em 0;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="window" class="col-lg-12 col-md-12 col-sm-12" style="display:none">
+        <form id="form" style="height:inherit;">
+            <p>Sales Team Note</p>
+            @*@Html.TextArea("SalesTeamNote", "", new { @id = "txtSalesTeamNote", @required = "required", @type = "text", @class = "form-control", @style = "height:200px; height: 80% ;width: 98%; max-width: 100%;" })*@
+            @Html.TextArea("SalesTeamNote", "", new { @id = "txtSalesTeamNote", @type = "text", @class = "form-control", @style = "height:200px; height: 80% ;width: 98%; max-width: 100%;" })
+            <br />
+            @*@Html.Label("SalesTeamNote Required!", new { style = "display: none; color: red", @class = "control-label col-md-3" })*@
+            <button type="submit" class="btn btn-success" onclick="CreateNote(); return false;">Save</button>
+            <button type="submit" class="btn btn-danger" onclick="CancelButton(); return false;">Cancel</button>
+            <br />
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#MenuControl1  li").each(function () {
+                if (window.location.href.indexOf($(this).find("a").attr("href")) > 0) {
+                    $(this).find("a").addClass("activeTab");
+                }
+            });
+
+            $(document).click(function () {
+                if ($(".dark-opaque").hasClass("open")) {
+                    $(".dark-opaque").removeClass("open");
+                }
+            });
+            $(".dropdown-toggle").click(function (e) {
+                e.stopPropagation();
+                if ($(".dark-opaque").hasClass("open")) {
+                    $(".dark-opaque").removeClass("open");
+                }
+                else {
+                    $(".dark-opaque").addClass("open");
+                }
+            });
+            $(".navbar-toggle").click(function (e) {
+                e.stopPropagation();
+                if ($("#mainMenu").hasClass("collapse")) {
+                    $("#mainMenu").removeClass("collapse");
+                }
+                else {
+                    $("#mainMenu").addClass("collapse");
+                }
+            });
+
+            //$("#window").css("max-height");
+            //$("#txtSalesTeamNote").css("max-height", $("#window").css("max-height"));
+        });
+
+
+        // duplicate from _SalesTeamNotes
+
+
+
+        $(".delete-button-divDeleteNotesConfirm").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("DeleteNotes", "SalesTeamNote")',
+                data: { SalesTeamNoteId: $("#SalesTeamNoteId").val() },
+                cache: false,
+                type: "POST",
+                dataType: "html",
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                success: function (data, textStatus, XMLHttpRequest) {
+                    if (data.hasOwnProperty("d")) {
+                        data = data.d;
+                    }
+                    @*$('#@girdName').data("kendoGrid").dataSource.read();*@
+                    //$(".k-grid").data("kendoGrid").dataSource.read();
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+
+            $("#divDeleteNotesConfirm").data("kendoWindow").close();
+        });
+
+        $(".close-button-divDeleteNotesConfirm").click(function () {
+            $("#divDeleteNotesConfirm").data("kendoWindow").close();
+        });
+
+        function deleteNotes(e) {
+            e.preventDefault();
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            $("#SalesTeamNoteId").val(dataItem.SalesTeamNoteId);
+
+            $("#divDeleteNotesConfirm").kendoWindow({
+                modal: true,
+                width: 400,
+                title: "Confirm",
+                visible: false,
+                resizable: false,
+                draggable: false,
+                close: function () {
+                    $(".open-button").show();
+                },
+                actions: ["Close"]
+            })
+            .data("kendoWindow")
+            .center()
+            .open();
+        }
+
+        function logOutUser() {
+            window.location.href = '@Url.Action("LogOff", "Account")';
+        }
+    </script>
+
+    <script type="text/javascript" id="timeOutScript">
+        var t;
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+
+        function logout() {
+            window.location.href = '@Url.Action("TimedOut", "Account")';
+        }
+
+        //Timeout is set to 30 minutes
+        var timeout = 30 * 60000;
+        function resetTimer() {
+            window.clearTimeout(t);
+            t = window.setTimeout(logout, timeout);
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#loading-image').hide();
+
+            $(document).bind('ajaxStop', function () {
+                $('#loading-image').hide();
+            });
+        });
+    </script>
+</body>
+</html>

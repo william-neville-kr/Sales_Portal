@@ -1,0 +1,143 @@
+﻿@using Kendo.Mvc.UI;
+@using PhysicianPortal.Web.Models
+@using PhysicianPortal.Core.Repository;
+@using PhysicianPortal.Core.Helpers;
+@{
+    Layout = null;
+
+    List<PatientPictureModel> patientPictures = null;
+    try
+    {
+        int patientId = int.Parse(SecurityHelper.Decrypt(ViewBag.PatientId));
+        UnitOfWork _unitOfWork = new UnitOfWork();
+        patientPictures = _unitOfWork.PatientPictureRepository.GetAsQuerable(x => x.PatientId == patientId).Select(y => new PatientPictureModel
+        {
+            PictureId = y.PictureId,
+            PatientId = y.PatientId.Value,
+            PicturePath = y.PicturePath,
+            PictureName = y.PictureName
+        }).ToList();
+    }
+    catch (Exception ex)
+    {
+        Logger.LogException(ex);
+    }
+}
+
+
+<div id="picturesKendoWindow">
+    <img width="100%" height="100%" id="fullScreenImg" src="" style="object-fit: contain;">
+</div>
+
+<script type="text/x-kendo-tmpl" id="PicturesListTemplate">
+    <div class="picturesCell msls-label">
+        @*<img class="pictureImg" width="200" height="150" src="https://sales.mhcpharmacy.com/PatientPortalAPI#:PicturePath#">*@
+        @{ var baseUrl = @Url.Content("~/");}
+        <img class="pictureImg" width="200" height="150" src="@baseUrl#:PicturePath#">
+    </div>
+</script>
+
+@(Html.Kendo().ListView(patientPictures)
+        .Name("PicturesListView")
+        .TagName("div")
+        .ClientTemplateId("PicturesListTemplate")
+        .DataSource(dataSource => dataSource
+            .PageSize(20)
+            .ServerOperation(false)
+        )
+    .Selectable()
+)
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#picturesKendoWindow").kendoWindow({
+            modal: true,
+            width: "70%",
+            height: "80%",
+            //maxWidth: 600,
+            //maxHeight: 800,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Patient Picture",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("#PicturesListView").data("kendoListView").clearSelection();
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#picturesKendoWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#insuranceKendoWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow");
+
+        $(".picturesCell").click(function (e) {
+            var imgSrc = e.target.src;
+            
+            $("#fullScreenImg").attr("src", imgSrc);
+            var dialog = $("#picturesKendoWindow").data("kendoWindow");
+            //dialog.content(data);
+            dialog.center();
+            dialog.open();
+
+        });
+    });
+</script>
+
+<style>
+    #PicturesListView {
+        padding: 10px 5px;
+        margin-bottom: -1px;
+        border: none;
+        display: flex;
+    }
+
+    .picturesCell {
+        cursor: pointer;
+        float: left;
+        position: relative;
+        text-align: center;
+        margin: 2px 5px;
+        padding: 10px;
+        border-style: solid;
+        border-width: 1px;
+        /*border-color: #428bca;*/
+        border-color: #ccc;
+    }
+
+        .picturesCell:hover {
+            /*background-color: rgba(0,0,0,0.75);*/
+            transition: background .2s linear, color .2s linear;
+            -moz-transition: background .2s linear, color .2s linear;
+            -webkit-transition: background .2s linear, color .2s linear;
+            -o-transition: background .2s linear, color .2s linear;
+            color: black;
+            /*background-color: lightblue;*/
+            background-color: #ebebeb;
+        }
+
+    .pictureImg {
+        object-fit: contain;
+    }
+
+    .k-listview:after {
+        content: ".";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+</style>

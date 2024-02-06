@@ -1,0 +1,245 @@
+<html style="" class="js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths k-webkit k-webkit62"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Physician Portal</title>
+
+    <link href="/Content/bootstrap.css" rel="stylesheet">
+<link href="/Content/Site.css" rel="stylesheet">
+<link href="/Content/jQueryNotifyBar/jquery.notifyBar.css" rel="stylesheet">
+
+    <script src="/Scripts/modernizr-2.6.2.js"></script>
+
+    <script src="/Scripts/jquery-3.1.1.js"></script>
+
+    <script src="/Scripts/jquery.validate.js"></script>
+<script src="/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <link href="/Content/kendo/2017.1.118/kendo.common.min.css" rel="stylesheet">
+<link href="/Content/kendo/2017.1.118/kendo.bootstrap.min.css" rel="stylesheet">
+<link href="/Content/kendo/2017.1.118/kendo.bootstrap.mobile.min.css" rel="stylesheet">
+
+    <script src="/Scripts/kendo/2017.1.118/jquery.min.js"></script>
+<script src="/Scripts/kendo/2017.1.118/kendo.all.min.js"></script>
+<script src="/Scripts/kendo/2017.1.118/kendo.aspnetmvc.min.js"></script>
+<script src="/Scripts/kendo/2017.1.118/jszip.min.js"></script>
+<script src="/Scripts/jQueryNotifyBar/jquery.notifyBar.js"></script>
+
+    <script src="/Scripts/DoubleTap.js"></script>
+
+    <script src="/Scripts/bootstrap.js"></script>
+<script src="/Scripts/respond.js"></script>
+
+    <link href="/Content/user-customization.css" rel="stylesheet">
+
+
+    <script src="/Scripts/jQueryMasked/jquery.maskedinput.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#loading-image').hide();
+
+            $(document).bind('ajaxStop', function () {
+                $('#loading-image').hide();
+            });
+            //.bind('ajaxStart', function () {
+            //    $('#loading-image').show();
+            //});
+
+            $("#DropDownMenu  li").each(function () {
+                if (window.location.href.indexOf($(this).find("a").attr("href")) > 0) {
+                    $(this).find("a").addClass("activeTab");
+                }
+            });
+
+            $(document).click(function () {
+                if ($("#navAdmin").hasClass("open")) {
+                    $("#navAdmin").removeClass("open");
+                }
+            });
+
+            $("#ddlNavAdmin").click(function (e) {
+                e.stopPropagation();
+                if ($("#navAdmin").hasClass("open")) {
+                    $("#navAdmin").removeClass("open");
+                }
+                else {
+                    $("#navAdmin").addClass("open");
+                }
+            });
+
+            $("#ddlNavReports").click(function (e) {
+                e.stopPropagation();
+                if ($("#navReports").hasClass("open")) {
+                    $("#navReports").removeClass("open");
+                }
+                else {
+                    $("#navReports").addClass("open");
+                }
+            });
+
+            $(".navbar-toggle").hover(function (e) {
+                $(this).css("background-color", "#2466a3");
+            });
+
+            $(".navbar-toggle").click(function (e) {
+                e.stopPropagation();
+                $(this).css("background-color", "#2466a3");
+                if ($("#mainMenu").hasClass("collapse")) {
+                    $("#mainMenu").removeClass("collapse");
+                }
+                else {
+                    $("#mainMenu").addClass("collapse");
+                }
+            });
+
+            document.addEventListener('touchstart', function (e) {
+                var x = document.activeElement;
+                console.log(x.nodeName);
+                if ((' ' + x.className + ' ').indexOf(' ' + 'dissmiss-keyboard-ipad' + ' ') > -1 || x.nodeName.toLowerCase() === "input" || x.nodeName.toLowerCase() === "textarea") {
+                    e.preventDefault();
+                    document.activeElement.blur();
+                }
+
+            }, false);
+
+                
+            $.ajax({
+                url: '/Admin/GetNewUsersCount',
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.success) {
+                        $("#newUsersNumber").text(data.message);
+                    }
+                    else {
+                        console.log(data.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+            
+
+            $("#refreshSessionBtn").click(function () {
+                $.ajax({
+                    url: '/Base/RenewSession',
+                    //data: JSON.stringify({ physicianId: selectedPatientForNewMessage.PhysicianId }),
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                    },
+                    success: function (data) {
+                        $("#divTimeoutAlert").data("kendoWindow").close();
+                    },
+                    error: function (xhr) {
+                        console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            });
+        });
+
+        setInterval(function () {
+            $.ajax({
+                url: '/Base/CheckForTimeout',
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                },
+                success: function (data) {
+
+                    if (data.success && data.message <= 60.0 && data.message > 0.0) {
+                        $("#divTimeoutAlert").kendoWindow({
+                            modal: true,
+                            width: 400,
+                            title: "Timeout",
+                            visible: false,
+                            resizable: false,
+                            draggable: false
+                        })
+                         .data("kendoWindow")
+                         .center()
+                         .open();
+                    }
+                    else if (data.success && data.message == 0.0) {
+                        if ($("#divTimeoutAlert").data("kendoWindow") != undefined) {
+                            $("#divTimeoutAlert").data("kendoWindow").close();
+                        }
+                        window.location.href = '/Account/Login';
+                    }
+                },
+                error: function (xhr) {
+                    console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                }
+            });
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div id="loading-image" style="display: none;">
+        <img src="/Content/Images/ajax-loader.gif">
+    </div>
+
+    <div style="background-color:#2466a3; height:10px;"> </div>
+    <div class="row header col-lg-12 col-md-12 col-sm-12 col-xs-12 paddingLeftRight0" style="margin-top: 0px; float:none">
+        <div class="headerLogo col-lg-4 col-md-4 col-sm-4 col-xs-12 paddingLeftRight0">
+            <a href="/Home/HomeDetail">
+                <table>
+                    <tbody><tr>
+                        <td style="padding-right: 20px;   vertical-align: inherit;">
+                            <img src="/Content/images/KrogerLogo.png" class="kroggerLogo">
+                        </td>
+                        <td>
+                            <h3>Specialty<br>Pharmacy</h3>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </a>
+        </div>
+        
+    </div>
+
+    
+
+    <div class="body-content">
+        
+
+
+<h1 class="text-danger">Sorry, we encountered an error</h1>
+<h2 class="text-danger">Could not find the resource you were looking for, please try again</h2>
+
+
+        <hr>
+        <footer></footer>
+    </div>
+
+    <div id="divTimeoutAlert" style="display: none;">
+        <div style="text-align:center; min-height: 34px;">
+            <p>
+                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                Your session is about to end because of inactivity
+            </p>
+        </div>
+        <div style="text-align: center">
+            <button id="refreshSessionBtn" class="k-button" style="">Renew session</button>
+        </div>
+    </div>
+
+    
+
+<!-- Visual Studio Browser Link -->
+<script type="application/json" id="__browserLink_initializationData">
+    {"appName":"Chrome","requestId":"dfb7990b87d74148a6c367f0fcbac4ee"}
+</script>
+<script type="text/javascript" src="http://localhost:2688/64534b1e0a9848748916c03024b20946/browserLink" async="async"></script>
+<!-- End Browser Link -->
+
+
+
+</body></html>

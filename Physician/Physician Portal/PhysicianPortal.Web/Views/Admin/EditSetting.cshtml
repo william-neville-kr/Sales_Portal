@@ -1,0 +1,60 @@
+﻿@model PhysicianPortal.Core.Data.ApplicationSetting
+
+@using (Ajax.BeginForm("EditSetting", "Admin", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onEditSettingSuccess" }, new { @class = "form-horizontal", role = "form", @id = "editSettingForm" }))
+{
+    <div>
+        @Html.AntiForgeryToken()
+        @Html.Hidden("ApplicationSettingId", Model.ApplicationSettingId)
+
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 validation-summary" style="height: auto"></div>
+        <div class="custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <p class="col-lg-11 col-md-11 col-sm-11 col-xs-11" style="font:bold">Enter the Following Information</p>
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12 box-sizing-border-box line-height-2_3">
+                @Html.LabelFor(m => m.Name)
+            </div>
+            <div class="form-group  col-lg-10 col-md-10 col-sm-9 col-xs-12 box-sizing-border-box">
+                @(Html.Kendo().TextBoxFor(m => m.Name)
+                            .Name("name")
+                            .HtmlAttributes(new { placeholder = "Enter Name", required = "required", validationmessage = "Name is Requried", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                )
+            </div>
+        </div>
+
+        <div class="custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12 box-sizing-border-box line-height-2_3">
+                @Html.LabelFor(m => m.Value)
+            </div>
+            <div class="form-group  col-lg-10 col-md-10 col-sm-9 col-xs-12 box-sizing-border-box">
+                @(Html.Kendo().TextBoxFor(m => m.Value)
+                            .Name("value")
+                            .HtmlAttributes(new { placeholder = "Enter Value", required = "required", validationmessage = "Value is Required", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                )
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 0px 0px;">
+            <button type="button" onclick="submitEditSettingForm(this);" class="btn btn-primary login-form-field" tabindex="3">Edit Setting</button>
+        </div>
+    </div>
+}
+
+<style>
+    .custom-input-form label {
+        float: left;
+    }
+
+    .padding20 {
+        padding: 20px;
+    }
+
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+</style>
+
+
+

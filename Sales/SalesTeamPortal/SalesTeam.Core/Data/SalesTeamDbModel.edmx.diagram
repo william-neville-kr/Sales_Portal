@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="0e9d3a060a3841a6997953eb8a40d4e7" Name="Diagram1" ZoomLevel="85">
+        <EntityTypeShape EntityType="MH_DWModel.vwPatientInsurance" Width="1.5" PointX="6.75" PointY="11" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPharmacyNote" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPhysician" Width="1.5" PointX="6.75" PointY="4.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPhysicianAddress" Width="1.5" PointX="8.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeam" Width="1.5" PointX="0.75" PointY="9.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamInfo" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamNote" Width="1.5" PointX="2.75" PointY="10.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamQueue" Width="1.5" PointX="2.5" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.SalesTeamNote" Width="1.5" PointX="13.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.SalesTeamQueue" Width="1.5" PointX="13.375" PointY="5.75" />
+        <EntityTypeShape EntityType="MH_DWModel.ApplicationSetting" Width="1.5" PointX="8.875" PointY="12.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="MH_DWModel.ReferralForm" Width="1.5" PointX="12.875" PointY="12.125" />
+        <EntityTypeShape EntityType="MH_DWModel.ReferralFormCategory" Width="1.5" PointX="13" PointY="8.625" />
+        <AssociationConnector Association="MH_DWModel.FK_ReferralForm_ReferralFormCategory" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamPhysician" Width="1.5" PointX="4.75" PointY="10.875" />
+        <EntityTypeShape EntityType="MH_DWModel.vwDocument" Width="1.5" PointX="7.375" PointY="14.75" />
+        <EntityTypeShape EntityType="MH_DWModel.AssociatesSalesTeam" Width="1.5" PointX="15.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPrescription" Width="1.5" PointX="9.75" PointY="5.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamPatient" Width="1.5" PointX="0.75" PointY="15.75" />
+        <EntityTypeShape EntityType="MH_DWModel.DimProcessTime" Width="1.5" PointX="15.375" PointY="3.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPatient" Width="1.5" PointX="9.375" PointY="14.75" />
+        <EntityTypeShape EntityType="MH_DWModel.FeedbackStatu" Width="1.5" PointX="13.125" PointY="16.875" />
+        <EntityTypeShape EntityType="MH_DWModel.Feedback" Width="1.5" PointX="15.375" PointY="16.875" />
+        <AssociationConnector Association="MH_DWModel.FK_Feedback_FeedbackStatus" />
+        <EntityTypeShape EntityType="MH_DWModel.FeedbackRelated" Width="1.5" PointX="15.375" PointY="7" />
+        <AssociationConnector Association="MH_DWModel.FK_Feedback_FeedbackRelated" />
+        <EntityTypeShape EntityType="MH_DWModel.vwFeedback" Width="1.5" PointX="15.375" PointY="10.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwSalesTeamPhysicianDrugTherapySearch" Width="1.5" PointX="17.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianConsent" Width="1.5" PointX="3.375" PointY="17.75" />
+        <EntityTypeShape EntityType="MH_DWModel.SalesPortalFaxLog" Width="1.5" PointX="17.375" PointY="8.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

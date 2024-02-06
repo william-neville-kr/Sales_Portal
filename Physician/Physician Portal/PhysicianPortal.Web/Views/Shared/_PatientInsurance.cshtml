@@ -1,0 +1,196 @@
+﻿@using PhysicianPortal.Core.Data;
+@using PhysicianPortal.Web.Models;
+@using PhysicianPortal.Core.Repository;
+@using Kendo.Mvc.UI;
+@using PhysicianPortal.Core.Helpers;
+
+@{
+    List<PatientInsuranceModel> patientInsurances = null;
+    try
+    {
+        string patientId = null;
+        int PatientId = 0;
+        if (ViewBag.PatientId == null)
+        {
+
+            patientId = @Model.PatientIdEncrypted;
+            PatientId = int.Parse(SecurityHelper.Decrypt(patientId));
+
+        }
+        else
+        {
+            patientId = ViewBag.PatientId;
+            PatientId = int.Parse(SecurityHelper.Decrypt(patientId));
+        }
+        //vwPhysician physicianModel = ViewBag.physicianModel;
+        vwPatient patientModel = Model;
+        //var patientInsurances = ViewBag.insurances;
+        UnitOfWork _unitOfWork = new UnitOfWork();
+
+        patientInsurances = new List<PatientInsuranceModel>();
+
+        foreach (var patientInsurance in _unitOfWork.PatientsInsuranceRepository.GetAsQuerable(t => t.PatientId == PatientId))
+        {
+            PatientInsuranceModel _PatientInsuranceModel = new PatientInsuranceModel();
+
+            _PatientInsuranceModel.InsuranceId = patientInsurance.InsuranceId;
+            _PatientInsuranceModel.InsuranceName = patientInsurance.InsuranceName;
+            _PatientInsuranceModel.InsuranceType = patientInsurance.InsuranceType;
+            _PatientInsuranceModel.InsuranceLevelName = patientInsurance.InsuranceLevelName;
+            _PatientInsuranceModel.LastUsedDate = patientInsurance.LastUsedDate;
+
+            patientInsurances.Add(_PatientInsuranceModel);
+        }
+    }
+    catch (Exception ex)
+    {
+        Logger.LogException(ex);
+    }
+}
+
+<legend>Patient Insurances</legend>
+<div id="insuranceKendoWindow"></div>
+
+<script type="text/x-kendo-tmpl" id="InsurancesListTemplate">
+    <div class="insuranceCell msls-label">
+        <label>#:InsuranceName#</label>
+        <label>#:InsuranceType#</label>
+        <div style="float:left;">
+            <label>#:InsuranceLevelName#</label>
+        </div>
+        <div style="float:left; padding-left: 5px;">
+            <label>#:LastUsedDateProp#</label>
+        </div>
+    </div>
+</script>
+
+@(Html.Kendo().ListView(patientInsurances)
+        .Name("InsurancesListView")
+        .TagName("div")
+        .ClientTemplateId("InsurancesListTemplate")
+        .DataSource(dataSource => dataSource
+            .PageSize(20)
+            .ServerOperation(false)
+        )
+    .Selectable()
+)
+
+<script type="text/javascript">
+    var data;
+
+    $(document).ready(function () {
+        $("#InsurancesListView").click(function (event) {
+            var tempList = $("#InsurancesListView").data("kendoListView");
+            data = tempList.dataItem(tempList.select());
+            if (data != undefined) {
+                getInsuranceDetailsView(data);
+            }
+        })
+    });
+
+    function getInsuranceDetailsView(arg) {
+
+        $("#insuranceKendoWindow").kendoWindow({
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Patient Insurance Details",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("#InsurancesListView").data("kendoListView").clearSelection();
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#insuranceKendoWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#insuranceKendoWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow");
+
+        $.ajax({
+            url: '@Url.Action("ShowInsuranceInfo", "Patients")',
+            data: JSON.stringify({ InsuranceID: arg.InsuranceId }),
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                var dialog = $("#insuranceKendoWindow").data("kendoWindow");
+                dialog.content(data);
+                dialog.center();
+                dialog.open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+</script>
+
+<style>
+    #InsurancesListView {
+        padding: 10px 5px;
+        margin-bottom: -1px;
+        border: none;
+    }
+
+    .insuranceCell {
+        cursor: pointer;
+        float: left;
+        position: relative;
+        width: 250px;
+        height: auto;
+        margin: 2px 5px;
+        padding: 10px;
+        border-style: solid;
+        border-width: 1px;
+        /*border-color: #428bca;*/
+        border-color: #ccc;
+    }
+
+        .insuranceCell label {
+            cursor: pointer;
+        }
+
+        .insuranceCell:hover {
+            /*background-color: rgba(0,0,0,0.75);*/
+            transition: background .2s linear, color .2s linear;
+            -moz-transition: background .2s linear, color .2s linear;
+            -webkit-transition: background .2s linear, color .2s linear;
+            -o-transition: background .2s linear, color .2s linear;
+            color: black;
+            /*background-color: lightblue;*/
+            background-color: #ebebeb;
+        }
+
+    .k-listview:after {
+        content: ".";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+</style>

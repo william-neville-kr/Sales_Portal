@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="710e312391df471b939935f62d380ef5" Name="Diagram1" ZoomLevel="55">
+        <EntityTypeShape EntityType="MH_DWModel.ApplicationSetting" Width="1.5" PointX="7.75" PointY="9" />
+        <EntityTypeShape EntityType="MH_DWModel.AuditOperationType" Width="1.5" PointX="3" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.AuditTrail" Width="1.5" PointX="5.25" PointY="5.25" />
+        <EntityTypeShape EntityType="MH_DWModel.ErrorLog" Width="1.5" PointX="8.75" PointY="2" />
+        <EntityTypeShape EntityType="MH_DWModel.Message" Width="1.5" PointX="0.75" PointY="11" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianNote" Width="1.5" PointX="9.75" PointY="9" />
+        <EntityTypeShape EntityType="MH_DWModel.Role" Width="1.5" PointX="0.75" PointY="6" />
+        <EntityTypeShape EntityType="MH_DWModel.Office" Width="1.5" PointX="6" PointY="1.5" />
+        <EntityTypeShape EntityType="MH_DWModel.PatientDocument" Width="1.5" PointX="10.75" PointY="2" />
+        <EntityTypeShape EntityType="MH_DWModel.State" Width="1.5" PointX="11.75" PointY="11" />
+        <EntityTypeShape EntityType="MH_DWModel.User_Office_Relationship" Width="1.5" PointX="8.25" PointY="6" />
+        <EntityTypeShape EntityType="MH_DWModel.UserClaim" Width="1.5" PointX="5.25" PointY="12.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwDocument" Width="1.5" PointX="9.75" PointY="14" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPatient" Width="1.5" PointX="13.75" PointY="5" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPhysician" Width="1.5" PointX="13.75" PointY="14" />
+        <AssociationConnector Association="MH_DWModel.FK_AuditTrail_AuditOperationType" />
+        <AssociationConnector Association="MH_DWModel.FK_User_Office_Relationship_Office" />
+        <EntityTypeShape EntityType="MH_DWModel.DimDrug" Width="1.5" PointX="0.75" PointY="15.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPharmacyNote" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianPortalPrescription" Width="1.5" PointX="16.375" PointY="15.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwMessage" Width="1.5" PointX="7.375" PointY="17.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwLastThreadMessage" Width="1.5" PointX="9.375" PointY="17.75" />
+        <EntityTypeShape EntityType="MH_DWModel.UserPhysicianRelationship" Width="1.5" PointX="10.375" PointY="5.75" />
+        <EntityTypeShape EntityType="MH_DWModel.Disease" Width="1.5" PointX="13" PointY="0.625" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormCardiovascular" Width="1.5" PointX="16.375" PointY="19.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormHivAid" Width="1.5" PointX="18.375" PointY="19.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwRefillFaxReportLog" Width="1.5" PointX="19.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwWorkflow" Width="1.5" PointX="3.375" PointY="20.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormCysticFibrosi" Width="1.5" PointX="20.375" PointY="10.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormGrowthHormone" Width="1.5" PointX="0.75" PointY="21.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormHepatology" Width="1.5" PointX="5.75" PointY="22.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormImmunology" Width="1.5" PointX="7.75" PointY="22.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormOncologyInfusion" Width="1.5" PointX="22.75" PointY="12.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormOsteoporosi" Width="1.5" PointX="24.75" PointY="12.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormPediatricGastoenterology" Width="1.5" PointX="2.75" PointY="25.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormRemicade" Width="1.5" PointX="26.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormTransplant" Width="1.5" PointX="28.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.Pharmacy" Width="1.5" PointX="21.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormNeurology" Width="1.5" PointX="31.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormOncology" Width="1.5" PointX="31.125" PointY="18.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormOncology_1" Width="1.5" PointX="33.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormOncology_2" Width="1.5" PointX="33.375" PointY="15.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormTransplant1" Width="1.5" PointX="35.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormTCA_AIandPI" Width="1.5" PointX="35.375" PointY="14.75" />
+        <EntityTypeShape EntityType="MH_DWModel.InsuranceEligibilityInfo" Width="1.5" PointX="23.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PokitDok_TradingPartner" Width="1.5" PointX="19.375" PointY="6.75" />
+        <AssociationConnector Association="MH_DWModel.FK_InsuranceEligibilityInfo_PokitDok_TradingPartner" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormGastroenterology" Width="1.5" PointX="10.375" PointY="21.75" />
+        <EntityTypeShape EntityType="MH_DWModel.NewRefill" Width="1.5" PointX="21.375" PointY="6.75" />
+        <EntityTypeShape EntityType="MH_DWModel.User1" Width="1.5" PointX="23.375" PointY="4.75" />
+        <EntityTypeShape EntityType="MH_DWModel.User" Width="1.5" PointX="3" PointY="4.25" />
+        <AssociationConnector Association="MH_DWModel.FK_AuditTrail_User" />
+        <AssociationConnector Association="MH_DWModel.FK_User_Role" />
+        <AssociationConnector Association="MH_DWModel.FK_User_Office_Relationship_User" />
+        <AssociationConnector Association="MH_DWModel.FK_UserClaim_User" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormNolaOncology" Width="1.5" PointX="27.375" PointY="36.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormGeneralintake" Width="1.5" PointX="37.375" PointY="4.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormBloodModifyingAgent" Width="1.5" PointX="37.375" PointY="21.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefillStatu" Width="1.5" PointX="37.125" PointY="43.875" />
+        <EntityTypeShape EntityType="MH_DWModel.vwDocument1" Width="1.5" PointX="39.375" PointY="21.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwReferralForm" Width="1.5" PointX="16.375" PointY="10.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwNotificationAlert" Width="1.5" PointX="39.375" PointY="4.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PatientQueue" Width="1.5" PointX="23.375" PointY="8.75" />
+        <EntityTypeShape EntityType="MH_DWModel.HomePage" Width="1.5" PointX="39.375" PointY="31" />
+        <AssociationConnector Association="MH_DWModel.FK_User_HomePage" />
+        <EntityTypeShape EntityType="MH_DWModel.PatientPicture" Width="1.5" PointX="39.375" PointY="30.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPatientInsurance" Width="2.875" PointX="15.375" PointY="1" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPrescription" Width="1.5" PointX="16.375" PointY="5.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwAuditTrail" Width="1.5" PointX="39.375" PointY="38.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianPortalPatient" Width="1.5" PointX="43.625" PointY="10" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianPortalPatient_ReferralForm_Relationship" Width="1.5" PointX="45.875" PointY="4.125" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianPortalPatientChecklistRelationship" Width="1.5" PointX="48.125" PointY="7.625" />
+        <EntityTypeShape EntityType="MH_DWModel.ReferralForm" Width="1.5" PointX="43.625" PointY="4.25" />
+        <EntityTypeShape EntityType="MH_DWModel.ReferralFormCategory" Width="1.5" PointX="41.375" PointY="4.625" />
+        <EntityTypeShape EntityType="MH_DWModel.ReferralFormChecklistRelationship" Width="1.5" PointX="45.875" PointY="8.75" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalPatient_PokitDok_TradingPartner" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalPatient_ReferralForm_Relationship_PhysicianPortalPatient" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalPatientChecklistRelationship_PhysicianPortalPatient" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalPatient_ReferralForm_Relationship_ReferralForm1" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalPatientChecklistRelationship_ReferralFormChecklistRelationship" />
+        <AssociationConnector Association="MH_DWModel.FK_ReferralForm_ReferralFormCategory" />
+        <AssociationConnector Association="MH_DWModel.FK_ReferralFormChecklistRelationship_ReferralForm1" />
+        <EntityTypeShape EntityType="MH_DWModel.vwDocumentsUploadLog" Width="1.5" PointX="37.375" PointY="1.25" />
+        <EntityTypeShape EntityType="MH_DWModel.vwReferralDocument" Width="1.5" PointX="39.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwRefillFaxDocument" Width="1.5" PointX="39.375" PointY="8.75" />
+        <EntityTypeShape EntityType="MH_DWModel.vwGetPhysicianPortalPatientMRN" Width="4.375" PointX="41.375" PointY="18.25" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPhysicianNote" Width="1.5" PointX="3.375" PointY="15.75" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianSignature" Width="1.5" PointX="39.375" PointY="34.75" />
+        <EntityTypeShape EntityType="MH_DWModel.FeedbackRelated" Width="1.5" PointX="41.375" PointY="21.25" />
+        <EntityTypeShape EntityType="MH_DWModel.FeedbackStatu" Width="1.5" PointX="41.375" PointY="43.125" />
+        <EntityTypeShape EntityType="MH_DWModel.PhysicianPortalFeedback" Width="1.5" PointX="43.625" PointY="32.125" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalFeedback_FeedbackRelated" />
+        <AssociationConnector Association="MH_DWModel.FK_PhysicianPortalFeedback_FeedbackStatus" />
+        <EntityTypeShape EntityType="MH_DWModel.vwPhysicianPortalFeedback" Width="1.5" PointX="41.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefillFaxReportLog" Width="1.5" PointX="39.375" PointY="47.5" />
+        <AssociationConnector Association="MH_DWModel.FK_RefillFaxReportLog_RefillStatus" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormDermatology" Width="1.5" PointX="12.375" PointY="20.75" />
+        <EntityTypeShape EntityType="MH_DWModel.RefFormRheumatology" Width="1.5" PointX="14.375" PointY="36.75" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

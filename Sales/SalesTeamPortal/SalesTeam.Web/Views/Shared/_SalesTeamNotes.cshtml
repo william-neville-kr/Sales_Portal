@@ -1,0 +1,244 @@
+﻿@{
+    SalesTeam.Core.Data.vwSalesTeamNote salesTeamNote = new SalesTeam.Core.Data.vwSalesTeamNote();
+    if (Model != null)
+    {
+        salesTeamNote = Model;
+    }
+    var girdName = "gridSalesTeamNotes" + DateTime.Now.Ticks.ToString();
+}
+
+<button id='BtnAddNotes' type='button' class='btn btn-default' style='border-radius: 0; margin-bottom: 15px;' onclick='BtnAddNotesFunc(); return false;'> Add Notes</button>
+
+@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamNote>()
+    .Name(girdName)
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.SalesTeamNoteId).Visible(false);
+        columns.Bound(c => c.CreateDate).Width(60).Format("{0:MM/dd/yyyy}").Title("Create");
+        columns.Bound(c => c.SalesRepresentativeFullName).Title("Created By");
+        columns.Bound(c => c.FullName).Title("Patient");
+        columns.Bound(c => c.PhysicianName).Title("Physician");
+        columns.Bound(c => c.SalesTeamNote).Title("Notes").HtmlAttributes(new { @style = "width: 60%;" });
+        //columns.Command(command => command.Custom("X").Click("deleteNotes").HtmlAttributes(new { @class = "btn-danger" })).Title("X");
+        columns.Command(command => command.Custom("X").Click("deleteNotes").HtmlAttributes(new { @class = "btn-danger" })).Title("X");
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("vwSalesTeamNotes_Read", "SalesTeamNote", Model))
+        .Sort(sort => sort.Add("CreateDate").Descending())
+        .PageSize(10)
+    )
+    //.Events(e => e.Change("onNotesChange"))
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+@*<div id="window" class="col-lg-12 col-md-12 col-sm-12" style="display:none">
+        <form id="form">
+            <div class="form-group">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <p>Sales Team Note</p>
+                    @Html.TextArea("SalesTeamNote", "", new { @id = "txtSalesTeamNote", @required = "required", @type = "text", @class = "form-control", @style = "height:200px" })<br />
+                    @Html.Label("SalesTeamNote Required!", new { style = "display: none; color: red", @class = "control-label col-md-3" })
+                    <button type="submit" class="btn btn-success" onclick="CreateNote(); return false;">Save</button>
+                    <button type="submit" class="btn btn-danger" onclick="CancelButton(); return false;">Cancel</button>
+                </div>
+            </div>
+            <br />
+        </form>
+    </div>*@
+
+@*<div id="divDeleteNotesConfirm" style="display: none;">
+        <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+            <p>
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="lblConfirm">
+                    Are you sure to delete selected note?
+                </span>
+            </p>
+        </div>
+        <input id="SalesTeamNoteId" type="hidden" />
+        <div style="float: right;">
+            <button class="k-button delete-button-divDeleteNotesConfirm btn-danger" style="margin: .5em .4em .5em 0;">Yes</button>
+            <button class="k-button close-button-divDeleteNotesConfirm" style="margin: .5em .4em .5em 0;">Cancel</button>
+        </div>
+    </div>*@
+
+<script>
+    var data;
+    //var textNote = $("#txtSalesTeamNote");
+    function onNotesChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    function BtnAddNotesFunc() {
+        var myWindow = $("#window");
+
+        myWindow.kendoWindow({
+            //modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Enter a Note",
+            visible: false,
+            actions: ["Close"],
+            draggable: false,
+            resizable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+            }
+        }).data("kendoWindow").center().open();
+
+        //myWindow.css("overflow", "hidden");
+    }
+
+    function CancelButton() {
+        if ($("#txtSalesTeamNote").val() != "") {
+            if (confirm("Do you really want to cancel the Note?")) {
+                $("#txtSalesTeamNote").val("");
+
+                $("#window").kendoWindow({
+                }).data("kendoWindow").close();
+                $("body").css("overflow", "");
+            }
+
+        }
+        else {
+            $("#window").kendoWindow({
+            }).data("kendoWindow").close();
+            $("body").css("overflow", "");
+        }
+
+    }
+
+    function CreateNote() {
+        //$("#form").validate();
+
+        //if ($("#form").valid())
+        {
+            var request = {
+                SalesTeamNote1: escapeHTML($("#txtSalesTeamNote").val()), SalesTeamId: '@salesTeamNote.SalesTeamId', PhysicianId: '@salesTeamNote.PhysicianId', PatientId: '@salesTeamNote.PatientId'
+                //SalesTeamNote1: escapeHTML($("#txtSalesTeamNote").val()), SalesTeamId: 'data.SalesTeamId', PhysicianId: 'data.PhysicianId', PatientId: 'data.PatientId'
+            };
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(request),
+                url: '@Url.Action("CreateNote", "SalesTeamNote")',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                success: function (msg) {
+                    var data;
+                    if (msg.hasOwnProperty("d")) {
+                        data = msg.d;
+                    }
+                    else
+                        data = msg;
+
+                    if (data.success) {
+                        success_check = true
+
+                        $("#window").data("kendoWindow").close();
+
+                        $('#@girdName').data("kendoGrid").dataSource.read();
+                        $("#txtSalesTeamNote").val("");
+                    }
+                    else {
+                        alert("Error: " + data.message);
+                        //$.notifyBar({ html: data.message, cssClass: 'error', position: 'top' });
+                    }
+                },
+
+            });
+        }
+    }
+
+    function escapeHTML(text) {
+        var replacements = { "<": "&lt;", ">": "&gt;", "&": "&amp;", "\"": "&quot;", '"': "&#34;", "'": "&#39;", ",": "&#44;", ":": "&#58;" };
+        if (text != "" && text != "null" && text != null) {
+            return text.replace(/[<>&"']/g, function (character) {
+                return replacements[character];
+            });
+        }
+        return "";
+    }
+
+
+    $(document).ready(function () {
+        $("#gridSalesTeamNotes").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                showSalesTeamNotesPopup(data);
+            }
+        });
+        $("#gridSalesTeamNotes").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                showSalesTeamNotesPopup(data);
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    @*$(".delete-button-divDeleteNotesConfirm").click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DeleteNotes", "SalesTeamNote")',
+            data: { SalesTeamNoteId: $("#SalesTeamNoteId").val() },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $('#@girdName').data("kendoGrid").dataSource.read();
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+        $("#divDeleteNotesConfirm").data("kendoWindow").close();
+    });
+
+    $(".close-button-divDeleteNotesConfirm").click(function () {
+        $("#divDeleteNotesConfirm").data("kendoWindow").close();
+    });*@
+
+    //function deleteNotes(e) {
+    //    e.preventDefault();
+    //    var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+    //    $("#SalesTeamNoteId").val(dataItem.SalesTeamNoteId);
+
+    //    $("#divDeleteNotesConfirm").kendoWindow({
+    //        modal: true,
+    //        width: 400,
+    //        title: "Confirm",
+    //        visible: false,
+    //        resizable: false,
+    //        draggable: false,
+    //        close: function () {
+    //            $(".open-button").show();
+    //        },
+    //        actions: ["Close"]
+    //    }).data("kendoWindow")
+    //        //.content(data)
+    //        .center()
+    //        .open();
+    //}
+</script>

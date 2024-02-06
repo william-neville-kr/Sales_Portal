@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/Views/Shared/_ErrorLayout.cshtml";
+    ViewBag.Title = "About";
+}
+
+<div class="container">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 row onePlacePush">
+        <h2>
+            About @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString()
+        </h2>
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 row">
+            <div class="text-align-justify">
+                <b>@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString() Inc.</b> is a nationwide, privately held clinical specialty pharmacy licensed to operate in all 50 states. Based in Lake Mary, Florida, @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName2"].ToString() specializes in providing physicians, patients, health plans, and other health care providers with injectable and oral brand-name products, as well as compounded pharmaceutical products. @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName2"].ToString()’s vision is to “Improve outcomes one relationship at a time.” @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName2"].ToString() achieves this through an experienced patient care team comprised of doctors of pharmacy, registered nurses, reimbursement specialists, and dedicated patient care coordinators; all of whom deliver the highest level of comprehensive care and clinical support with every prescription.   <br><br>  @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName2"].ToString() is accredited by the Accreditation Commission for Health Care (ACHC), and was recently awarded the 2011 SMART Award in Healthcare &amp; Life Sciences by the Orlando Chapter of the Association for Corporate Growth (ACG Orlando). @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName2"].ToString() also holds the honor of being included in the Inc.500/5000 List of America’s Fastest Growing Private Companies.
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+
+            <div>
+                <img class="margin-bottom30px margin-auto" id="smartAward" src="https://www.axiumportal.com/images/oneplace/smart_awards.png" style="border-width:0px;">
+                <img class="margin-bottom30px margin-auto" id="inc500" src="https://www.axiumportal.com/images/oneplace/inc_500.png" style="border-width:0px;">
+                <img class="margin-bottom30px margin-auto" id="achc" src="https://www.axiumportal.com/images/oneplace/ACHC.png" style="border-width:0px;">
+            </div>
+        </div>
+    </div>
+</div>

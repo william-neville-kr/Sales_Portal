@@ -1,0 +1,100 @@
+﻿<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Header</label>
+    <span id="NoteHeader">
+        @Model.NoteHeader
+    </span>
+</div>
+<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Note Date</label>
+    <span id="NoteDate">
+        @Model.NoteDate
+    </span>
+</div>
+<div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Full Name</label>
+                <span id="NoteFullName">
+                    @Model.FullName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Staff Full Name</label>
+                <span id="NoteStaffFullName">
+                    @Model.StaffFullName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Is Technician</label>
+                <span id="NoteIsTechnician">
+                    @Model.IsTechnician
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Note</label>
+</div>
+<div style="padding:10px;  border: 1px solid;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 0px 6px 0;">
+                    <p id="NoteText">
+                        @Model.Note
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="margin: 10px; text-align: center">
+    @*<button type="button" onclick="getPreviousNote()" style="margin: 5px; width: 100px; height: 30px; padding: 5px">Previous</button>
+    <button type="button" onclick="getNextNote()" style="margin: 5px; width: 100px; height: 30px; padding: 5px">Next</button>*@
+    <button class="btn btn-primary" id="btnPrev" type="button" onclick="getPreviousNote()" style="margin: 5px; width: 100px; padding: 5px">Previous</button>
+    <button class="btn btn-primary" id="btnNext" type="button" onclick="getNextNote()" style="margin: 5px; width: 100px; padding: 5px">Next</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        if (checkNextOrPreviosNote(-1) == false) {
+            $("#btnPrev").prop('disabled', true);
+        }
+
+        if (checkNextOrPreviosNote(1) == false) {
+            $("#btnNext").prop('disabled', true);
+        }
+
+        //$("#btnPrev").prop('disabled', true);
+    });
+
+    function getPreviousNote()
+    {
+        loadNextOrPreviosNote(-1);
+        if (checkNextOrPreviosNote(-1) == false)
+        {
+            $("#btnPrev").prop('disabled', true);
+            loadNextOrPreviosNote(-1);
+        }
+        $("#btnNext").prop('disabled', false);
+        //loadNextOrPreviosNote(-1);
+    }
+
+    function getNextNote()
+    { 
+        loadNextOrPreviosNote(1);
+        if (checkNextOrPreviosNote(1) == false)
+        {
+            $("#btnNext").prop('disabled', true);
+            loadNextOrPreviosNote(1);
+        }
+        $("#btnPrev").prop('disabled', false);
+        //loadNextOrPreviosNote(1);
+    }
+</script>

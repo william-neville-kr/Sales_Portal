@@ -1,0 +1,1531 @@
+﻿@using PhysicianPortal.Web.Models
+@model RefFormRheumatologyViewModel
+@{
+    ViewBag.Title = "Rheumatology Referral Form";
+    Layout = null;
+}
+
+@using (Ajax.BeginForm("RheumatologyReferralForm", "Patients", new AjaxOptions { OnSuccess = "OnSuccessReferralForm", OnFailure = "OnFailureReferralForm" }, new { @class = "ReferralForm display-inline-block form-style", @id = "RheumatologyForm" }))
+{
+    @Html.HiddenFor(m => m.PhysicianPortalPatientId)
+    @Html.HiddenFor(m => m.ReferralFormId)
+    @Html.HiddenFor(m => m.RefFormRheumatologyId)
+    @Html.HiddenFor(m => m.IsSignatured)
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding-bottom10px buttonsDiv">
+        <button class="btn btn-primary" onclick="ReferralFormSave(); return false;" type="button">Save</button>
+        <button class="btn btn-danger" type="button" onclick="$('#divReferralForm').html(''); return false;">Cancel</button>
+
+        @if (User.IsInRole("Physician"))
+        {
+            if (!ViewBag.IsHaveSignature)
+            {
+                <input class="btn btn-primary" disabled type="button" onclick="GetSignature();" value="Sign It" />
+                <span>Please add your signature into your account</span>
+            }
+            else
+            {
+                <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />
+            }
+        }
+        else
+        {
+            <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />
+        }
+        <button type="button" onclick="printButtonPressed('#RheumatologyForm');" class="btn btn-primary login-form-field">Print</button>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block" style="padding-bottom: 5px;">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 padding0 visible-lg visible-md visible-sm display-inline-block kroger-logo-container">
+            <img class="kroger-logo-class" alt="@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName3"].ToString() Logo" src="~/Content/images/KrogerLogo.png" style="width: 100%;" />
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 text-center">
+                <span class="color2">SPECIALTY PHARMACY</span>
+            </div>
+        </div>
+        <div class="col-xs-12 padding0 visible-xs text-center display-inline-block kroger-logo-container-xs">
+            <img class="kroger-logo-class" alt="@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName3"].ToString() Logo" src="~/Content/images/KrogerLogo.png" style="width: 35%;" />
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 text-center">
+                <span class="color2">SPECIALTY PHARMACY</span>
+            </div>
+        </div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 padding0 display-inline-block">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                <h1 class="pull-right color2" style="font-weight: 600; line-height: 37px;">RHEUMATOLOGY</h1>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                @if (Model.ReferralFormId == 65)
+                {
+                <span class="pull-right">
+                    <span class="color1">Garden Grove, CA</span> <span class="color2">toll free</span> 800.228.3643 <span class="color2">toll free fax</span> 866.539.1092
+                </span>
+                }
+                 else if (Model.ReferralFormId == 66)
+                {
+                <span class="pull-right">
+                    <span class="color1">Lake Mary, FL</span> <span class="color2">toll free</span> 855.733.3126 <span class="color2">toll free fax</span> 888.315.3270
+                </span>
+                }
+                else if (Model.ReferralFormId == 67)
+                {
+                <span class="pull-right">
+                    <span class="color1">Orlando, FL</span> <span class="color2">toll free</span> 855.274.1694 <span class="color2">toll free fax</span> 855.819.6922
+                </span>
+                }
+                else
+                {
+                <span class="pull-right">
+                    <span class="color1">New Orleans, LA</span> <span class="color2">toll free</span> 888.355.4191 <span class="color2">toll free fax</span> 888.355.4192
+                </span>
+                }
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block form-group padding0">
+                <h3 class="pull-right color2" style="margin: 0;">@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientNameWeb"].ToString()</h3>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0" style="padding-bottom: 5px;">
+                <div class="color3" style="height: 5px;"></div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                <label class="control-label">DATE: </label>
+                @Html.TextBoxFor(m => m.FormDate, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass" })
+
+                <label class="control-label">NEEDS BY DATE: </label>
+                @Html.TextBoxFor(m => m.FormNeedsByDate, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass" })
+
+                <label class="control-label"><b>SHIP TO: </b></label>
+
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToPatient")
+                        PATIENT
+                    </label>
+                </div>
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToOffice")
+                        OFFICE
+                    </label>
+                </div>
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToOther")
+                        OTHER
+                    </label>
+                    @Html.TextBoxFor(m => m.TxtBox_ShipToOther)
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0" style="padding-top: 5px;">
+                <div class="color3" style="height: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0 patient-prescriber">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <h4 class="heading1">PATIENT INFO</h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding10px" style="border: 1px black solid;">
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Patient Name</label>
+                @Html.TextBoxFor(m => m.PatientFullName, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Address</label>
+                @Html.TextBoxFor(m => m.PatientAddressLine1, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">City, State, Zip</label>
+                @Html.TextBoxFor(m => m.PatientCity_StateProvince_PostalCode, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Main Phone</label>
+                    @Html.TextBoxFor(m => m.PatientPhoneNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Alternate Phone</label>
+                    <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Social Security #</label>
+                <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Date of Birth</label>
+                    @Html.TextBoxFor(m => m.PatientDateOfBirth, "{0:MM/dd/yyyy}", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Gender</label>
+                    <div class="radio-inline">
+                        <label>
+                            @Html.RadioButtonFor(m => m.PatientGender, "M")
+                            Male
+                        </label>
+                    </div>
+                    <div class="radio-inline">
+                        <label>
+                            @Html.RadioButtonFor(m => m.PatientGender, "F")
+                            Female
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <h4 class="heading1">PRESCRIBER INFO</h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding10px" style="border: 1px black solid;">
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Prescriber Name</label>
+                @Html.TextBoxFor(m => m.PhysicianFullName, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding-left0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">DEA #</label>
+                        @Html.TextBoxFor(m => m.PhysicianDrugEnforcementAdministrationNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding-left0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">NPI #</label>
+                        @Html.TextBoxFor(m => m.PhysicianNationalProviderIdentifier, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">License #</label>
+                        @Html.TextBoxFor(m => m.PhysicianPhysicianLicenseNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Address</label>
+                @Html.TextBoxFor(m => m.PhysicianAddressLine1, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">City, State, Zip</label>
+                @Html.TextBoxFor(m => m.PhysicianCity_StateProvince_PostalCode, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Phone</label>
+                    @Html.TextBoxFor(m => m.PhysicianPhoneNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Fax</label>
+                    @Html.TextBoxFor(m => m.PhysicianFaxNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Contact Person</label>
+                <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+        @if (Model.ReferralFormId == 65)
+        {
+        <h4 class="heading2">
+            <b class="font-weight800">INSURANCE: </b>
+            PLEASE FAX COPY OF PRESCRIPTION CARD &amp; MEDICAL CARD FRONT &amp; BACK
+        </h4>
+        }
+        else
+        {
+
+        <h4 class="heading2yellow">
+            <b class="font-weight800">PLEASE FAX COPY OF: </b>
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand600mgPM2)*@
+            PRESCRIPTION CARD FRONT & BACK
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand400mgPM2)*@
+            CLINICAL NOTES
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand400mgPM2)*@
+            MEDICAL CARD FRONT & BACK
+
+        </h4>
+        }
+
+
+
+    </div>
+
+    <div id="ClinicalInfoContainer">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <h4 class="heading1">CLINICAL INFORMATION</h4>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            Diagnosis:
+            <div class="display-inline-block" style="padding-left: 30px;">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_M06_9)
+                        M06.9 Rheumatoid Arthritis
+                    </span>
+                </div>
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_L40_50)
+                        L40.50 Psoriatic Arthritis
+                    </span>
+                </div>
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_M45_9)
+                        M45.9 Ankylosing Spondylitis
+                    </span>
+                </div>
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_K50_90)
+                        K50.90 Crohn’s Disease
+                    </span>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+
+            <div class="display-inline-block" style="padding-left: 100px;">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_M32_10)
+                        M32.10 Systemic Lupus Erythematosus
+                    </span>
+                </div>
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_L40_8)
+                        L40.8 Psoriasis Moderate to Severe Plaque
+                    </span>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+
+            <div class="display-inline-block" style="padding-left: 100px;">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_Other)
+                        Other
+                    </span>
+                </div>
+                <div class="checkbox-inline">
+                    @*<input type="text" value="">*@
+                    @Html.TextBoxFor(m => m.Other_TxtBox, new { @type = "text" })
+                </div>
+            </div>
+            <div class="display-inline-block">
+                DX Code:
+                @*<input type="text" value="">*@
+                @Html.TextBoxFor(m => m.CLINICAL_DX_Code_TxtBox, new { @type = "text" })
+            </div>
+
+
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            Drug Allergies:
+            <div class="display-inline-block">
+                @*<input style="width: 985px;" type="text" value="">*@
+                @Html.TextBoxFor(m => m.CLINICAL_DrugAllergies_TxtBox, new { @style = " width: 985px;", @type = "text" })
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="display-inline-block">
+                Prior Failed Meds:
+            </div>
+            <div class="display-inline-block" style="padding-left: 10px;">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_Prior1)
+                        Methotrexate
+                    </span>
+                </div>
+            </div>
+            <div class="display-inline-block" style="padding-left: 50px;">
+                Length of Treatment:
+                @*<input class="width100px" type="text" value="">*@
+                @Html.TextBoxFor(m => m.LengthofTreatment_TxtBox1, new { @class = "width100px", @type = "text" })
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.Chkbox_ReasonforDiscontinuing1)
+                        Reason for Discontinuing
+                    </span>
+                    @*<input type="text" value="" style="width: 260px;">*@
+                    @Html.TextBoxFor(m => m.ReasonforDiscontinuing1_TxtBox, new { @style = " width: 260px;", @type = "text" })
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+
+            <div class="display-inline-block" style="padding-left: 10px;">
+                <div class="checkbox-inline" style="padding-left: 139px;">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_Prior2)
+                    </span>
+                    @*<input class="width100px" type="text" value="">*@
+                    @Html.TextBoxFor(m => m.Prior2_TxtBox, new { @class = "width100px", @type = "text" })
+                </div>
+            </div>
+            <div class="display-inline-block" style="padding-left: 36px;">
+                Length of Treatment:
+                @*<input class="width100px" type="text" value="">*@
+                @Html.TextBoxFor(m => m.LengthofTreatment_TxtBox2, new { @class = "width100px", @type = "text" })
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.Chkbox_ReasonforDiscontinuing2)
+                        Reason for Discontinuing
+                    </span>
+                    @*<input type="text" value="" style="width: 260px;">*@
+                    @Html.TextBoxFor(m => m.ReasonforDiscontinuing2_TxtBox2, new { @style = " width: 260px;", @type = "text" })
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+
+            <div class="display-inline-block" style="padding-left: 10px;">
+                <div class="checkbox-inline" style="padding-left: 139px;">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_Prior3)
+                    </span>
+                    @*<input class="width100px" type="text" value="">*@
+                    @Html.TextBoxFor(m => m.Prior3_TxtBox, new { @class = "width100px", @type = "text" })
+                </div>
+            </div>
+            <div class="display-inline-block" style="padding-left: 36px;">
+                Length of Treatment:
+                @*<input class="width100px" type="text" value="">*@
+                @Html.TextBoxFor(m => m.LengthofTreatment_TxtBox3, new { @class = "width100px", @type = "text" })
+            </div>
+            <div class="display-inline-block">
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.Chkbox_ReasonforDiscontinuing3)
+                        Reason for Discontinuing
+                    </span>
+                    @*<input type="text" value="" style="width: 260px;">*@
+                    @Html.TextBoxFor(m => m.ReasonforDiscontinuing3_TxtBox3, new { @style = " width: 260px;", @type = "text" })
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 display-inline-block">
+                Does patient have a latex allergy?
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_latexallergy_Yes)
+                        Yes
+                    </span>
+                </div>
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_latexallergy_No)
+                        No
+                    </span>
+
+                </div>
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 display-inline-block">
+                TB/PPD Test given or intended to be given before start?
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_beforestart_Yes)
+                        Yes
+                    </span>
+                </div>
+                <div class="checkbox-inline">
+                    <span>
+                        @*<input type="checkbox" value="">*@
+                        @Html.CheckBoxFor(m => m.ChkBox_beforestart_No)
+                        No
+                    </span>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="PrescriptionInfoContainer" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+        <table class="border-bottom2px">
+            <thead>
+                <tr>
+                    <th class="padding0" colspan="3">
+                        <h4 class="heading1">PRESCRIPTION INFORMATION</h4>
+                    </th>
+                    <th class="padding0" style="width: 10%;">
+                        <h4 class="heading1">QUANTITY</h4>
+                    </th>
+                    <th class="padding0" style="width: 10%;">
+                        <h4 class="heading1">REFILLS</h4>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border-right2px" style="width: 10%;">
+
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Actemra)
+                                Actemra®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px " style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_162mg)
+                                162mg Prefilled Syringe
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span class="border-right2pxwhite border-top1px">
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_vial)
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input style="width: 100px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Vial_TxtBox, new { @style = " width: 100px;", @type = "text" })
+                                Vial
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px " style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Inject162mgsubcutaneously)
+                                Inject 162mg subcutaneously
+                            </span>
+                        </div>
+
+                        <span>
+                            @*<input type="checkbox" value="">*@
+                            @Html.CheckBoxFor(m => m.ChkBox_ONCEaweek)
+                            ONCE a week or
+                        </span>
+
+                        <div class="checkbox-inline">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_everyOTHERweek)
+                                every OTHER week
+                            </span>
+                        </div>
+                        <div class="checkbox-inline">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Actemra_Infuse)
+                                Infuse
+                            </span>
+                        </div>
+
+                        <span>
+                            @*<input style="width: 50px;" type="text" value="">*@
+                            @Html.TextBoxFor(m => m.Actemra_Infuse_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                            mg at
+                        </span>
+
+
+                        <span>
+                            @*<input type="text" value="">*@
+                            @Html.TextBoxFor(m => m.Actemra_mgat_TxtBox, new { @style = " width: 50px;", @type = "text" })
+
+
+                        </span>
+
+
+
+
+
+                    </td>
+
+
+                    <td class="border-right2px " style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px " style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox1, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Benlysta)
+                                Benlysta®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_120mg)
+                                120mg/5ml
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_400mg)
+                                400mg/20ml
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Infuse1)
+                                    Infuse
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Infuse1_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                                mg at weeks 0, 2, and 4 , then every 4 weeks thereafter
+                            </span>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Infuse2)
+                                    Infuse
+                                </span>
+                            </div>
+
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Infuse2_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                                mg every 4 weeks
+                            </span>
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox2, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Cimzia)
+                                Cimzia®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_200PrefilledSyringe)
+                                200x2 Prefilled Syringe
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_200LYOPowder)
+                                200x2 LYO Powder
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_StarterKit)
+                                    Starter Kit: Inject 400mg subcutaneously at weeks 0, 2 and 4
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Maintenance)
+                                    Maintenance: Inject 400mg SubQ once every 4 weeks or
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Inject200mg)
+                                    Inject 200 mg SubQ once every 2 weeks
+                                </span>
+                            </div>
+
+                            <span>
+                                <input style="width: 50px;" type="text" value="">
+
+                                mg every 4 weeks
+                            </span>
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        1 Kit<br />
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        none<br />
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox3, new { @type = "text" })
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Cosentyx)
+                                Cosentyx®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_300mg)
+                                300mg(2x150) Pen
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_PFS)
+                                PFS
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_150mgPen)
+                                150mg Pen
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_PFS2)
+                                PFS
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Load)
+                                    Load: Inject
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_300mg2)
+                                    300mg or
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_150mgsubcutaneously)
+                                    150mg subcutaneously week 0, 1, 2, 3, 4
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Maintenance2)
+                                    Maintenance: Inject
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_300mg3)
+                                    300mg or
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_150mgsubcutaneously2)
+                                    150mg subcutaneously every 4 weeks
+                                </span>
+                            </div>
+
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        10
+                        <br />
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        none<br />
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox4, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Enbrel)
+                                Enbrel®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Enbrel50mgSureclick)
+                                50mg Sureclick
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Enbrel50mgPrefilledSyringe)
+                                50mg Prefilled Syringe
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Enbrel25mgPFS)
+                                25mg PFS or
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_EnbrelVials)
+                                Vials
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_EnbrelInject50mgsubcutaneouslyONCE)
+                                    Inject 50mg subcutaneously ONCE a week
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Enbrelnject50mgsubcutaneouslyTWICE)
+                                    Inject 25mg subcutaneously TWICE a week 72-96 hours apart
+                                </span>
+                            </div>
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox5, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Humira)
+                                Humira®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Humira40mgPen)
+                                40mg Pen
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Humira40mgPrefilledSyringe)
+                                40mg Prefilled Syringe
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_HumiraInject40mgsubcutaneouslyevery)
+                                    Inject 40mg subcutaneously every OTHER week
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_HumiraInject40mgsubcutaneouslyONCE)
+                                    Inject 40mg subcutaneously ONCE a week
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox6, new { @type = "text" })
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @Html.CheckBoxFor(m => m.ChkBox_Kevzara)
+                                Kevzara®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @Html.CheckBoxFor(m => m.ChkBox_200mgPrefilledSyringe)
+                                200 mg Prefilled Syringe
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_150mgPrefilledSyringe)
+                                150 mg Prefilled Syringe
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <span>
+                                Inject 200mg subcutaneously once every 2 weeks
+                            </span>
+
+
+                            <span>
+                                Inject 150mg subcutaneously once every 2 weeks
+                            </span>
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Kevzara_Refills_TxtBox, new { @type = "text" })
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Orencia)
+                                Orencia®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Orencia125mg)
+                                125mg
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_OrenciaPFS)
+                                PFS
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_OrenciaClickJect)
+                                ClickJect™
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Orencia250mg)
+                                250mg Vials
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_OrenciaInject125mg)
+                                    Inject 125mg subcutaneously ONCE a week
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_OrenciaInfuse)
+                                    Infuse
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input style="width: 50px;" type="text" value="">*@
+                                    @Html.TextBoxFor(m => m.OrenciaInfuse_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                                    mg at
+                                </span>
+                            </div>
+
+                            <span>
+                                @*<input style="width: 100px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Orenciamgat_TxtBox1, new { @style = " width: 100px;", @type = "text" })
+
+
+                            </span>
+
+
+
+                        </div>
+
+
+                    </td>
+
+
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox7, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Otezla)
+                                Otezla®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_OtezlaStarterPack)
+                                Starter Pack
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Otezla230mgTablets)
+                                30mg Tablets
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_OtezlaTitrate)
+                                    Titrate: Take 1 tablet on day 1 then twice daily as directed OR date provided
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Otezla_dateprovided_TxtBox, "{0:MM/dd/yyyy}", new { @style = " width: 50px;", @class= "dateclass" })
+                            </span>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Otezla_Maintenance)
+                                    Maintenance: Take 1 tablet by mouth twice daily.
+                                </span>
+                            </div>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_Otezla_Bridge)
+                                    Bridge Rx: Take 1 tablet by mouth twice daily; dispensed by OSP
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        1 Starter Pack<br />
+                        60<br />
+                        28
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        none<br />
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox8, new { @type = "text" })
+                        <br />
+                        12
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Remicade)
+                                Remicade®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Remicade100mgVial)
+                                100mg Vial
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_RemicadeInfuse)*@
+                                    Infuse
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.RemicadeInfuse_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                                mg at
+                            </span>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input style="width: 150px;" type="text" value="">*@
+                                    @Html.TextBoxFor(m => m.Remicademgat_TxtBox, new { @style = " width: 150px;", @type = "text" })
+                                    wt
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Remicadewt_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                            </span>
+
+
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox9, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Rituxan)
+                                Rituxan®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="text" value="">*@
+                                @Html.TextBoxFor(m => m.Rituxan_TxtBox, new { @type = "text" })
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_RituxanInfuse)*@
+                                    Infuse
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.RituxanInfuse_TxtBox, new { @style = " width: 50px;", @type = "text" })
+                                mg at
+                            </span>
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input style="width: 150px;" type="text" value="">*@
+                                    @Html.TextBoxFor(m => m.Rituxanmgat_TxtBox, new { @style = " width: 150px;", @type = "text" })
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox10, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Simponi)
+                                Simponi®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Simponi50mgSmartJect)
+                                50mg SmartJect or
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_SimponiPFS)
+                                PFS
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_SimponiAria)
+                                Aria
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_SimponiInject50mgsubcutaneouslyONCE)*@
+                                    Inject 50mg subcutaneously ONCE a MONTH
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_SimponiInfuse)*@
+                                    Infuse
+                                </span>
+                            </div>
+                            <span>
+                                @*<input style="width: 50px;" type="text" value="">*@
+                                @Html.TextBoxFor(m => m.SimponiInfusemgatweeks0and4, new { @style = " width: 50px;", @type = "text" })
+                                mg at weeks 0 and 4, then every 8 weeks thereafter
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        4 week supply
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox11, new { @type = "text" })
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Stelara)
+                                Stelara®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Stelara45mgPrefilledSyringe)
+                                45mg Prefilled Syringe
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_StelaraInject45mgonday)
+                                    Inject 45mg on day 0, then week 4, then every 12 weeks
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*<input type="checkbox" value="">*@
+                                    @Html.CheckBoxFor(m => m.ChkBox_StelaraInject45mgevery12)
+                                    Inject 45mg every 12 weeks
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        2-Loading Dose<br />
+                        1
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        none<br />
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox12, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Xeljanz)
+                                Xeljanz®
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Xeljanz5mgTablets)
+                                5mg Tablets
+                            </span>
+                        </div>
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Xeljanz11mgXRTablets)
+                                11mg XR Tablets
+                            </span>
+                        </div>
+
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 50%;">
+                        <div class="checkbox-inline">
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_Xeljanz1tabletbymouthtwice)*@
+                                    Take 1 tablet by mouth twice daily
+                                </span>
+                            </div>
+
+                            <div class="checkbox-inline">
+                                <span>
+                                    @*@Html.CheckBoxFor(m => m.ChkBox_Xeljanz1tabletbymouthonce)*@
+                                    Take 1 tablet by mouth once daily
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center">
+                        60<br />
+                        30
+
+                    </td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center">
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox13, new { @type = "text" })
+                        <br />
+                        @*<input type="text" />*@
+                        @Html.TextBoxFor(m => m.Refills_TxtBox14, new { @type = "text" })
+                    </td>
+                </tr>
+                <tr style="height: 75px;">
+                    <td class="border-right2px border-top1px" style="width: 10%;">
+                        <div class="checkbox">
+                            <span>
+                                @*<input type="checkbox" value="">*@
+                                @Html.CheckBoxFor(m => m.ChkBox_Others)
+                                Other
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-right2px border-top1px" style="width: 20%;"></td>
+                    <td class="border-right2px border-top1px" style="width: 50%;"></td>
+                    <td class="border-right2px border-top1px" style="width: 10%; text-align: center"></td>
+                    <td class="border-top2px border-top1px" style="width: 10%; text-align: center"></td>
+                </tr>
+
+        </table>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <p class="ft6">By signing this form and utilizing our services, you are authorizing @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString()<sup>TM</sup> and it’s employees to serve as your prior authorization designated agent in dealing with medical and prescription insurance companies.</p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding-left0">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0">
+                    <img id="imgSignature1" src="" style="height: 60px; width: 250px; border: black 1px solid;" alt="Attach your signature">
+                    &nbsp;
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block padding0">
+                    @Html.TextBoxFor(m => m.Date1, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass", @readonly = "True" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0 border-top1px-black-solid">
+                    <b>Prescriber’s Signature</b> <span class="ft6">(no stamps)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @if (Model.ReferralFormId == 65)
+                    {
+                    <b>Dispense As Written</b>
+                    }
+                    else
+                    {
+                    <b>Substitution Permitted</b>
+                    }
+
+
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block border-top1px-black-solid text-center">
+                    <b>Date</b>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding-right0">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0">
+                    <img id="imgSignature2" src="" style="height: 60px; width: 250px; border: black 1px solid;" alt="Attach your signature">
+                    &nbsp;
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block padding0">
+                    @Html.TextBoxFor(m => m.Date2, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass", @readonly = "True" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0 border-top1px-black-solid">
+                    <b>Prescriber’s Signature</b> <span class="ft6">(no stamps)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @if (Model.ReferralFormId == 65)
+                    {
+                    <b>Substitution Permitted</b>
+                    }
+                    else
+                    {
+                    <b>Dispense As Written</b>
+                    }
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block border-top1px-black-solid text-center">
+                    <b>Date</b>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <p class="ft6">
+                <b>IMPORTANT NOTICE:</b> This fax is intended to be delivered only to the named addressee. It contains material that is confidential, privileged property or exempt from disclosure under applicable law. If you are not the named addresses you should not disseminate, distribute or copy this fax. Please notify the sender immediately if you have received this document in error and then destroy this document immediately.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block buttonsDiv">
+        <button class="btn btn-primary" onclick="ReferralFormSave(); return false;" type="button">Save</button>
+        <button class="btn btn-danger" type="button" onclick="$('#divReferralForm').html(''); return false;">Cancel</button>
+
+        @if (User.IsInRole("Physician"))
+        {
+            if (!ViewBag.IsHaveSignature)
+            {
+        <input class="btn btn-primary" disabled type="button" onclick="GetSignature();" value="Sign It" />
+        <span>Please add your signature into your account</span>
+            }
+            else
+            {
+        <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />}
+        }
+        else { <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />
+        }
+        <button type="button" onclick="printButtonPressed('#RheumatologyForm');" class="btn btn-primary login-form-field">Print</button>
+    </div>
+}

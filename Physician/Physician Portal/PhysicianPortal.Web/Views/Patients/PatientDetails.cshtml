@@ -1,0 +1,468 @@
+﻿@using Kendo.Mvc.UI;
+@using PhysicianPortal.Core.Data;
+
+@{
+    ViewBag.Title = "PatientDetails";
+    string patientId = ViewBag.PatientId;
+    string phyId = ViewBag.PhysicianId;
+    vwPhysician physicianModel = ViewBag.physicianModel;
+    var Workflow = ViewBag.WorkflowModel;
+}
+
+<fieldset>
+    <legend>Patient - @Model.FullName</legend>
+
+    @*Patient Details*@
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div id="divPatientDetail" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 border1px-solid" style="display: inline-block; margin-bottom:20px; border-style: solid; border-width: 1px; border-color: #ccc;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block; padding-left:20px;padding-top:10px">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Patient Number</label>
+                        <span>
+                            @Model.PatientCode
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                        <label>Gender</label>
+                        <span>
+                            @Model.Gender
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Address</label>
+                        <span>
+                            @Model.AddressLine1
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Zip</label>
+                        <span>
+                            @Model.PostalCode
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block; padding-left:20px;padding-top:10px">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>First Name</label>
+                        <span>
+                            @Model.FirstName
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                        <label>Preferred Language</label>
+                        <span>
+                            @Model.PreferredLanguage
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>City</label>
+                        <span>
+                            @Model.City
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Provider Name</label>
+                        <span>
+                            @Model.PhysicianName
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block; padding-left:20px;padding-top:10px">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Last Name</label>
+                        <span>
+                            @Model.LastName
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                        <label>Phone Number</label>
+                        <span>
+                            @Model.PhoneNumber
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>State</label>
+                        <span>
+                            @Model.StateProvince
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Disease State</label>
+                        <span>
+                            @Model.DiseaseState
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block; padding-left:20px;padding-top:10px">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Date Of Birth</label>
+                        <span>
+                            @(Model.DateOfBirth != null ? String.Format("{0:MM/yyyy}", Model.DateOfBirth) : "")
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                        <label>Activity Status</label>
+                        <span>
+                            @Model.ActivityStatus
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label></label>
+                        <span>
+                            @*@Model.StateProvince*@
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0" style="display: inline-block;">
+                    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                        <label>Originating Pharmacy</label>
+                        <span>
+                            @Model.OriginatingPharmacy
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div id="divWorkflow" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="display: inline-block; margin-bottom:20px; border-style: solid; border-width: 1px; border-color: #ccc; overflow: auto; height: 290px;">
+            <h4>Status</h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="overflow: auto; height: 80%;">
+                @{
+                    foreach (var workflow in Workflow)
+                    {
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; background: #@workflow.colorcode">
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 padding0" style="width: 100px;">@workflow.WorkflowStartDateIdStr</div>
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 padding0" style="min-width: 200px; width: 22%;">@workflow.WorkflowName</div>
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 padding0">@workflow.OrderItemName</div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+                            <hr class="margin-workflow" />
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <style type="text/css">
+            .margin-workflow {
+                margin: 10px 0;
+            }
+        </style>
+    </div>
+</fieldset>
+@*Patient Insurance Partial View*@
+
+<fieldset>
+    <div>
+        @Html.Partial("_PatientInsurance")
+    </div>
+</fieldset>
+
+@*<fieldset>
+        @Html.Hidden("IsEligibilityValueExist", (bool)ViewBag.IsEligibilityValueExist)
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @Html.Label("PokitDok_TradingPartnerId", "Insurance Carrier", new { @class = "col-lg-3 col-md-3 col-sm-6 col-xs-12 row control-label" })
+
+                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                    @(Html.Kendo().DropDownList()
+                        .Name("PokitDok_TradingPartnerId")
+                        .DataTextField("Text")
+                        .DataValueField("Value")
+                        .Filter("contains")
+                        .HtmlAttributes(new { style = "width: 100%;" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPokitDok_TradingPartnerList", "Patients");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        .Value(ViewBag.PokitDok_TradingPartnerId)
+                    )
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <button type="button" onclick="CheckPatientEligibility(); return false;" class="btn btn-primary pull-left">Check Eligibility</button>
+            </div>
+        </div>
+    </fieldset>*@
+
+@*<div id="divCheckPatientEligibility"></div>*@
+
+<fieldset style="margin-top: 10px;">
+    <legend style="margin-top:20px">Patient Details</legend>
+    <div style="margin: 10px 0px">
+        @(Html.Kendo().TabStrip()
+            .Name("tabStripNotes")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+            .Events(events => events
+                .Select("onSelectTab")
+            )
+            .Items(tabstrip =>
+            {
+                tabstrip.Add().Text("My Documents")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Selected(true)
+                .Content(@Html.Partial("_PatientDocuments", new vwDocument { PatientIdEncrypted = patientId }).ToHtmlString());
+
+                tabstrip.Add().Text("Pharmacy Documents")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("_PharmacyDocuments", new vwDocument1 { PatientIdEncrypted = patientId }).ToHtmlString());
+
+                tabstrip.Add().Text("Prescriptions")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("_PatientPrescriptions", new vwPrescription { PatientIdEncrypted = patientId }).ToHtmlString());
+
+                //Pharmacy Note is not needed in Physician Portal
+                if (User.IsInRole("Pharmacist"))
+                {
+                    tabstrip.Add().Text("Pharmacy Notes")
+                    .HtmlAttributes(new { @class = "tabStripTabs" })
+                    .Content(@Html.Partial("_PharmacyNotes", new vwPharmacyNote { PatientIdEncrypted = patientId, PhysicianIdEncrypted = phyId }).ToHtmlString());
+                }
+
+                tabstrip.Add().Text("My Notes")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("~/Views/Notes/_PhysicianNotes.cshtml", new vwPhysicianNote { PhysicianIdEncrypted = phyId, PatientIdEncrypted = patientId }).ToHtmlString());
+
+                tabstrip.Add().Text("Messages")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("~/Views/Home/Index.cshtml", new PhysicianPortal.Web.Models.PatientId_PhysicianIdViewModel { PatientIdEncrypted = patientId, PhysicianIdEncrypted = phyId }).ToHtmlString());
+
+                tabstrip.Add().Text("Pictures")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("_PatientPictures", new vwPatient { PatientIdEncrypted = patientId }).ToHtmlString());
+            })
+        )
+    </div>
+</fieldset>
+
+<div id="divPreviewDocument" style="display: none;">
+    <table style="width:100%">
+        <tr style="margin: 5px 5px 5px 0; display: block;">
+            <td style="width:15%">
+                <div>
+                    <input class="btn btn-default" type="button" style="width:200px" onclick="showRefaxDocConfirmation();" value="Refax This Document" />
+                </div>
+            </td>
+            <td style="width:85%">&nbsp;</td>
+        </tr>
+        <tr>
+            @*<td style="width:15%">&nbsp;</td>*@
+            <td colspan="2" style="width:85%">
+                <div id="divDocumentViewer" style="width:100%"> </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<input type="hidden" id="hidDocPath" value="" />
+<div id="divRefaxPatientDocConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px; display: inline-block;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                You can also edit this given Fax Number.
+            </span>
+        </p>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Fax Number
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="idFaxNumberPatientDoc" type="text" value='@physicianModel.FaxNumber' />
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Email Address
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="txtEmailAddressPatientDoc" type="text" value='' />
+            </div>
+        </div>
+    </div>
+    <div style="float: right;">
+        <button class="btn btn-success btn-dialog" onclick="refaxPatientDocument();" style="margin: .5em .4em .5em 0;">Send</button>
+        <button class="btn btn-default btn-dialog" onclick="cancelPatientRefaxDocConfirmation();" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+
+<div id="divRefaxPharmacyDocConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px; display: inline-block;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                You can also edit this given Fax Number.
+            </span>
+        </p>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Fax Number
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="idFaxNumberPharmacyDoc" type="text" value='@physicianModel.FaxNumber' />
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Email Address
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="txtEmailAddressPharmacyDoc" type="text" value='' />
+            </div>
+        </div>
+    </div>
+    <div style="float: right;">
+        <button class="btn btn-success btn-dialog" onclick="refaxPharmacyDocument();" style="margin: .5em .4em .5em 0;">Send</button>
+        <button class="btn btn-default btn-dialog" onclick="cancelPharmacyRefaxDocConfirmation();" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+
+
+<div id="prescriptionKendoWindow"></div>
+
+<script type="text/javascript">
+
+    /*
+     0 = My Documents
+     1 = Pharmacy Documents
+     2 = Prescriptions
+     3 = My Notes
+     4 = Messages
+     5 = Pictures
+    */
+    var selectedTab = 0;
+
+    $(document).ready(function () {
+        localStorage.setItem("phyId", '@phyId');
+        localStorage.setItem("patId", '@patientId');
+
+        $("#hdPatientNotes").css("display", "none");
+        debugger;
+        $("#PhysicianId").val('@phyId');
+        $("#PatientId").val('@patientId');
+        $("#gridPhysicianNotes").data("kendoGrid").dataSource.read();
+
+        $("#divWorkflow").height($("#divPatientDetail").height());
+
+        if ($("#IsEligibilityValueExist").val() == "True") {
+            CheckPatientEligibility();
+        }
+    });
+
+    $(window).resize(function () {
+        $("#divWorkflow").height($("#divPatientDetail").height());
+    });
+
+
+    function onSelectTab(e) {
+
+    }
+
+    function CheckPatientEligibility() {
+        $.ajax({
+            url: '@Url.Action("CheckPatientEligibility", "Patients")',
+            data: { PatientId: $("#PatientId").val(), PokitDok_TradingPartnerId: $("#PokitDok_TradingPartnerId").val() },
+            cache: true,
+            type: "GET",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#divCheckPatientEligibility").html(data);
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+
+    function showRefaxDocConfirmation() {
+
+        var selectedTabIndex = $("#tabStripNotes").data("kendoTabStrip").select().index();
+        var faxWindowId = "";
+        switch (selectedTabIndex) {
+            case 0:
+                faxWindowId = "#divRefaxPatientDocConfirm";
+                break;
+            case 1:
+                faxWindowId = "#divRefaxPharmacyDocConfirm";
+                break;
+        }
+
+        $(faxWindowId).kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Fax This Document",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+
+                // Clear Text Boxes
+                $("#txtEmailAddressPatientDoc").val("");
+                $("#txtEmailAddressPharmacyDoc").val("");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $(faxWindowId).bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $(faxWindowId).data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+</script>

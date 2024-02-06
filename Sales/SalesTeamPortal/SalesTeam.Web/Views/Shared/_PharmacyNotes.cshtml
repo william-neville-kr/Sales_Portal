@@ -1,0 +1,146 @@
+﻿<div>
+    <label>Record Updated On</label>
+    <label>@ViewBag.LatestNotesTime Pacific Time (PT)</label>
+</div>
+
+@(Html.Kendo().Grid<SalesTeam.Core.Data.vwPharmacyNote>()
+    .Name("gridPharmacyNotes")
+    .Columns(columns =>
+    {
+        //columns.Bound(c => c.LastOrderEvent).Width(160).Title("Last Event");
+        //columns.Bound(c => c.NoteDate).Width(60).Format("{0:MM/dd/yyyy}").Title("Note Date");
+        columns.Bound(c => c.NoteDate).Title("Note Date").Format("{0:MM/dd/yyyy}").Width(60);
+        columns.Bound(c => c.NoteHeader).Title("Note Header");
+        columns.Bound(c => c.Note).Title("Note");/*.HtmlAttributes(new { @style = "min-width: 70%;" });*/
+    })
+    .Selectable()
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("vwPharmacyNotes_Read", "SalesTeamNote", Model))
+        .Sort(sort => sort.Add("NoteDate").Descending())
+        .PageSize(10)
+    )
+    //.Events(e => e.Change("onPharmacyNotesChange"))
+    .NoRecords(n => n.Template("No records to display"))
+)
+
+<script>
+    var dataa;
+
+    $(document).ready(function () {
+        $("#gridPharmacyNotes").click(function (event) {
+
+            var tempGrid1 = $("#gridPharmacyNotes").data("kendoGrid");
+            dataa = tempGrid1.dataItem(tempGrid1.select());
+
+        })
+
+        $("#gridPharmacyNotes").on("dblclick", "tr.k-state-selected", function () {
+            if (dataa != undefined) {
+                getNotesDetailsView(dataa);
+            }
+        });
+        $("#gridPharmacyNotes").on("doubletap", "tr.k-state-selected", function () {
+            if (dataa != undefined) {
+                getNotesDetailsView(dataa);
+            }
+        });
+
+        $("#notesKendoWindow").kendoWindow({
+            modal: true,
+            width: "70%",     
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600, 
+            minWidth: 300,
+            minHeight: 300,
+            title: "Pharmacy Notes",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                $("body").css("overflow", "");
+            }
+        }).data("kendoWindow");
+
+        $(".k-dropdown-operator").hide();
+    });
+
+    function getNotesDetailsView(arg) {
+        $.ajax({
+            url: '@Url.Action("ShowPharmacyNotesInfo", "SalesTeamNote")',
+            data: { PharmacyNoteId: arg.PharmacyNoteId },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                var dialog = $("#notesKendoWindow").data("kendoWindow");
+                dialog.close();
+                dialog.content(data);
+                dialog.center();
+                dialog.open();
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function loadNextOrPreviosNote(offset) {
+        var tempGrid = $("#gridPharmacyNotes").data("kendoGrid");
+        var dataRows = tempGrid.items();
+        var rowIndex = dataRows.index(tempGrid.select());
+        var data1 = dataRows[rowIndex + (offset)];
+        tempGrid.select(data1);
+        var newData = tempGrid.dataItem(data1);
+
+        if (newData != undefined) {
+            //getNotesDetailsView(newData);
+            $("#NoteHeader").text(newData.NoteHeader);
+            $("#NoteDate").text(newData.NoteDate.toLocaleDateString());
+            $("#NoteFullName").text(newData.FullName);
+            $("#NoteStaffFullName").text(newData.StaffFullName);
+            $("#NoteIsTechnician").text(newData.IsTechnician);
+            $("#NoteText").text(newData.Note);
+        }
+    }
+
+    function checkNextOrPreviosNote(offset) {
+        var tempGrid = $("#gridPharmacyNotes").data("kendoGrid");
+        var dataRows = tempGrid.items();
+        var rowIndex = dataRows.index(tempGrid.select());
+        var data1 = dataRows[rowIndex + (offset)];
+        //tempGrid.select(data1);
+        var newData = tempGrid.dataItem(data1);
+
+        if (newData != undefined) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+
+<style>
+    #gridPharmacyNotes tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

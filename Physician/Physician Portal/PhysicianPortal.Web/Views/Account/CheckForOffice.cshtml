@@ -1,0 +1,35 @@
+﻿@model PhysicianPortal.Web.Models.SelectOfficeViewModel
+@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = "Select Office";
+}
+
+<div class="loginPageBody">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        @using (Html.BeginForm("CheckForOffice", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", style = "margin: 0px;" }))
+        {
+            @Html.AntiForgeryToken()
+            <div id="loginContainer" class="loginPage">
+                <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px">
+                    <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                    <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                    <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>
+                    <br />
+                    <h4 class="text-center">Select office for which you want to login</h4>
+                    <div>
+                        <div class="text-center">
+                            @Html.DropDownListFor(model => model.SelectedOffice, Model.Offices, new { style = "width: 100%; max-width: 100%"})
+                            <br />
+                            <br />
+                            <input type="submit" value="Submit" class="btn btn-primary btn-block login-form-field" />
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

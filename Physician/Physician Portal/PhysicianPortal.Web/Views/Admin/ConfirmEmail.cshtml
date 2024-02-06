@@ -1,0 +1,36 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = "Confirm Email";
+}
+<div class="loginPageBody">
+    <div class="login-backgroudImage"></div>
+    <div class="loginCenterContainer">
+        <div id="loginContainer" class="loginPage">
+            <div class="well" style="background-color: rgba(255, 255, 255, 0.7); margin: 0px; display: inline-block; text-align: center;">
+                <img src="~/Content/images/KrogerLogo.png" class="loginLogoImage" />
+                <p class="text-center" style="color: #337ab7">SPECIALTY PHARMACY</p>
+                <p class="text-center" style="color: #337ab7">EXPECT MORE FROM YOUR SPECIALTY PHARMACY</p>
+                <br />
+                @*<h4 class="text-center">Your account has not yet been verified. Please contact the system admin to verify yourself.</h4>*@
+                <h4 class="text-center">
+                    Thank you for confirming your email address. Our representative will contact you for your account verification.
+                </h4>
+                @*@{
+        if (!Request.IsAuthenticated)
+        {
+            <div class="col-md-12 col-sm-12" style="padding-top: 10px;">
+                <a href="~/Account/Login " class="btn btn-info  btn-lg">Click here to Log in.</a>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12 col-sm-12" style="padding-top: 10px;">
+                <a href="~/Home/HomeDetail" class="btn btn-info  btn-lg">Continue</a>
+            </div>
+        }
+    }*@
+            </div>
+        </div>
+    </div>
+</div>
+

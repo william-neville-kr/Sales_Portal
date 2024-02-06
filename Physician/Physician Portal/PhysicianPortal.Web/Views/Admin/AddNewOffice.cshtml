@@ -1,0 +1,108 @@
+﻿@model PhysicianPortal.Web.Models.AddOfficeModel
+@using Kendo.Mvc.UI
+@{
+    Layout = null;
+
+    PhysicianPortal.Core.Repository.UnitOfWork unitOfWork = new PhysicianPortal.Core.Repository.UnitOfWork();
+    var statesList = unitOfWork.StateRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Name, Value = t.Name });
+}
+
+@using (Ajax.BeginForm("AddNewOffice", "Admin", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddOfficeSuccess" }, new { @class = "form-horizontal", role = "form", @id = "addOfficeForm" }))
+{
+    <div>
+        @Html.AntiForgeryToken()
+
+        <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.OfficeTitle, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.OfficeTitle)
+                            .Name("OfficeTitle")
+                            .HtmlAttributes(new { @id = "officeTitleAddOffice", placeholder = "Title", required = "required", validationmessage = "Enter Office Title", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                            .Name("PhoneNumber")
+                            .HtmlAttributes(new { @id = "phonenumberAddOffice", placeholder = "Phone Number", required = "required", validationmessage = "Entered Phone number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.FaxNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.FaxNumber)
+                            .Name("FaxNumber")
+                            .HtmlAttributes(new { @id = "faxnumberAddOffice", placeholder = "Fax Number", required = "required", validationmessage = "Entered Fax number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.SubmitChecklistDocumentPath, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.SubmitChecklistDocumentPath)
+                            .Name("SubmitChecklistDocumentPath")
+                            .HtmlAttributes(new { placeholder = "Document Path", @class = "form-control email login-form-field dissmiss-keyboard-ipad" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Address, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.TextAreaFor(m => m.Address, new { @id = "addressAddOffice", placeholder = "Address", @class = "k-textbox max-width-field", rows = 4, style = "max-width: 100%; width: 100%; resize: none; padding-bottom: 10px;" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.City, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.City)
+                            .Name("City")
+                            .HtmlAttributes(new { @id = "cityAddOffice", placeholder = "City", required = "required", validationmessage = "Enter City", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.State, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.DropDownListFor(m => m.State, statesList, new { @id = "stateAddOffice" })
+                    </div>
+                </div>
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.Zip, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.Zip)
+                            .Name("Zip")
+                            .HtmlAttributes(new { @id = "zipAddOffice", type = "number", placeholder = "Zip", required = "required", validationmessage = "Enter Zip Code", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <button type="button" onclick="submitNewOfficeForm(this);" class="btn btn-primary login-form-field" tabindex="3">Add Office</button>
+            </div>
+        </div>
+    </div>
+}

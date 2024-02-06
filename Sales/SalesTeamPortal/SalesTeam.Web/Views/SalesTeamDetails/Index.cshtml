@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Physicians";
+    int id = ViewBag.id;
+}
+
+<h4 style="margin: 0;">Sales Team Details</h4>
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>First Name</label>
+        <span>
+            @Model.SalesRepresentativeFirstName
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>Last Name</label>
+        <span>
+            @Model.SalesRepresentativeLastName
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>Territory</label>
+        <span>
+            @Model.SalesTerritory
+        </span>
+    </div>
+</div>
+
+<h3>Physicians</h3>
+
+@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamPhysician>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.PhysicianViewModel>()
+    .Name("gridSalesTeamDetailsPhysician")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.FirstName).Title("First");
+        columns.Bound(c => c.LastName).Title("Last");
+        columns.Bound(c => c.AddressLine1).Title("Address");
+        columns.Bound(c => c.City).Title("City");
+        columns.Bound(c => c.StateProvince).Title("St");
+        columns.Bound(c => c.PostalCode).Title("Zip");
+        columns.Bound(c => c.NationalProviderIdentifier).Title("NPI");
+        columns.Bound(c => c.Pending).Title("P");
+        columns.Bound(c => c.Active).Title("A");
+        columns.Bound(c => c.Cancelled).Title("C");
+    })
+    .Selectable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetPhysiciansList", "SalesTeamPhysician", Model).Data("SearchPhysicianFunc"))
+        .Sort(sort => sort.Add("Pending").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChange"))
+)
+
+<script>
+    function SearchPhysicianFunc() {
+        return {
+            //_id: parseInt(@*@ViewBag.id*@)
+            SalesTeamId: parseInt(@ViewBag.id)
+        }
+    }
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridSalesTeamDetailsPhysician").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $("#gridSalesTeamDetailsPhysician").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPhysicianDetails")' + "?id=" + data.Url_SId_PhyId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+</script>
+
+<style>
+    #gridSalesTeamDetailsPhysician tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

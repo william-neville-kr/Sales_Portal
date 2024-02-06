@@ -1,0 +1,366 @@
+﻿@using SalesTeam.Core.Data;
+@model vwPhysician
+@{
+    ViewBag.Title = "Physician Details";
+    int salesTeamId = ViewBag.SalesTeamId;
+    int physicianId = ViewBag.PhysicianId;
+}
+
+<h3>Physician Details</h3>
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+        <label>Full Name</label>
+        <span>
+            @Model.FullName
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>License</label>
+        <span>
+            @Model.PhysicianLicenseNumber
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>NPI</label>
+        <span>
+            @Model.NationalProviderIdentifier
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>City</label>
+        <span>
+            @Model.City
+        </span>
+    </div>
+    <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px;">
+        <label>Sales Representative Name</label>
+        <span>
+            @ViewBag.SalesRepresentativeFullName
+            @*@Model.SalesRepresentativeFullName*@
+        </span>
+    </div>
+    <div class="msls-label" style="float: right; min-width: 30px; padding: 6px 10px;">
+        <label></label>
+        <span>
+            <button class="btn btn-primary" onclick="ShowPDFFormsList(); return false;">PDF Forms</button>
+        </span>
+    </div>
+</div>
+
+@(Html.Kendo().TabStrip()
+    .Name("tabStrip")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+    .Items(tabstrip =>
+    {
+        tabstrip.Add().Text("Patients")
+        .HtmlAttributes(new { @class = "k-state-active tabStripTabs" })
+        .Selected(true)
+        //.Content(@Html.Partial("_SalesTeamPatients", new vwSalesTeamPatient { SalesTeamId = @salesTeamId, PhysicianId = @physicianId }).ToHtmlString());
+        .Content(@Html.Partial("_vwPatients", new vwSalesTeamPatient { MasterSalesTeamId = salesTeamId, PhysicianId = physicianId }).ToHtmlString());
+
+        tabstrip.Add().Text("Physician Details")
+        .HtmlAttributes(new { @class = "tabStripTabs" })
+        .Content(@Html.Partial("_PhysicianDetails", Model).ToHtmlString());
+
+        tabstrip.Add().Text("My Notes")
+        .HtmlAttributes(new { @class = "tabStripTabs" })
+        .Content(@Html.Partial("_SalesTeamNotes", new vwSalesTeamNote { SalesTeamId = salesTeamId, PhysicianId = physicianId }).ToHtmlString());
+    })
+)
+
+<div id="showPDFFormsListKendoWindow" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; display: inline-block; box-sizing: border-box;">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" style="box-sizing:inherit;">
+                    Select Category
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="box-sizing:inherit;">
+                    @(Html.Kendo().DropDownList()
+                      .Name("CategoryList")
+                      .DataTextField("Text")
+                      .DataValueField("Value")
+                      .Events(e => e.Select("onSelectCategoryList").DataBound("onDataBoundCategoryList"))
+                      //.Events(e => e.Change("change"))
+                      .BindTo(ViewBag.GetReferralFormCategories)
+                      .Value("1")
+                      .HtmlAttributes(new { style = "width: 100%" })
+                    )
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; display: inline-block; box-sizing: border-box;">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" style="box-sizing:inherit;">
+                    Select PDF Form
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="box-sizing:inherit;">
+                    @(Html.Kendo().DropDownList()
+                      .Name("PDFFormList")
+                      .DataTextField("Text")
+                      .DataValueField("Value")
+                      .AutoBind(false)
+                      //.Events(e => e.DataBound("onDataBoundPDFFormList"))
+                      //.Value("1")
+                      .HtmlAttributes(new { style = "width: 100%;" })
+                    )
+                </div>
+                <button type="button" class="btn btn-primary" onclick="fillPDFForm(); return false;">Preview</button>
+                <button id="btnSendForm" type="button" class="btn btn-primary" onclick="showRefaxDocConfirmation(); return false;" style="display:none;">Send Form</button>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; display: inline-block; box-sizing: border-box;">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" style="box-sizing:inherit;">
+                    Select Address
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="box-sizing:inherit;">
+                    @(Html.Kendo().DropDownList()
+                      .Name("PhysicianAddressList")
+                      .DataTextField("CompleteAddress")
+                      .DataValueField("PID")
+                      .BindTo(ViewBag.GetPhysicianAddressList)
+                      //.Value("1")
+                      .HtmlAttributes(new { style = "width: 100%" })
+                    )
+                </div>
+            </div>
+
+            <div id="divPDFFormViewer" style="text-align: center; padding: 15px;"></div>
+        </p>
+    </div>
+</div>
+
+<input type="hidden" id="hidDocPath" value="" />
+<input type="hidden" id="hidFaxNumber" value='@Model.FaxNumber' />
+<input type="hidden" id="hidPhysicianId" value='@Model.PhysicianId' />
+
+<div id="divRefaxDocConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span id="lblConfirm">
+                You can also edit this given Fax Number.
+            </span>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; display: inline-block; box-sizing: border-box;">
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                    Fax Number
+                </div>
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                    <input id="idFaxNumber" type="text" value='@Model.FaxNumber' />
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0; display: inline-block; box-sizing: border-box;">
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                    Email Address
+                </div>
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                    <input id="txtEmailAddress" type="text" value='' />
+                </div>
+            </div>
+        </p>
+    </div>
+    <div style="float: right;">
+        <button class="btn btn-success" onclick="refaxDocument();" style="margin: .5em .4em .5em 0;">Save and Send</button>
+        <button class="btn btn-default" onclick="cancelRefaxDocConfirmation();" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Hiding divs of serach from partial views
+        $("#divTxtBoxSearchPhysician").hide();
+        $("#divTxtBoxSearchPatient").hide();
+        $("#divBtnSearchPatient").hide();
+        $("#divBtnClearSearchPatient").hide();
+        $("#divBtnSearchPhysician").hide();
+        $("#divBtnClearSearchPhysician").hide();
+    });
+
+    function ShowPDFFormsList() {
+        $("#showPDFFormsListKendoWindow").kendoWindow({
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "PDF Forms",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                $("#divPDFFormViewer").html("");
+                $("#btnSendForm").css("display", "none");
+            }
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function fillPDFForm() {
+        var fileName = $("#PDFFormList").val();
+        var faxNumber = $("#txtFaxNumberPDFForm").val();
+        var emailAddress = $("#txtEmailAddressPDFForm").val();
+        var pID = $("#PhysicianAddressList").val();
+
+        var request = {
+            FileName: fileName,
+            //PatientId: "@*@patientModel.PatientId*@",
+            PhysicianId: "@Model.PhysicianId",
+            //DocumentPath: "",
+            FaxNumber: faxNumber,
+            Email: emailAddress,
+            PID: pID
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("FillPDFForm", "SalesTeamPatient")',
+            data: JSON.stringify(request),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success == true) {
+                    $("#hidDocPath").val(data.message);
+
+                    filenamepdf = '@Url.Action("GetPatientDocumentsPDF", "SalesTeamPatient")' + '?fileName=' + encodeURI(data.message);
+
+                    var object = "<object data='{FileName}' type='application/pdf' style='width: 95%; height: 1000px;'>";
+                    object += "If you are unable to view file, you can download from <a href = '{FileName}'>here</a>";
+                    object += " or download <a target = '_blank' href = 'http://get.adobe.com/reader/'>Adobe PDF Reader</a> to view the file.";
+                    object += "</object>";
+                    object = object.replace(/{FileName}/g, filenamepdf);
+
+                    $("#divPDFFormViewer").html(object);
+                    $("#btnSendForm").css("display", "");
+                }
+                else {
+                    console.log(data.message);
+                }
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function cancelRefaxDocConfirmation() {
+        $("#divRefaxDocConfirm").data("kendoWindow").close();
+    }
+
+    function showRefaxDocConfirmation() {
+        $("#divRefaxDocConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Fax This Document",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+
+                // Clear Text Boxes
+                $("#txtEmailAddress").val("");
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function refaxDocument() {
+        var _documentPath = $("#hidDocPath").val();
+        var _faxNumber = $("#idFaxNumber").val();
+        //var _faxNumber = $("#hidFaxNumber").val();
+        var _physicianId = $("#hidPhysicianId").val();
+        var emailAddress = $("#txtEmailAddress").val();
+
+        //if (confirmDialog(_faxNumber)) {
+        $.ajax({
+            url: '@Url.Action("FaxDocument", "SalesTeamPatient")',
+            type: 'POST',
+            data: JSON.stringify({
+                DocumentPath: _documentPath,
+                FaxNumber: _faxNumber,
+                Email: emailAddress,
+                PhysicianId: _physicianId
+            }),
+            dataType: 'json',
+            contentType: "application/json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                $("#divRefaxDocConfirm").data("kendoWindow").close();
+                alert(data.message);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        //}
+    }
+
+    function onSelectCategoryList(e) {
+        var dataItem = this.dataItem(e.item.index());
+        //console.log(dataItem.Value);
+        getReferralForms(dataItem.Value);
+    }
+
+    function onDataBoundCategoryList(e) {
+        //var dataItem = this.dataItem(e.item.index());
+        //console.log(dataItem.Value);
+        getReferralForms("1");
+        //$("#CategoryList").data("kendoDropDownList").select(0);
+    }
+
+    function getReferralForms(referralFormCategoryId) {
+        $.ajax({
+            url: '@Url.Action("GetReferralForms", "ViewPatientDetails")',
+            //data: { ReferralFormCategoryId: dataItem.Value },
+            data: { ReferralFormCategoryId: referralFormCategoryId },
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    //= [{ Text: "", Value: "" }];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ Text: item.Text, Value: item.Value });
+                    });
+                    var PDFFormList = $("#PDFFormList").data("kendoDropDownList");
+                    PDFFormList.dataSource.data(tempArray);
+                    PDFFormList.select(0);
+                    $("#divPDFFormViewer").html("");
+                    $("#btnSendForm").css("display", "none");
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+</script>

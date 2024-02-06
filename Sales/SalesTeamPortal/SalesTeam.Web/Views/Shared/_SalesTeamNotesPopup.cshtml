@@ -1,0 +1,37 @@
+﻿@{
+    int salesTeamId = Model.SalesTeamId ?? 0;
+    int physicianId = Model.PhysicianId ?? 0;
+    int patientId = Model.PatientId ?? 0;
+
+    //Check to see if the notes were opened from the Patients tab or the Physicians tab
+    string notesHeading = "";
+    if (patientId == 0)
+    {
+        notesHeading = "Physicians Notes";
+    }
+    else
+    {
+        notesHeading = "Notes";
+    }
+}
+<div id="notesKendoWindow"></div>
+<div class="demo-section k-content">
+    @(Html.Kendo().TabStrip()
+        .Name("tabStripNotes")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+        //.Animation(animation =>
+        //    animation.Open(effect =>
+        //        effect.Fade(FadeDirection.In)))
+        .Items(tabstrip =>
+        {
+            tabstrip.Add().Text("Pharmacy Note")
+            .HtmlAttributes(new { @class = "k-state-active tabStripTabs" })
+            .Selected(true)
+            .Content(@Html.Partial("_PharmacyNotes", new SalesTeam.Core.Data.vwPharmacyNote { PatientId = patientId }).ToHtmlString());
+
+            tabstrip.Add().Text(notesHeading)
+            .HtmlAttributes(new { @class = "tabStripTabs" })
+            .Content(@Html.Partial("_SalesTeamNotes", new SalesTeam.Core.Data.vwSalesTeamNote { SalesTeamId = salesTeamId, PhysicianId = physicianId, PatientId = patientId }).ToHtmlString());
+        })
+    )
+</div>

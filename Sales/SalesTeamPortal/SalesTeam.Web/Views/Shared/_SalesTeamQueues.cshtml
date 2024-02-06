@@ -1,0 +1,128 @@
+﻿@(Html.Kendo().Grid<SalesTeam.Web.Models.PatientViewModel>()
+    .Name("gridSalesTeamQueues")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.ActivityStatus).Title("Stat");
+        columns.Bound(c => c.FirstName).Title("First Name");
+        columns.Bound(c => c.LastName).Title("Last Name");
+        columns.Bound(c => c.PhysicianName).Title("Physician");
+        columns.Bound(c => c.RXStatus).Title("RX");
+        columns.Bound(c => c.DiseaseState).Title("Disease");
+        columns.Bound(c => c.ReferralDateId).Width(60).Format("{0:MM/dd/yyyy}").Title("Refer");
+        columns.Command(command => command.Custom("X").Click("deleteQueues").HtmlAttributes(new { @class = "btn-danger" })).Title("X");
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getSalesTeamQueueRecords", "SalesTeamQueue"))
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Selectable()
+    .Events(e => e.Change("onChange"))
+)
+
+<div id="divDeleteQueuesConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span id="lblConfirm">
+                Are you sure to delete selected patient from queue?
+            </span>
+        </p>
+    </div>
+    <input id="SalesTeamQueueId" type="hidden" />
+    <div style="float: right;">
+        <button class="k-button delete-button-divDeleteQueuesConfirm btn-danger" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="k-button close-button-divDeleteQueuesConfirm" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridSalesTeamQueues").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $("#gridSalesTeamQueues").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "ViewPatientDetails")' + "?id=" + data.Url_SId_PId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    $(".delete-button-divDeleteQueuesConfirm").click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DeleteQueues", "SalesTeamQueue")',
+            data: { SalesTeamQueueId: $("#SalesTeamQueueId").val() },
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                @*$('#@girdName').data("kendoGrid").dataSource.read();*@
+                //$(".k-grid").data("kendoGrid").dataSource.read();
+                $(".k-grid").each(function () {
+                    $(this).data("kendoGrid").dataSource.read();
+                });
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+        $("#divDeleteQueuesConfirm").data("kendoWindow").close();
+    });
+
+    $(".close-button-divDeleteQueuesConfirm").click(function () {
+        $("#divDeleteQueuesConfirm").data("kendoWindow").close();
+    });
+
+    function deleteQueues(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#SalesTeamQueueId").val(dataItem.SalesTeamQueueId);
+
+        $("#divDeleteQueuesConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+</script>
+
+<style>
+    #gridSalesTeamQueues tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

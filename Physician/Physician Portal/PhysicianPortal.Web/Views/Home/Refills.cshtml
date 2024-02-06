@@ -1,0 +1,788 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Refills";
+}
+
+<fieldset>
+    <legend>Refills</legend>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding0">
+
+        @if (!User.IsInRole("Pharmacist"))
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="padding-bottom: 15px;">
+                <h4>New Refills</h4>
+                @(Html.Kendo().Grid<PhysicianPortal.Web.Models.RefillViewModel>()
+                        .Name("gridRefill")
+                        .HtmlAttributes(new { @style = "display:inline-block; width: 100%" })
+                        .Columns(columns =>
+                        {
+                            columns.Bound(c => c.PatientName).Title("Patient");
+                            columns.Bound(c => c.FullName).Title("Provider");
+                            columns.Bound(c => c.NationalProviderIdentifier).Title("NPI");
+                            columns.Bound(c => c.RXNum).Title("Rx No.");
+                            //columns.Bound(c => c.RXNumCount).Title("Total Rx");
+                            columns.Bound(c => c.Drug).Title("Drug");
+                            columns.Command(command => command.Custom("View").Click("viewRefillDetails").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton", style = "width: 52px;" });
+                            //columns.Command(command => command.Custom("N").Click("showRefillNotesPopup").Text("N <span id='notesNumber' class='badge'></span>").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+                            columns.Command(command => command.Custom("N").Click("showNotesPopup").Text("N <span id='notesNumberRefill' class='badge'></span>").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+
+                        })
+                        .ToolBar(tools => tools.Excel())
+                        .Excel(excel => excel
+                            .FileName("New Refills.xlsx")
+                            .Filterable(true)
+                            .AllPages(true)
+                        )
+                        .Filterable(ftb => ftb
+                                .Mode(GridFilterMode.Row)
+                                .Extra(true)
+                                .Operators(o => o
+                                .ForString(s => s
+                                    .Clear()
+                                    .Contains("Contains")
+                                )
+                            )
+                        )
+                        .Sortable()
+                        .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            )
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Read(read => read.Action("GetRefills", "Home", Model))
+                            .PageSize(10)
+                        )
+                        .NoRecords(n => n.Template("No records to display"))
+                          .Events(e => e
+                            .DataBound("onDataBoundgridRefill")
+                            )
+                )
+            </div>
+        }
+
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <h4>Sent Refills</h4>
+            @(Html.Kendo().Grid<PhysicianPortal.Web.Models.RefillViewModel>()
+                    .Name("gridSentRefill")
+                    .HtmlAttributes(new { @style = "display:inline-block;" })
+                    .Columns(columns =>
+                    {
+                        columns.Bound(c => c.PatientName).Title("Patient");
+                        columns.Bound(c => c.FullName).Title("Provider");
+                        columns.Bound(c => c.NationalProviderIdentifier).Title("NPI");
+                        columns.Bound(c => c.RXNum).Title("Rx No.");
+                        //columns.Bound(c => c.RXNumCount).Title("Total Rx");
+                        columns.Bound(c => c.Drug).Title("Drug");
+                        columns.Bound(c => c.RefillStatus).Title("Status");
+                        columns.Bound(c => c.SentBy).Title("Sent By");
+                        columns.Bound(c => c.SentOn).Title("Sent On").Format("{0:MM/dd/yyyy, hh:mm:tt}").Width(125);
+                        columns.Command(command => command.Custom("View").Click("viewRefillDetails").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton", style = "width: 52px;" });
+                        columns.Command(command => command.Custom("N").Click("showNotesPopup").Text("N <span id='notesNumberSentRefill' class='badge'></span>").HtmlAttributes(new { @class = "btn-primary btn-grid", title = "Notes" })).Title("").HtmlAttributes(new { @class = "text-align-center" }).Width(42);
+                    })
+                    .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Sent Refills.xlsx")
+                        .Filterable(true)
+                        .AllPages(true)
+                    )
+                    .Filterable(ftb => ftb
+                            .Mode(GridFilterMode.Row)
+                            .Extra(true)
+                            .Operators(o => o
+                            .ForString(s => s
+                                .Clear()
+                                .Contains("Contains")
+                            )
+                        )
+                    )
+                    .Sortable()
+                    .Pageable(pageable => pageable
+                                    .Refresh(true)
+                                    .PageSizes(true)
+                                    )
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Read(read => read.Action("GetSentRefills", "Home", Model))
+                        .PageSize(10)
+                    )
+                    .NoRecords(n => n.Template("No records to display"))
+                    .Events(e => e
+                        .DataBound("onDataBoundSentRefill")
+                        )
+            )
+            <div class="text-align-center" style="padding: 15px;">
+                <ul class="list-inline">
+                    <li class="alert-danger" style="width: 125px;">Hold Refill</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="RefillDetailsWindow" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="display: none;">
+        <table style="width:100%">
+            <tr style="margin: 5px 5px 5px 0; display: block;">
+                <td colspan="2">
+                    <button class="btn btn-primary" type="button" onclick="showAddQueuesConfirmation();">Send Refill</button>
+                    @if (User.IsInRole("Physician"))
+                    {
+                        if (!ViewBag.IsHaveSignature)
+                        {
+                            <button class="btn btn-primary" disabled type="button" onclick="GetSignature();">Sign It</button>
+                            <span>Please add your signature into your account</span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" type="button" onclick="GetSignature();">Sign It</button>
+                        }
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" type="button" onclick="GetSignature();">Sign It</button>
+                    }
+                    <button class="btn btn-primary" type="button" onclick="denyReasonFun(); return false;">Deny</button>
+                    <button class="btn btn-primary" type="button" onclick="holdRefillFun(); return false;">Hold</button>
+                    <button class="btn btn-primary" type="button" onclick="printDiv('divRefillInformation'); return false;">Print</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width:85%">
+                    <div id="divRefillInformation" style="width:100%"> </div>
+                </td>
+            </tr>
+            <tr style="margin: 5px 5px 5px 0; display: block;">
+                <td colspan="2">
+                    <button class="btn btn-primary" type="button" onclick="showAddQueuesConfirmation();">Send Refill</button>
+                    @if (User.IsInRole("Physician"))
+                    {
+                        if (!ViewBag.IsHaveSignature)
+                        {
+                            <button class="btn btn-primary" disabled type="button" onclick="GetSignature();">Sign It</button>
+                            <span>Please add your signature into your account</span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" type="button" onclick="GetSignature();">Sign It</button>
+                        }
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" type="button" onclick="GetSignature();">Sign It</button>
+                    }
+                    <button class="btn btn-primary" type="button" onclick="denyReasonFun(); return false;">Deny</button>
+                    <button class="btn btn-primary" type="button" onclick="holdRefillFun(); return false;">Hold</button>
+                    <button class="btn btn-primary" type="button" onclick="printDiv('divRefillInformation'); return false;">Print</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</fieldset>
+
+<div id="divRefillFaxConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px; display: inline-block;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                You can also edit this given Fax Number.
+            </span>
+        </p>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Fax Number
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="idFaxNumber" type="text" value="" />
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; box-sizing: border-box;">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12" style="box-sizing:inherit;">
+                Email Address
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" style="box-sizing:inherit;">
+                <input id="txtEmailAddress" type="text" value="" />
+            </div>
+        </div>
+    </div>
+    <div style="float: right;">
+        <button class="btn btn-success btn-dialog" onclick="RefillFax();" style="margin: .5em .4em .5em 0;">Send</button>
+        <button class="btn btn-default btn-dialog" onclick="cancelRefillFaxConfirm();" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+@* Create new Notes window *@
+<div id="window1234" class="col-lg-12 col-md-12 col-sm-12" style="display:none">
+    <form id="form" style="height:inherit;">
+        <input type="hidden" id="PhysicianNPI" name="PhysicianNPI" />
+        <input type="hidden" id="PatientMRN" name="PatientMRN" />
+        <input type="hidden" id="RefillStatusId" name="RefillStatusId" />
+        @Html.TextArea("PhysicianNote", "", new { @id = "txtNote", @type = "text", @class = "form-control dissmiss-keyboard-ipad", @style = "height:200px; height: 89% ;width: 98%; max-width: 100%;" })
+        <br />
+        <button type="button" class="btn btn-success" onclick="CreateNote1(); return false;">Save</button>
+        <button type="button" class="btn btn-danger" onclick="CancelButton1(); return false;">Cancel</button>
+        <br />
+    </form>
+</div>
+
+<div id="divNotesPopup"></div>
+
+<script>
+    var RefillFaxHTMLText = "";
+    var RXNumCount;
+    var IsSigned = false;  @* If a user signed then the value of IsSigned will true otherwise false. *@
+    var RefillFaxReportLogId;
+    var NewRefillViewModel = [];
+    //var PatientMRN;
+    var NPI;
+
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+        $("meta[name='viewport']").prop("content", "width=1480px, initial-scale=1.0");
+    });
+
+    function showNotesPopup(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#divNotesPopup").kendoWindow({
+            content: {
+                url: "@Url.Action("PatientNotes", "Notes")",
+                data: { PatientCode: dataItem.PatientId },
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                complete: function () {
+                    $("#hdPatientNotes").css("display", "none");
+                }
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "My Notes",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divNotesPopup").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divNotesPopup").data("kendoWindow").center();
+                });
+            }
+        })
+    .data("kendoWindow")
+    .center()
+    .open();
+    }
+
+    function viewRefillDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#PhysicianNPI").val(dataItem.NationalProviderIdentifier);
+        $("#PatientMRN").val(dataItem.PatientId);
+
+        var request = JSON.stringify({
+            Id: dataItem.Id
+        });
+
+        $.ajax({
+            url: '@Url.Action("GetRefill", "Home")',
+            type: "POST",
+            data: request,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+
+                    var dataItem = data.message;
+
+                    dataItem.HTMLText = dataItem.HTMLText.replace("Authorized By:___________________________", "Authorized By: " + dataItem.FullName);
+                    dataItem.HTMLText = dataItem.HTMLText.replace("Signature:_______________________________", "Signature: [AddSignaturesImage]");
+                    dataItem.HTMLText = dataItem.HTMLText.replace("Date:________________________", "Date:" + new Date().toLocaleDateString());
+
+                    //dataItem.HTMLText = dataItem.HTMLText.replace("Signature:<img id=\"imgDocument\"  src=\"\" style=\"height: 60px; width: 250px; border: black 1px solid;\" alt=\"Attach your signature\">", "Signature: [AddSignaturesImage]");
+
+                    dataItem.HTMLText = dataItem.HTMLText.replace("Signature: [AddSignaturesImage]", "Signature:" + "<img id=\"imgDocument\"  src=\"\" style=\"height: 60px; width: 250px; border: black 1px solid;\" alt=\"Attach your signature\">");
+                    RefillFaxHTMLText = dataItem.HTMLText;
+
+                    $("#divRefillInformation").html(dataItem.HTMLText);
+                    $("#RefillDetailsWindow").css("display", "");
+                    RefillFaxReportLogId = dataItem.Id;
+                    RXNumCount = dataItem.RXNumCount;
+
+                    var newRefillViewModelList = $("#tblPrescription input");
+                    NewRefillViewModel = dataItem.newRefillViewModelList;
+
+                    for (var i = 0, j = 0; i < RXNumCount; i++) {
+                        newRefillViewModelList[j++].value = NewRefillViewModel[i].Qty;
+                        newRefillViewModelList[j++].value = NewRefillViewModel[i].AdditionalRefills;
+                        newRefillViewModelList[j++].value = NewRefillViewModel[i].DoNotSubstitute;
+                    }
+
+                    $("#idFaxNumber").val(dataItem.PharmacyFaxNumber);
+                    //PatientMRN = dataItem.PatientId;
+                    NPI = dataItem.NationalProviderIdentifier;
+                }
+                else {
+                    //$.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function cancelRefillFaxConfirm() {
+        $("#divRefillFaxConfirm").data("kendoWindow").close();
+    }
+
+    function RefillFax() {
+
+        var newRefillViewModelList = $("#tblPrescription input");
+        NewRefillViewModel = [];
+
+        for (var i = 0; i / 3 < RXNumCount; i += 3) {
+            NewRefillViewModel.push({
+                //"NewRefillId": NewRefillId,
+                "Qty": newRefillViewModelList[i + 0].value,
+                "AdditionalRefills": newRefillViewModelList[i + 1].value,
+                "DoNotSubstitute": newRefillViewModelList[i + 2].value,
+                "RefillFaxReportLogId": RefillFaxReportLogId
+            });
+        }
+
+        var request = JSON.stringify({
+            FaxNumber: $("#idFaxNumber").val(),
+            Email: $("#txtEmailAddress").val(),
+            HTMLText: RefillFaxHTMLText,
+            //HTMLText: $("#divRefillInformation").html(),
+            Signature: $("#Signatures").val(),
+            IsSigned: IsSigned,
+            Id: RefillFaxReportLogId,
+            newRefillViewModelList: NewRefillViewModel
+        });
+
+        $.ajax({
+            url: '@Url.Action("RefillFax", "Home")',
+            type: "POST",
+            data: request,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                    $("#divRefillFaxConfirm").data("kendoWindow").close();
+                    IsSigned = false;
+                    $("#gridRefill").data("kendoGrid").dataSource.read();
+                    $("#gridSentRefill").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function GetSignature() {
+        var request = JSON.stringify({
+            PhysicianNPI: $("#PhysicianNPI").val()
+        });
+        $.ajax({
+            url: '@Url.Action("GetSignature", "Home")',
+            type: 'POST',
+            data: request,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $("#imgDocument").attr("src", "data:image/tiff;base64," + data.message);
+
+                    RefillFaxHTMLText = $("#divRefillInformation")[0].innerHTML;
+                    $.notifyBar({ html: "Your Signature Added Successfully", cssClass: "success", position: "top" });
+                    IsSigned = true;
+                }
+                else {
+                    $.notifyBar({ html: "Kindly Add Signature", cssClass: "warning", position: "top" });
+                    IsSigned = false;
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                //alert(errorThrown);
+            }
+        });
+    }
+
+    function showRefillFaxConfirmation() {
+        $("#divRefillFaxConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Fax This Document",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+
+                // Clear Text Boxes
+                //$("#txtEmailAddress").val("");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divRefillFaxConfirm").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divRefillFaxConfirm").data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function colseKendoWindowDivDenyReason() {
+        $("#divDenyReason").data("kendoWindow").close();
+        return false;
+    }
+
+    //print div
+    function printDiv(divName) {
+        //var printContents = document.getElementById(divName).innerHTML;
+        var printContents = $("#" + divName).html();
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+
+    //Deny Reason
+    function denyReasonFun() {
+        $("#RefillStatusId").val(1);
+        var myWindow = $("#window1234");
+
+        if (myWindow.data("kendoWindow") != undefined) {
+            myWindow.data("kendoWindow").title("Enter a reason for denial");
+        }
+
+        myWindow.kendoWindow({
+            //modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Enter a reason for denial",
+            visible: false,
+            actions: ["Close"],
+            draggable: false,
+            resizable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                myWindow.bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    myWindow.data("kendoWindow").center();
+                });
+            }
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function CancelButton1() {
+        if ($("#txtNote").val() != "") {
+            if (confirm("Do you really want to cancel the Note?")) {
+                $("#txtNote").val("");
+
+                $("#window1234").kendoWindow({
+                }).data("kendoWindow").close();
+                $("body").css("overflow", "");
+            }
+
+        }
+        else {
+            $("#window1234").kendoWindow({
+            }).data("kendoWindow").close();
+            $("body").css("overflow", "");
+        }
+    }
+
+    function CreateNote1() {
+        var request = {
+            RefillFaxReportLogId: RefillFaxReportLogId,
+            Note: escapeHTML($("#txtNote").val()),
+            PhysicianNPI: $("#PhysicianNPI").val(),
+            PatientMRN: $("#PatientMRN").val(),
+            RefillStatusId: $("#RefillStatusId").val()
+        };
+
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(request),
+            url: '@Url.Action("RefillNotesSave", "Notes")',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (msg) {
+                var data;
+                if (msg.hasOwnProperty("d")) {
+                    data = msg.d;
+                }
+                else
+                    data = msg;
+
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    success_check = true
+
+                    $("#window1234").data("kendoWindow").close();
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                    $("#gridRefill").data("kendoGrid").dataSource.read();
+                    $("#gridSentRefill").data("kendoGrid").dataSource.read();
+                    $("#txtNote").val("");
+                }
+                else {
+                    alert("Error: " + data.message);
+                }
+            },
+        });
+    }
+
+    function escapeHTML(text) {
+        var replacements = { "<": "&lt;", ">": "&gt;", "&": "&amp;", "\"": "&quot;", '"': "&#34;", "'": "&#39;", ",": "&#44;", ":": "&#58;" };
+        if (text != "" && text != "null" && text != null) {
+            return text.replace(/[<>&"']/g, function (character) {
+                return replacements[character];
+            });
+        }
+        return "";
+    }
+
+    //Hold Refill
+    function holdRefillFun() {
+        $("#RefillStatusId").val(3);
+        var myWindow = $("#window1234");
+
+        if (myWindow.data("kendoWindow") != undefined) {
+            myWindow.data("kendoWindow").title("Enter a reason for hold");
+        }
+
+        myWindow.kendoWindow({
+            //modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Enter a reason for hold",
+            visible: false,
+            actions: ["Close"],
+            draggable: false,
+            resizable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                myWindow.bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    myWindow.data("kendoWindow").center();
+                });
+            }
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    //Change hold refill color
+    function onDataBoundSentRefill(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridSentRefill").data("kendoGrid").dataItem(this);
+            if (dataItem.RefillStatus == "Hold") {
+                this.className = this.className.replace("k-alt", "");
+                this.className += " alert-danger";
+            }
+
+            var index1 = 'notesNumberSentRefill_Id__' + dataItem.Id;
+            //$("#notesNumberSentRefill").attr('id', index1).text(dataItem.NotesCount);
+            $("#notesNumberSentRefill").attr('id', index1).text(dataItem.NotesCount);
+        });
+    }
+
+    // first gird ondatabound
+    function onDataBoundgridRefill(arg) {
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridRefill").data("kendoGrid").dataItem(this);
+
+            var index1 = 'notesNumberRefill_Id__' + dataItem.Id;
+            //$("#notesNumberRefill").attr('id', index1).text(dataItem.NotesCount);
+            $("#notesNumberRefill").attr('id', index1).text(dataItem.NotesCount);
+        });
+    }
+
+    //Show send refill confrimation in kendo window
+    function showAddQueuesConfirmation() {
+        $("#divAddQueuesConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    //Add or delete patient from PatientQueue
+    function addDeletePatientQueue() {
+
+        var newRefillViewModelList = $("#tblPrescription input");
+        NewRefillViewModel = [];
+
+        for (var i = 0; i / 3 < RXNumCount; i += 3) {
+            NewRefillViewModel.push({
+                //"NewRefillId": NewRefillId,
+                "Qty": newRefillViewModelList[i + 0].value,
+                "AdditionalRefills": newRefillViewModelList[i + 1].value,
+                "DoNotSubstitute": newRefillViewModelList[i + 2].value,
+                "RefillFaxReportLogId": RefillFaxReportLogId
+            });
+        }
+
+        var request = JSON.stringify({
+            //FaxNumber: $("#idFaxNumber").val(),
+            //Email: $("#txtEmailAddress").val(),
+            HTMLText: RefillFaxHTMLText,
+            //HTMLText: $("#divRefillInformation").html(),
+            Signature: $("#Signatures").val(),
+            IsSigned: IsSigned,
+            Id: RefillFaxReportLogId,
+            newRefillViewModelList: NewRefillViewModel,
+            PatientMRN: $("#PatientMRN").val(),
+            NPI: NPI
+        });
+
+        $.ajax({
+            url: '@Url.Action("RefillFax", "Home")',
+            type: "POST",
+            data: request,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                    //$("#divRefillFaxConfirm").data("kendoWindow").close();
+                    $("#divAddQueuesConfirm").data("kendoWindow").close();
+                    IsSigned = false;
+                    $("#gridRefill").data("kendoGrid").dataSource.read();
+                    $("#gridSentRefill").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function cancelQueueConfirmation() {
+        $("#divAddQueuesConfirm").data("kendoWindow").close();
+    }
+</script>
+
+<style type="text/css">
+    body {
+        /*min-width: 1480px;*/
+    }
+</style>
+
+<div id="divAddQueuesConfirm" style="display: none;">
+    <p>
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        Do you really want to push this refill into send fax queue?
+    </p>
+    <div class="text-align-center" style="border-top: 1px solid #dddddd; padding-top: 10px;">
+        <button id="btnAddDeletePatientQueue" class="btn btn-success" onclick="addDeletePatientQueue();">Yes</button>
+        <button class="btn btn-default" onclick="cancelQueueConfirmation();">Cancel</button>
+    </div>
+</div>

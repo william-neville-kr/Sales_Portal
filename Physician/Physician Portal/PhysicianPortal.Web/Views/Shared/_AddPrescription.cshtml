@@ -1,0 +1,93 @@
+﻿@*@model PhysicianPortal.Web.Models.AddPrescriptionViewModel
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label">Select Drug</label>
+            </div>
+            <div id="autocompleteDrug" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center;">
+                @(Html.Kendo().AutoComplete()
+                    .Name("drugField")
+                    .DataTextField("ProductName")
+                    .Filter("contains")
+                    .Placeholder("Select Drug...")
+                    .MinLength(1)
+                    .HtmlAttributes(new { style = "width: 100%;", @class = "dissmiss-keyboard-ipad" })
+                    .DataSource(source =>
+                        source.Read(read => read.Action("GetDrugs", "Patients"))
+                    //.ServerFiltering(true)
+                    )
+                .Events(e => e
+                    .Select("onSelectAutoComDrug")
+                    .Filtering("onFilterAutoComDrug")
+                    .Close("onCloseAutoComDrug"))
+                )
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.FillNumber, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.FillNumber)
+                            .Name("fillnumber")
+                            .HtmlAttributes(new { @id = "fillnumberField", type = "number", value = 1, min= 1, placeholder = "Number of Fills...", required = "required", validationmessage = "Enter number of fills", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.DaysSupplied, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.DaysSupplied)
+                            .Name("dayssupplied")
+                            .HtmlAttributes(new { @id = "dayssuppliedField", type = "number", value = 1, min = 1, placeholder = "Number of days supplied for...", required = "required", validationmessage = "Enter number of days supplied for", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 box-sizing-border-box" style="display: inline-block;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.FillsAllowed, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.FillsAllowed)
+                            .Name("FillsAllowed")
+                            .HtmlAttributes(new { @id = "fillallowedField", type = "number", value = 1, min = 1, placeholder = "Number of Fills Allowed...", required = "required", validationmessage = "Enter number of fills allowed", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @Html.LabelFor(m => m.DaysSupplyPrescribed, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                        @(Html.Kendo().TextBoxFor(m => m.DaysSupplyPrescribed)
+                            .Name("DaysSupplyPrescribed")
+                            .HtmlAttributes(new { @id = "daysprescribedField", type = "number", value = 1, min = 1, placeholder = "Number of days prescribed for...", required = "required", validationmessage = "Enter number of days prescribed for", @class = "form-control email login-form-field dissmiss-keyboard-ipad", autocomplete = "off" })
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+

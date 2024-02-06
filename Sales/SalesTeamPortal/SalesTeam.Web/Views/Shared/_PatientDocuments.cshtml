@@ -1,0 +1,199 @@
+﻿<div>
+    <label>Record Updated On</label>
+    <label>@ViewBag.LatestDocumentTime Pacific Time (PT)</label>
+</div>
+
+@(Html.Kendo().Grid<SalesTeam.Core.Data.vwDocument>()
+    .Name("gridPatientDocuments")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.DocumentDescription).Title("Document Name").ClientTemplate(
+            String.Format(
+                    @"<div class='customer-photo'
+                        style='background-image: url({0});'></div>
+                    <div class='customer-name'>#: DocumentDescription #</div>", Url.Content("~/Content/Images/pdf_logo.png")));
+        columns.Bound(c => c.DocumentCreatedDate).Width(60).Format("{0:MM/dd/yyyy}").Title("Created");
+        columns.Bound(c => c.DocumentAssignedDate).Width(60).Format("{0:MM/dd/yyyy}").Title("Assinged");
+    })
+    .Sortable()
+    //.Filterable()
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Pageable(pageable => pageable
+        .Refresh(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getPatientDocumentsRecords", "SalesTeamPatient", Model))
+        .Sort(sort => sort.Add("DocumentCreatedDate").Descending())
+        .PageSize(10)
+    )
+    .Selectable()
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChangePatientDocuments"))
+)
+
+<script type="text/javascript">
+    var data;
+    function onChangePatientDocuments(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridPatientDocuments").on("dblclick", "tr.k-state-selected", function () {
+            previewPatientDocuments(data);
+        });
+        $("#gridPatientDocuments").on("doubletap", "tr.k-state-selected", function () {
+            previewPatientDocuments(data);
+        });
+        $(".k-dropdown-operator").hide();
+    });
+
+    function previewPatientDocuments(patientDocuments) {
+        $("#divPreviewDocument").css("display", "block");
+        $("#hidDocPath").val(patientDocuments.DocumentIdEncrypted);
+
+
+
+        $.ajax({
+            url: '@Url.Action("GetPatientDocumentData", "SalesTeamPatient")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: patientDocuments.DocumentIdEncrypted }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+
+                    if (data.filetype == "tif") {
+                        $("#divDocumentViewer").html('<img id="imgDocument" style="width:98%;border:1px solid #000;" src="" >');
+                        $("#imgDocument").attr("src", "data:image/tiff;base64," + data.fileData);
+                    }
+                    else {
+                        var object = "<object data='{FileName}' type='application/pdf' style='width: inherit; height: 1000px;'>";
+                        object += "If you are unable to view file, you can download from <a href = '{FileName}'>here</a>";
+                        object += " or download <a target = '_blank' href = 'http://get.adobe.com/reader/'>Adobe PDF Reader</a> to view the file.";
+                        object += "</object>";
+                        object = object.replace(/{FileName}/g, "data:application/pdf;base64," + data.fileData);
+
+                        $("#divDocumentViewer").html(object);
+                    }
+                    $("#divPreviewDocument").kendoWindow({
+                        modal: true,
+                        width: "70%",
+                        height: "70%",
+                        maxWidth: 800,
+                        maxHeight: 600,
+                        minWidth: 300,
+                        minHeight: 300,
+                        title: "Patient Documents",
+                        visible: false,
+                        resizable: false,
+                        draggable: false,
+                        actions: ["Close"],
+                        open: function (e) {
+                            $("body").css("overflow", "hidden");
+                        },
+                        close: function (e) {
+                            //$("#gridPharmacyNotes").data("kendoGrid").clearSelection();
+                            $("body").css("overflow", "");
+                        }
+                    })
+               .data("kendoWindow")
+               //.content($("#divDocumentViewer").html())
+               .center()
+               .open();
+                }
+                else {
+                    $("#divDocumentViewer").css("text-align", "center");
+                    $("#divDocumentViewer").html("<b>File not found.</b>");
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function cancelRefaxDocConfirmation() {
+        $("#divRefaxDocConfirm").data("kendoWindow").close();
+    }
+
+    function showRefaxDocConfirmation() {
+        $("#divRefaxDocConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Fax This Document",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+
+                // Clear Text Boxes
+                $("#txtEmailAddress").val("");
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function refaxDocument() {
+        var _documentPath = $("#hidDocPath").val();
+        var _faxNumber = $("#idFaxNumber").val();
+        var _physicianId = $("#hidPhysicianId").val();
+        var emailAddress = $("#txtEmailAddress").val();
+
+        $.ajax({
+            url: '@Url.Action("FaxDocument", "SalesTeamPatient")',
+            type: 'POST',
+            data: JSON.stringify({
+                DocumentIdEncrypted: _documentPath,
+                FaxNumber: _faxNumber,
+                Email: emailAddress,
+                PhysicianId: _physicianId
+            }),
+            dataType: 'json',
+            contentType: "application/json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                $("#divRefaxDocConfirm").data("kendoWindow").close();
+                alert(data.message);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+</script>
+
+<style>
+    #gridPatientDocuments tbody tr:hover {
+        cursor: pointer;
+    }
+
+    .customer-photo {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        background-size: 25px 25px;
+        background-position: center center;
+        vertical-align: middle;
+        background-repeat: no-repeat;
+    }
+
+    .customer-name {
+        display: inline-block;
+        vertical-align: middle;
+    }
+</style>

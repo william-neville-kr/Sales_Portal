@@ -1,0 +1,73 @@
+﻿
+@*<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Header</label>
+    <span>
+        @Model.NoteHeader
+    </span>
+</div>
+<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Note Date</label>
+    <span>
+        @Model.NoteDate
+    </span>
+</div>
+<div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Full Name</label>
+                <span>
+                    @Model.FullName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Staff Full Name</label>
+                <span>
+                    @Model.StaffFullName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;" db>
+                <label>Is Technician</label>
+                <span>
+                    @Model.IsTechnician
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="msls-label" style="min-width: 30px; padding: 2px 0px 2px 0px;">
+    <label>Note</label>
+</div>*@
+<div style="padding:10px;  border: 1px solid;">
+   @(Html.Kendo().Grid<SalesTeam.Core.Data.vwPrescription>()
+    .Name("gridPrescriptions")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.FillNumber).Title("Fill #").Visible(true);
+        columns.Bound(c => c.FillsAllowed).Title("Alwd");
+        columns.Bound(c => c.FillsRemaining).Title("Left");
+        columns.Bound(c => c.OrderItemName).Title("Drug");
+        columns.Bound(c => c.RxDate).Title("Fill Dt.");
+        columns.Bound(c => c.DaysSupplied).Title("Days Supld");
+        columns.Bound(c => c.TherapyStatus).Title("Therapy Status");
+    })
+    //.Selectable()
+    //.Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    //.Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getPatientPrescriptionRecords", "SalesTeamPatient", Model))
+        //.Sort(sort => sort.Add("ReferralDateId").Descending())
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    //.Events(e => e.Change("onChange"))
+)
+</div>

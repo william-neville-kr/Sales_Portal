@@ -1,0 +1,479 @@
+﻿@model PhysicianPortal.Web.Models.AddUserModel
+@using Kendo.Mvc.UI
+@using PhysicianPortal.Core.Repository;
+@{
+    Layout = null;
+
+    UnitOfWork unitOfWork = new UnitOfWork();
+
+    List<SelectListItem> roles = unitOfWork.RoleRepository.GetAsQuerable().Select(t => new SelectListItem { Text = t.Value, Value = t.RoleId.ToString() }).ToList();
+    var currentUser = unitOfWork.UserRepository.GetSingle(x => x.UserId == Model.UserId);
+
+    if (!User.IsInRole("SuperAdmin"))
+    {
+        // Only the super admin can create a new user with the following roles, if the current use is not a super admin, remove the following roles from list of selectable roles
+        roles.Remove(roles.Single(x => x.Text == "Admin"));
+        roles.Remove(roles.Single(x => x.Text == "SuperAdmin"));
+        roles.Remove(roles.Single(x => x.Text == "Pharmacist"));
+    }
+    if (!User.IsInRole("Admin") && !User.IsInRole("SuperAdmin"))
+    {
+        //Only the office admin can add physicians for that office, if the current user is not a office admin, remove the following roles
+        roles.Remove(roles.Single(x => x.Text == "Provider"));
+    }
+
+    //Only one superadmin exists and no new can be created
+    if (roles.Exists(t => t.Text == "SuperAdmin"))
+    {
+        roles.Remove(roles.Single(x => x.Text == "SuperAdmin"));
+    }
+}
+
+<script type="text/javascript">
+
+    var physicianList = [];
+
+    @foreach (var d in Model.PhysicianList)
+    {
+        @:physicianList.push(@d);
+                    }
+
+
+    function GetPhysicianByNPIFun() {
+        return {
+            text: $("#npiFieldEdit").data("kendoAutoComplete").value(),
+            OfficeList: "@string.Join(",", Model.OfficeList)",
+            RoleId: $("#RoleIdEditUser").val()
+        }
+    }
+
+    function onSelectAutoComNPI(e) {
+        var dataItem = this.dataItem(e.item.index());
+
+        $("#firstnameEditUser").val(dataItem.FirstName);
+        $("#lastnameEditUser").val(dataItem.LastName);
+        $("#phonenumberEditUser").val(dataItem.PhoneNumber);
+        $("#isActiveEditUser").prop("checked", true);
+
+        physicianList = [];
+        physicianList.push(dataItem.PhysicianId);
+        $("#PhysicianListEditUser").val(physicianList.toString());
+
+        refreshGrid();
+
+        //var multiselect = $("#PhysicianListAddUser").data("kendoMultiSelect");
+        //multiselect.value(["" + dataItem.PhysicianId + ""]);
+    }
+
+    function onDataBoundPhysicianGridEdit(arg) {
+
+        var items = arg.sender.items();
+        items.each(function (index) {
+            var dataItem = $("#gridPhysicianEdit").data("kendoGrid").dataItem(this);
+            if (physicianList.indexOf(dataItem.PhysicianId) == -1) {
+                $("#cb_" + dataItem.PhysicianId).prop("checked", false);
+            }
+            else if (physicianList.indexOf(dataItem.PhysicianId) > -1) {
+                $("#cb_" + dataItem.PhysicianId).prop("checked", true);
+            }
+        });
+    }
+
+    function physicianIdListFun() {
+        return {
+            PhysicianIdListStr: "@string.Join(",", Model.PhysicianList)",
+            text: $("#PhysicianListEditUser").data("kendoMultiSelect").input.val()
+        }
+    }
+
+    function reloadPhysicianListEditUser() {
+        $("#PhysicianListEditUser").data("kendoMultiSelect").dataSource.read();
+    }
+
+    function onChangePhysicianList(arg) {
+        reloadPhysicianListEditUser();
+    }
+
+    function onClosePhysicianList(arg) {
+        reloadPhysicianListEditUser();
+    }
+
+    @*$(document).ready(function () {
+
+        @if (User.IsInRole("Admin")) {
+            <text>
+        var multiselect = $("#OfficeList").data("kendoMultiSelect");
+                //multiselect.enable(false);
+            </text>
+        }
+    });*@
+
+    function additionalDataPhysicianGrid() {
+        return {
+            PhysicianIdListStr: "@string.Join(",", Model.PhysicianList)",
+            OfficeIdListStr: "@string.Join(",", Model.OfficeList)",
+            RoleId: $("#RoleIdEditUser").val()
+        }
+    }
+
+    function onClickCheckbox(physicianId) {
+
+        dataChanged();
+        debugger;
+        if (physicianList.indexOf(physicianId) == -1) {
+            physicianList.push(physicianId);
+        }
+        else if (physicianList.indexOf(physicianId) > -1) {
+            physicianList.pop(physicianId);
+        }
+        var tempArray = [];
+        physicianList.forEach(function (element, index) {
+            tempArray.push(element.toString());
+        });
+        $("#PhysicianListEditUser").val(tempArray);
+
+        @*var request = JSON.stringify({
+            UserId: @Model.UserId,
+            PhysicianId: physicianId
+        });
+
+        $.ajax({
+            url: '@Url.Action("AssignPhysicianToTechnician", "Admin")',
+            type: "POST",
+            data: request,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                //alert(errorThrown);
+            }
+        });*@
+    }
+</script>
+
+@*<div id="PhysicinSignatureWindowEditUser"></div>*@
+
+@using (Ajax.BeginForm("EditUser", "Admin", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onEditUserSuccess" }, new { @class = "form-horizontal", role = "form", @id = "editUserForm", style = "display: inline-block;" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.PhysicianListStr, htmlAttributes: new { id = "PhysicianListEditUser" })
+    @*@Html.HiddenFor(m => m.Signature, htmlAttributes: new { id = "Signature" })*@
+    @Html.Hidden("UserId", Model.UserId)
+    <div class="validation-summary" style="padding: 20px; height: auto;"></div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box padding0">
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.Email, new { @class = "box-sizing-border-box padding0 required" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().TextBoxFor(m => m.Email)
+                            .Name("email")
+                            .HtmlAttributes(new { @id = "emailEditUser", type = "email", placeholder = "Email", required = "required", validationmessage = "Entered email is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad edit-user-data-changed", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.FirstName)
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().TextBoxFor(m => m.FirstName)
+                            .Name("firstname")
+                            .HtmlAttributes(new { @id = "firstnameEditUser", placeholder = "First Name", required = "required", validationmessage = "Enter First Name", @class = "form-control email login-form-field dissmiss-keyboard-ipad edit-user-data-changed", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.LastName)
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().TextBoxFor(m => m.LastName)
+                            .Name("lastname")
+                            .HtmlAttributes(new { @id = "lastnameEditUser", placeholder = "Last Name", required = "required", validationmessage = "Enter Last Name", @class = "form-control email login-form-field dissmiss-keyboard-ipad edit-user-data-changed", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.PhoneNumber)
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().TextBoxFor(m => m.PhoneNumber)
+                            .Name("phonenumber")
+                            .HtmlAttributes(new { @id = "phonenumberEditUser", placeholder = "Phone Number", required = "required", validationmessage = "Entered Phone number is not of correct format", @class = "form-control email login-form-field dissmiss-keyboard-ipad edit-user-data-changed", autocomplete = "off" })
+                    )
+                </div>
+            </div>
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.IsActive, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().CheckBoxFor(m => m.IsActive)
+                            .HtmlAttributes(new { @id = "isActiveEditUser", @class = "edit-user-data-changed" })
+                            .Name("IsActive")
+                            .Label("")
+                    )
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 box-sizing-border-box padding0">
+            <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0 line-height-2_3">
+                    @Html.LabelFor(m => m.RoleId)
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @Html.DropDownListFor(m => m.RoleId, roles, new { @onchange = "roleDropdownChangedEditUser(this)", @id = "RoleIdEditUser" })
+                </div>
+            </div>
+            <div id="npiContainerEditUser" class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0">
+                    @Html.Label("NPI", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @*@(Html.Kendo().TextBoxFor(m => m.NPI)
+                                .Name("NPI")
+                                .HtmlAttributes(new { id = "npiFieldEdit", type = "text", placeholder = "NPI", validationmessage = "Enter NPI", @class = "form-control email login-form-field dissmiss-keyboard-ipad npifieldclass edit-user-data-changed", autocomplete = "off" })
+                        )*@
+
+
+
+                    @(Html.Kendo().AutoComplete()
+                                .Name("NPI")
+                                .Placeholder("NPI")
+                                .DataTextField("NationalProviderIdentifier")
+                                .Filter("contains")
+                                .MinLength(1)
+                                .HtmlAttributes(new { id = "npiFieldEdit", validationmessage = "Please select NPI from the dropdown", @class = "dissmiss-keyboard-ipad npifieldclass", style = "width:100%;", autocomplete = "off" })
+                                .Template("<span class=\"k-state-default\">#: data.FullName #, #: data.NationalProviderIdentifier #</span>")
+                                .ClearButton(true)
+                                .DataSource(source =>
+                                    source.Read(read => read.Action("GetPhysicianByNPI", "Admin").Data("GetPhysicianByNPIFun"))
+                                    .ServerFiltering(true)
+                                )
+                                .Events(e => e.Select("onSelectAutoComNPI"))
+                    )
+
+
+                </div>
+            </div>
+            <div id="joinDateContainerEditUser" class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 box-sizing-border-box padding0">
+                    @Html.LabelFor(m => m.JoinDate, new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 row control-label" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 box-sizing-border-box">
+                    @(Html.Kendo().DatePickerFor(x => x.JoinDate).Name("JoinDate")
+                        .HtmlAttributes(new { id = "joinDateField", placeholder = "Join Date", @class = "form-control email login-form-field dissmiss-keyboard-ipad edit-user-data-changed", autocomplete = "off" }))
+                </div>
+            </div>
+
+            @*<div id="physicianSignatureEditUser" class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <button type="button" onclick="showEditPhysicianSignatureWindow(this);" class="btn btn-primary login-form-field">Add Signature</button>
+            </div>*@
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+                <button type="button" onclick="logoutUserFromAllDevices()" class="btn btn-primary login-form-field" style="width: initial;">Logout User from all devices</button>
+            </div>
+        </div>
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+        {
+            @*@Html.HiddenFor(m => m.PhysicianNameList)*@
+            <div id="autocompletePhysicianContainerEditUser" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box line-height-2_3 padding0">
+                    @Html.LabelFor(m => m.PhysicianList)
+                </div>
+                @*<div id="divPhysicianListEditUser" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0 text-align-center" style="padding-bottom: 10px; display: none;">
+                        @(Html.Kendo().MultiSelect()
+                            .Name("PhysicianList")
+                            .DataTextField("FullName")
+                            .DataValueField("PhysicianId")
+                            //.HeaderTemplate("<div class=\"dropdown-header k-widget k-header\">" +
+                            //"<span class=\"k-state-default\">Physician Full Name, NPI </span>"+
+                            // "</div>")
+                            .ItemTemplate("<span class=\"k-state-default\">#: data.FullName #, #: data.NPI #</span>")
+                            .TagTemplate("<span class=\"k-state-default\">#: data.FullName #, #: data.NPI #</span>")
+                            //.Placeholder("Select office...")
+                            .DataSource(source => source
+                                .Read(read => read.Action("GetPhysicianSelectListItems", "Admin").Data("physicianIdListFun"))//.Data("physicianIdListFun")), new { text = "", PhysicianIdList = Model.PhysicianList })
+                                .ServerFiltering(true)
+                            )
+                            .HtmlAttributes(new { @id = "PhysicianListEditUser", @class = "edit-user-data-changed" })
+                            .Events(e => e.Change("onChangePhysicianList").Close("onClosePhysicianList"))
+                        )
+                    </div>*@
+
+                @(Html.Kendo().Grid<PhysicianPortal.Web.Controllers.PhysicianViewModel>()
+                    .Name("gridPhysicianEdit")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(c => c.FullName).Title("Name");
+                        columns.Bound(c => c.PhoneNumber).Title("Contact Number").Width(130).HtmlAttributes(new { @class = "text-align-center" });
+                        columns.Bound(c => c.NPI).Title("NPI").Width(120).HtmlAttributes(new { @class = "text-align-center" });
+                        columns.Bound(c => c.Address);
+                        columns.Bound(c => c.IsExist).Title("").ClientTemplate(
+                            "<input type=\"checkbox\" value=\"#= PhysicianId #\" onclick=\"onClickCheckbox(#= PhysicianId #)\" " +
+                                "# if (IsExist) { #" +
+                                    "checked = \"checked\"" +
+                                "# } #" +
+                            "/>"
+                        );
+                    })
+                    .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                    )
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(5)
+                        .Model(model => model.Id(p => p.PhysicianId))
+                        .Read(read => read.Action("PhysicianGrid_Read", "Admin").Data("additionalDataPhysicianGrid"))
+                    )
+                    .NoRecords(n => n.Template("No records to display"))
+                    //.Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+                    .Sortable()
+                    .HtmlAttributes(new { style = "display: inline-block; width: 100%; margin-bottom: 10px;" })
+                    .Events(e => e.DataBound("onDataBoundPhysicianGridEdit"))
+                //.Scrollable()
+                //.HtmlAttributes(new { style = "height:550px;" })
+                )
+            </div>
+
+            <div id="officeListEditUser" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box line-height-2_3 padding0">
+                    @Html.LabelFor(m => m.OfficeList)
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                    @(Html.Kendo().MultiSelect()
+                        .Name("OfficeList")
+                        .DataTextField("OfficeTitle")
+                        .DataValueField("OfficeId")
+                        //.Placeholder("Select office...")
+                        .DataSource(source => source.Read(read => read.Action("GetOfficeSelectListItems", "Admin")))
+                        .HtmlAttributes(new { @class = "edit-user-data-changed" })
+                    //.MaxSelectedItems(1)
+                    )
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">
+            <button id="editUserButton" type="button" onclick="submitEditUserForm(this);" class="btn btn-primary login-form-field" tabindex="3">Save User</button>
+
+
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">*@
+                <button type="button" onclick="impersonateUser(this, @Model.UserId);" class="btn btn-primary login-form-field" tabindex="3">Impersonate User</button>
+                @*</div>*@
+            }
+            @if (User.IsInRole("SuperAdmin") && currentUser.IsVerified == false)
+            {
+                @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">*@
+                <button type="button" onclick="verifyUser(this, @Model.UserId);" class="btn btn-primary login-form-field" tabindex="3">Verify User</button>
+                @*</div>*@
+            }
+            @if (User.IsInRole("SuperAdmin") && (currentUser?.IsVerified ?? false))
+            {
+                @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 box-sizing-border-box" style="text-align: center; margin: 10px 0px;">*@
+                <button type="button" onclick="unverifiedUser(this, @Model.UserId);" class="btn btn-primary login-form-field" tabindex="3">Suspend User</button>
+                @*</div>*@
+            }
+        </div>
+
+    </div>
+}
+
+<div class="field__item even" property="content:encoded">
+    <a onclick="termsAndConditions();" style="margin-left: 2%;">Click here to read terms and conditions</a>
+    @*<h3>Terms and conditions</h3>
+        <p>Welcome to our website. If you continue to browse and use this website, you are agreeing to comply with and be bound by the following terms and conditions of use, which together with our privacy policy govern [business name]'s relationship with you in relation to this website. If you disagree with any part of these terms and conditions, please do not use our website.</p>
+        <p>The term '[business name]' or 'us' or 'we' refers to the owner of the website whose registered office is [address]. Our company registration number is [company registration number and place of registration]. The term 'you' refers to the user or viewer of our website.</p>
+        <p>The use of this website is subject to the following terms of use:</p>
+        <ul>
+            <li>The content of the pages of this website is for your general information and use only. It is subject to change without notice.</li>
+            <li>This website uses cookies to monitor browsing preferences. If you do allow cookies to be used, the following personal information may be stored by us for use by third parties: [insert list of information].</li>
+            <li>Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials found or offered on this website for any particular purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law.</li>
+            <li>Your use of any information or materials on this website is entirely at your own risk, for which we shall not be liable. It shall be your own responsibility to ensure that any products, services or information available through this website meet your specific requirements.</li>
+            <li>This website contains material which is owned by or licensed to us. This material includes, but is not limited to, the design, layout, look, appearance and graphics. Reproduction is prohibited other than in accordance with the copyright notice, which forms part of these terms and conditions.</li>
+            <li>All trade marks reproduced in this website which are not the property of, or licensed to, the operator are acknowledged on the website.</li>
+            <li>Unauthorised use of this website may give rise to a claim for damages and/or be a criminal offence.</li>
+            <li>From time to time this website may also include links to other websites. These links are provided for your convenience to provide further information. They do not signify that we endorse the website(s). We have no responsibility for the content of the linked website(s).</li>
+            <li>Your use of this website and any dispute arising out of such use of the website is subject to the laws of England, Northern Ireland, Scotland and Wales.</li>
+        </ul>*@
+</div>
+
+
+<style>
+    /*.custom-input-form {
+                margin-right: 0px;
+                margin-left: 0px;
+            }*/
+    .custom-input-form label {
+        float: left;
+    }
+
+    .padding20 {
+        padding: 20px;
+    }
+
+    .valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+
+    .btn {
+        width: 130px;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        @if (User.IsInRole("Admin"))
+        {
+            <text>
+            var multiselect = $("#OfficeList").data("kendoMultiSelect");
+            multiselect.enable(false);
+            //$("#RoleIdEditUser option[value*='2']").prop('disabled', true);
+            </text>
+
+            @*if (Model.RoleId == 2)
+            {
+                <text>
+                $("#editUserForm :input").attr("disabled", true);
+                $("#divPhysicianListEditUser").addClass("hidden");
+                $("#editUserButton").attr("disabled", true);
+                </text>
+            }*@
+        }
+        @if (Model.RoleId == 3)
+        {
+            <text>
+                $("#divPhysicianListEditUser").addClass("hidden");
+            </text>
+        }
+
+        $("#PhysicianListEditUser").val(physicianList.toString());
+
+    });
+
+    
+
+</script>

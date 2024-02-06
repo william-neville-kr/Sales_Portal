@@ -1,0 +1,660 @@
+﻿@using Kendo.Mvc.UI
+@using Kendo.Mvc.Extensions
+@using PhysicianPortal.Web.Models
+@{
+    ViewBag.Title = "Messages";
+    var userRole = ViewBag.userRole;
+    List<int> physicianIds = ViewBag.physicianIds;
+    var currentUserId = ViewBag.currentUserId;
+}
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+<script src="~/signalr/hubs"></script>
+
+<fieldset>
+    <legend>Messages</legend>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+        <div style="display: -webkit-box; text-align: -webkit-right;">
+            <button onclick="addNewMessage(this);" class="btn btn-primary" style="display:inline;">New Message</button>
+        </div>
+
+        <div style="margin-top: 10px;">
+            @(Html.Kendo().Grid<GridMessageViewModel>()
+                .Name("gridMessages")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.PhysicianName).Title("From (Provider)");
+                    //columns.Bound(c => c.PatientName).Title("For (Patient)").ClientTemplate("<a href='/Patients/PatientDetails?phyId=#:PhysicianId#&patId=#:PatientId#'>#:PatientName#</a>");
+                    columns.Bound(c => c.PatientName).Title("For (Patient)").ClientTemplate(
+                            String.Format("<a onclick=\"openPatientDetails('#:PhysicianIdEncrypted#', '#:PatientIdEncrypted#')\">#:PatientName#</a>"));
+                    columns.Bound(c => c.MessageBody).ClientTemplate(
+                        "<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0'>" +
+                            "<div class='col-lg-10 col-md-10 col-sm-10 col-xs-10 padding0'>" +
+                                "<p>#:MessageBody#</p>" +
+                                "<span class='message-time'>#:CreatedOn#</span>" +
+                            "</div>" +
+                            "<div class='col-lg-2 col-md-2 col-sm-2 col-xs-2 padding0' style='text-align: right;'>" +
+                                "<div class='col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0'>" +
+                                    "<img src='" + Url.Content("~/Content/images/NewMessage.gif") + "' class='messages-new-icon message-new-hidden' />" +
+                                "</div>" +
+                                "<div class='col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0'>" +
+                                     "<p class='messages-completed-icon message-completed-hidden' style='color: green'>completed</p>" +
+                                "</div>" +
+                                "<div class='col-lg-4 col-md-4 col-sm-4 col-xs-4 padding0'>" +
+                                    "<span class='messages-count-label'>#:ThreadMessageCount#</span>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>"
+                    ).Title("Message");
+                    columns.Command(command => command.Custom("Reply").Click("replyToMessage").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton", style = "width: 52px; vertical-align: middle;" });
+                })
+                .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    )
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Read(read => read.Action("GetMessages", "Home").Data("PatientMessagesFunc"))
+                    //.Events(e => e.Error("getMessagesFailed"))
+                    .Sort(sort => sort.Add("MessageId").Descending())
+                    .PageSize(10))
+                .NoRecords(n => n.Template("No records to display"))
+                .Selectable()
+                .Events(e => e.Change("onMessageRowChange").DataBound("onMessageDataBound"))
+            //.ClientRowTemplate("<tr class='#:IsRead == true ? 'red' : 'white'#'></tr>")
+            //.ClientAltRowTemplate("<tr class='#:IsRead == true ? 'red' : 'white'#'></tr>")
+            )
+        </div>
+    </div>
+</fieldset>
+
+<div id='AddMessageWindow'></div>
+<div id="MessageThreadWindow"></div>
+
+
+<script>
+    var selectedMessageRow;
+    var messageThreadWindowOpened = false;
+    var listOfPhysicianIds = @Html.Raw(Json.Encode(physicianIds));
+
+    function onMessageRowChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            selectedMessageRow = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    function openPatientDetails(phyId, patId) {
+
+        window.location.href = '@Url.Content("~/Patients/PatientDetails")' + "?phyId=" + encodeURIComponent(phyId) + "&patId=" + encodeURIComponent(patId);
+    }
+
+    function onMessageDataBound(e) {
+        var items = e.sender.items();
+        items.each(function (index) {
+            var grid = $("#gridMessages").data("kendoGrid");
+            var dataItem = grid.dataItem(this);
+
+            @if (User.IsInRole("Physician") || User.IsInRole("Technician"))
+            {
+                <text>
+            if (dataItem.IsRead === true) {
+                //this.className += " read-message";
+            }
+            else {
+                this.className += " unread-message";
+            }
+            </text>
+        }
+
+            if (dataItem.IsCompleted === true) {
+                var imgElement = $(this).find(".messages-completed-icon")[0]
+                $(imgElement).removeClass("message-completed-hidden")
+                $(imgElement).addClass("message-completed-displayed")
+
+                //this.className += " thread-completed";
+            }
+
+            if (dataItem.IsRead == false)
+            {
+                var imgElement = $(this).find(".messages-new-icon")[0]
+                $(imgElement).removeClass("message-new-hidden")
+                $(imgElement).addClass("message-new-displayed")
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("#gridMessages").on("dblclick", "tr.k-state-selected", function () {
+            if (selectedMessageRow != undefined) {
+                var threadID = selectedMessageRow.PreMessageId ? selectedMessageRow.PreMessageId : selectedMessageRow.MessageId;
+                var patientName = selectedMessageRow.PatientName;
+                showMessageThread(threadID, patientName);
+            }
+        });
+        $("#gridMessages").on("doubletap", "tr.k-state-selected", function () {
+            if (selectedMessageRow != undefined) {
+                var threadID = selectedMessageRow.PreMessageId ? selectedMessageRow.PreMessageId : selectedMessageRow.MessageId;
+                var patientName = selectedMessageRow.PatientName;
+                showMessageThread(threadID, patientName);
+            }
+        });
+
+        @*@if (User.IsInRole("Physician") || User.IsInRole("Technician"))
+        {
+            <text>
+        var grid = $("#gridMessages").data("kendoGrid");
+        grid.bind("dataBound", onGridDataBound);
+        </text>
+        }*@
+        //grid.dataSource.fetch();
+    });
+
+    function getMessagesFailed() {
+    }
+
+    function showMessageThread(id, patientName) {
+        $("#gridMessages").data("kendoGrid").clearSelection()
+        $("#MessageThreadWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Home/MessagesThread")",
+                data: {threadID: id}
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Messages for " + patientName,
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+                $("html").css("overflow", "hidden");
+                $("html").css("position", "relative");
+                $("html").css("height", "100%");
+                messageThreadWindowOpened = true;
+
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                $("html").css("overflow", "");
+                $("html").css("position", "");
+                $("html").css("height", "");
+                messageThreadWindowOpened = false;
+            },
+            refresh: function () {
+                var messagesContainer = $("#threadMessagesContainer")[0];
+                //messagesContainer.animate({scrollTop: 500}, 'slow');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                //Reloading the grid here
+                $("#gridMessages").data("kendoGrid").dataSource.read();
+
+                this.title("Messages for " + patientName);
+
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#MessageThreadWindow").bind( "orientationchange", function( event ) {
+                    var x = document.activeElement;
+                    x.blur();
+                    $("#MessageThreadWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    var selectedPatientForNewMessage;
+    var selectedPhysicianForNewMessage;
+
+    function addNewMessage(addButton) {
+        $("#AddMessageWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Home/NewMessage")"
+                @if (Model != null)
+                {
+                    <text>
+                        ,data: { PatientIdEncrypted: '@Model.PatientIdEncrypted', PhysicianIdEncrypted: '@Model.PhysicianIdEncrypted' }
+                </text>
+                }
+                //async: true
+                //data: {id: 100}
+                //PatientId = PatientId, PhysicianId = PhysicianId
+
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "New Message",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                clearData();
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#AddMessageWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null)
+                    {
+                        x.blur();
+                    }
+                    $("#AddMessageWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function submitNewMessageForm(button) {
+        debugger;
+        var userForm = $("#newMessageForm");
+        var validator = userForm.kendoValidator().data("kendoValidator");
+        var status = $(".validation-summary");
+
+        if (validator.validate()) {
+
+            if (selectedPatientForNewMessage == undefined) {
+                if ($("#patientIdField").val() == "") {
+                    status.text("Plese select a patient.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+                    return false;
+                }
+            }
+            if (@userRole == 1) {
+                if (selectedPhysicianForNewMessage == undefined) {
+                    status.text("Plese select a physician.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+                    return false;
+                }
+            }
+
+
+            var physicianField = document.getElementById("physicianIdField");
+            var patientField = document.getElementById("patientIdField");
+            if (selectedPhysicianForNewMessage != undefined) {
+                physicianField.value = selectedPhysicianForNewMessage.PhysicianIdEncrypted;
+            }
+            if (selectedPatientForNewMessage != undefined) {
+                patientField.value = selectedPatientForNewMessage.PatientIdEncrypted;
+            }
+            selectedPhysicianForNewMessage = undefined;
+            selectedPatientForNewMessage = undefined;
+            status.text("Message added successfully.")
+                    .removeClass("invalid")
+                    .addClass("valid");
+            userForm.submit();
+        }
+        else {
+            status.text("Please enter valid data in the fields.")
+                .removeClass("valid")
+                .addClass("invalid");
+            return false;
+        }
+    }
+
+    function onNewMessageSuccess(arg) {
+
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $("#gridMessages").data("kendoGrid").dataSource.read();
+        $("#AddMessageWindow").data("kendoWindow").close();
+    }
+
+    function replyToMessage(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var threadId = dataItem.PreMessageId ? dataItem.PreMessageId : dataItem.MessageId;
+        var patientName = dataItem.PatientName;
+        showMessageThread(threadId, patientName);
+    }
+
+    function onSelectAutoComPhysician(e) {
+        selectedPhysicianForNewMessage = this.dataItem(e.item.index());
+        selectedPatientForNewMessage = undefined;
+        $("#patientAutocomplete").val("");
+        $("#physicianAutocomplete").data("kendoAutoComplete").dataSource.read();
+    }
+    function onFilterAutoComPhysician(e) {
+        selectedPhysicianForNewMessage = undefined;
+    }
+
+    function onSelectAutoComPatient(e) {
+        selectedPatientForNewMessage = this.dataItem(e.item.index());
+
+        //Here we get the physician against the selected patient so that the physician autocomplete field can be populated
+
+        $.ajax({
+            url: '@Url.Action("GetPhysicianWithId", "Home")',
+            data: JSON.stringify({ physicianId: selectedPatientForNewMessage.PhysicianIdEncrypted }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                selectedPhysicianForNewMessage = data;
+                $("#physicianAutocomplete").val(data.FullName);
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+    function onFilterAutoComPatient(e) {
+        selectedPatientForNewMessage = undefined;
+    }
+
+    function getSelectedPhysicianAndSearchText() {
+        if (selectedPhysicianForNewMessage == null || selectedPhysicianForNewMessage == undefined)
+        {
+            return {
+                selectedPhysicianId: null,
+                searchText: $("#patientAutocomplete").val()
+            }
+        }
+        else
+        {
+            return {
+                selectedPhysicianId: selectedPhysicianForNewMessage.PhysicianIdEncrypted,
+                searchText: $("#patientAutocomplete").val()
+            }
+        }
+    }
+
+    function getSelectedPatientAndSearchText() {
+        if (selectedPatientForNewMessage == null || selectedPatientForNewMessage == undefined)
+        {
+            return {
+                selectedPatientId: null,
+                searchText: $("#physicianAutocomplete").val()
+            }
+        }
+        else
+        {
+            return {
+                selectedPatientId: selectedPatientForNewMessage.PatientIdEncrypted,
+                searchText: $("#physicianAutocomplete").val()
+            }
+        }
+    }
+
+    function submitReply(button, threadId) {
+        var replyText = $("#ReplyMessageBody").val();
+        if (replyText.replace(/\s+/g,"") === "")
+        {
+            return false;
+        }
+        $.ajax({
+            url: '@Url.Action("ReplyToMessage", "Home")',
+            data: JSON.stringify({ threadID: threadId, replyBody: replyText }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.success == true)
+                {
+                    $.notifyBar({ html: data.message, cssClass: 'success', position: 'top' });
+                    $("#ReplyMessageBody").val("")
+
+                    //Inserting the new message in the thread here
+
+                    var newMessageHtml = "<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0\">" +
+                            "<div class=\"col-lg-8 col-md-8 col-sm-8 col-xs-12\" style=\"float: right;\">" +
+                                "<div style=\"float: right; text-align: right;\">" +
+                                    "<div class=\"talk-bubble tri-right round right-in\">" +
+                                        "<div class=\"talktext\">" +
+                                            "<p  style=\"white-space: pre-wrap;\">" + replyText + "</p>" +
+                                        "</div>" +
+                                    "</div>" +
+                                    "<div>" +
+                                        "<span>" + data.creationTime + "</span>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    var messagesContainer = $("#threadMessagesContainer")[0];
+                    messagesContainer.innerHTML += newMessageHtml;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    //messagesContainer.animate({scrollTop: 500}, 'slow');
+                    //Reloading the grid here
+                    $("#gridMessages").data("kendoGrid").dataSource.read();
+
+                }
+                else
+                {
+                    $.notifyBar({ html: data.message, cssClass: 'error', position: 'top' });
+                }
+            },
+            error: function (xhr) {
+                $.notifyBar({ html: "Failed to submit reply", cssClass: 'error', position: 'top' });
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function clearData() {
+        //var kendoWindow =  $("#AddMessageWindow").data("kendoWindow");
+        selectedPhysicianForNewMessage = undefined;
+        selectedPatientForNewMessage = undefined;
+        var physicianField = document.getElementById("physicianIdField");
+        var patientField = document.getElementById("patientIdField");
+        if (physicianField != undefined)
+        {
+            physicianField.value = null;
+        }
+        if (patientField != undefined)
+        {
+            patientField.value = null;
+        }
+        //$("#AddMessageWindow").html("");
+    }
+
+    $(function () {
+
+        // Reference the auto-generated proxy for the hub.
+        var signalRMessenger = $.connection.messageHub;
+
+        // Create a function that the hub can call back to display messages.
+        signalRMessenger.client.broadcastMessage = function (physicianid) {
+            //Callback method when new message recieved
+            //reload the grid on new message
+            //Reloading the grid here
+            if (listOfPhysicianIds.includes(physicianid) || @userRole == 1 || @userRole == 4 || @userRole == 5)
+            {
+                //Only reload the grid if the message was sent to the current logged in physician or if the user is an admin or a pharmacist
+                $("#gridMessages").data("kendoGrid").dataSource.read();
+            }
+
+        };
+
+        // Create a function that the hub can call to notify for reply message
+        signalRMessenger.client.sendReplyNotification = function (userid, physicianid, replyBody, creationTime, senderName) {
+            //Callback method when new reply recieved
+
+            if (listOfPhysicianIds.includes(physicianid) || @userRole == 1 || @userRole == 4 || @userRole == 5)
+            {
+                //DO not do anything if the reply was sent by the current user
+                if (@currentUserId != userid)
+                {
+                    if (messageThreadWindowOpened == true)
+                    {
+                        // Only add html for new message if the thread is currently open
+
+                        var newMessageHtml = "<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0\">" +
+                                "<div class=\"col-lg-8 col-md-8 col-sm-8 col-xs-12\" style=\"float: left;\">" +
+                                    "<div style=\"float: left; text-align: left;\">" +
+                                        "<div class=\"talk-bubble tri-right round left-in\">" +
+                                            "<div class=\"talktext\">" +
+                                                "<p  style=\"white-space: pre-wrap;\">" + replyBody + "</p>" +
+                                            "</div>" +
+                                        "</div>" +
+                                        "<div>" +
+                                            "<span>" + senderName + "</span>" +
+                                            "<br />" +
+                                            "<span>" + creationTime + "</span>" +
+                                        "</div>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>";
+
+                        var messagesContainer = $("#threadMessagesContainer")[0];
+                        messagesContainer.innerHTML += newMessageHtml;
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                    else
+                    {
+                        // else reload the grid
+                        $("#gridMessages").data("kendoGrid").dataSource.read();
+                    }
+                }
+            }
+
+        };
+
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+
+        });
+    });
+
+    function PatientMessagesFunc() {
+        return {
+            PatientIdEncrypted: $("#PatientId").val()
+        }
+    }
+</script>
+
+<style>
+    .col-sm-12 .col-xs-12 {
+        /*margin-top: 10px;*/
+    }
+
+    .k-upload .k-button {
+        background: #337ab7;
+        color: white;
+    }
+
+    .message-completed-hidden {
+        display: none !important;
+    }
+
+    .message-new-hidden {
+        display: none !important;
+    }
+
+    .message-completed-displayed {
+        display: inline-block !important;
+    }
+
+    .message-new-displayed {
+        display: inline-block !important;
+    }
+
+    .messages-completed-icon {
+        border-style: solid;
+        border-color: black;
+        border-width: 1px;
+        border-radius: 20px;
+        padding: 5px;
+        /*background: #bfbfbf;*/
+        /*color: black;*/
+        /*width: 20px;
+        height: 20px;*/
+        display: inline-block;
+        text-align: center;
+        margin-right: 5px;
+    }
+
+    .messages-new-icon {
+        border-style: solid;
+        border-color: black;
+        border-width: 1px;
+        border-radius: 20px;
+        padding: 5px;
+        /*background: #bfbfbf;*/
+        /*color: black;*/
+        /*width: 20px;
+        height: 20px;*/
+        display: inline-block;
+        text-align: center;
+        margin-right: 5px;
+        margin-top: 5px;
+    }
+
+    /*.valid {
+        color: green;
+    }
+
+    .invalid {
+        color: red;
+    }
+
+    .message-time {
+        float: right;
+        font-style: italic;
+        font-weight: lighter;
+    }
+
+    .messages-count-label {
+        border-style: solid;
+        border-color: black;
+        border-width: 1px;
+        border-radius: 20px;
+        padding: 5px;
+        background: #bfbfbf;
+        color: black;
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        text-align: center;
+    }
+
+    #gridMessages tbody tr:hover {
+        cursor: pointer;
+    }
+
+    .unread-message {
+        background-color: #B7DBFF;
+    }
+
+    .read-message {
+        background-color: white;
+    }
+
+    .thread-completed {
+        opacity: 0.5;
+    }*/
+
+    /*.thread-completed {
+        background-color: white;
+    }*/
+</style>

@@ -1,0 +1,195 @@
+﻿@{
+    ViewBag.Title = "Patients Documents";
+}
+
+<fieldset style="margin-top: 10px;">
+    <div style="margin: 10px 0px">
+        @(Html.Kendo().TabStrip()
+            .Name("tabStripNotes")
+            .HtmlAttributes(new { @class = "tabStripClass" })
+            .Items(tabstrip =>
+            {
+                tabstrip.Add().Text("Patient Documents")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Selected(true)
+                .Content(@Html.Partial("PatientDocuments").ToHtmlString());
+
+                tabstrip.Add().Text("Referral Form Documents")
+                .HtmlAttributes(new { @class = "tabStripTabs" })
+                .Content(@Html.Partial("ReferralFormDocuments").ToHtmlString());
+
+                tabstrip.Add().Text("Refill Documents")
+              .HtmlAttributes(new { @class = "tabStripTabs" })
+              .Content(@Html.Partial("RefillDocuments").ToHtmlString());
+
+                //tabstrip.Add().Text("Prescriptions")
+                //.HtmlAttributes(new { @class = "tabStripTabs" })
+                //.Content(@Html.Partial("_PatientPrescriptions", new vwPrescription { PatientId = patientId }).ToHtmlString());
+
+            })
+        )
+    </div>
+</fieldset>
+
+<div id="divPreviewDocument" style="display: none;">
+    <div id="divDocumentViewer" style="text-align: center; width: 100%; height: 100%;"></div>
+</div>
+
+
+
+<script type="text/javascript">
+    var data;
+    var isFileSelected = false;
+    var dialogHeight = 0;
+    var dialogWidth = 0;
+    var count = 0;
+
+    function getPatientDocumentData(documentId) {
+        $.ajax({
+            url: '@Url.Action("GetDocumentData", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: documentId }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    showDocument(data);
+                }
+                else {
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function getReferralFormDocumentData(documentId) {
+        $.ajax({
+            url: '@Url.Action("GetReferralFormDocumentData", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: documentId }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, xhr) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    showDocument(data);
+                }
+                else {
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function getRefillDocument(documentId) {
+        $.ajax({
+            url: '@Url.Action("GetRefillFormDocumentData", "Patients")',
+            type: 'POST',
+            data: JSON.stringify({ documentIdEncrypted: documentId }),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (documentData, textStatus, xhr) {
+                if (documentData.hasOwnProperty("d")) {
+                    documentData = documentData.d;
+                }
+                if (documentData.success) {
+                    showDocument(documentData);
+                }
+                else {
+                    console.log("File not found.");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
+    function showDocument(data) {
+        if (data.filetype == "tif") {
+            $("#divDocumentViewer").html('<img id="imgDocument" style="width:98%; border:1px solid #000;" src="" >');
+            $("#imgDocument").attr("src", "data:image/tiff;base64," + data.fileData);
+        }
+        else {
+            var object = "<object data='{FileName}' type='application/pdf' style='width: inherit; height: 1000px;'>";
+            object += "</object>";
+            object = object.replace(/{FileName}/g, "data:application/pdf;base64," + data.fileData);
+
+            $("#divDocumentViewer").html(object);
+        }
+        $("#divPreviewDocument").kendoWindow({
+            modal: true,
+            width: 800,
+            height: 600,
+            maxWidth: 1200,
+            maxHeight: 1200,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Patient Documents",
+            visible: false,
+            resizable: true,
+            draggable: true,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+                if (count == 1) {
+                    var dialog = $("#divPreviewDocument").data("kendoWindow");
+                    dialog.setOptions({
+                        height: dialogHeight,
+                        Width: dialogWidth,
+                        resize: true
+                    });
+                    $("#divPreviewDocument").data("kendoWindow").center();
+                    count = 0;
+                }
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                $("#divPreviewDocument").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divPreviewDocument").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    function previewPatientDocuments(patientDocuments, Type) {
+        var fileName = null;
+        $("#divPreviewDocument").css("display", "block");
+
+        if (Type == 1) {
+            getPatientDocumentData(data.DocumentIdEncrypted);
+        }
+        else if (Type == 2) {
+            getReferralFormDocumentData(data.DocumentIdEncrypted);
+        }
+        else if (Type == 3) {
+            getRefillDocument(data.DocumentIdEncrypted);
+        }
+    }
+</script>

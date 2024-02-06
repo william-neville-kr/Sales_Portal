@@ -1,0 +1,306 @@
+﻿@{
+    ViewBag.Title = "Pharmacist Home";
+}
+
+<fieldset style="background: #f9f9f9;">
+    <legend>Patient Search</legend>
+    @*<div class="" style="padding-bottom: 10px;">
+        <a href="@Url.Action("AddPatient", "Patients")" class="btn btn-primary" style="width: auto;">Add New Referral</a>
+    </div>*@
+    @(Html.Kendo().AutoComplete()
+        .Name("autoComPatientFullName")
+        .Placeholder("Enter Patient Name")
+        .DataTextField("FullName")
+        .Filter("contains")
+        .MinLength(1)
+        .HtmlAttributes(new { style = "width:100%;" })
+        .ClearButton(true)
+        .DataSource(source =>
+            source.Read(read => read.Action("GetPatientNameList", "Patients").Data("GetPatientNameFun"))
+            .ServerFiltering(true)
+        )
+        .Events(e => e.Select("onSelectAutoComPatientFullName"))
+    )
+
+    <div class="col-lg-offset-1 col-md-offset-1 col-lg-10 col-md-10 col-sm-12 col-xs-12" style="padding-top: 15px;">
+        @*<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">*@
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" integrity="sha384-CmLV3WR+cw/TcN50vJSYAs2EAzhDD77tQvGcmoZ1KEzxtpl2K5xkrpFz9N2H9ClN" crossorigin="anonymous">
+
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="box" data-metric="events" data-type="events" data-autorefresh="true">
+                    <div class="box-header">
+                        <h3 class="box-title"><b>Alerts – Information Needed</b></h3>
+                    </div>
+                    <div id="notificationBody" class="box-body" style="padding:5px;">
+
+                        <ul class="timeline" id="panelbar">
+                            <li class="time-label">
+                                <span class="bg-blue">@DateTime.Now.ToString("D")</span>
+                            </li>
+                            <li>
+                                <i class="fa fa-weixin bg-green"></i>
+                                <div class="timeline-item">
+                                    <h3 class="timeline-header">
+                                        <a data-toggle="collapse" href="#collapseNewMessages"><strong>New message received</strong></a>
+                                        <span id="newMessagesCount" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+                                    </h3>
+                                    <div class="collapse in" id="collapseNewMessages" aria-expanded="true" style="">
+                                        @* Add data dynamically *@
+                                    </div>
+                                </div>
+                            </li>
+                            @*<li>
+                                <i class="fa fa-file-text-o bg-red"></i>
+                                <div class="timeline-item">
+                                    <h3 class="timeline-header">
+                                        <a data-toggle="collapse" href="#collapseMissingDocuments"><strong>Missing documents</strong></a>
+                                        <span id="missingDocumentsCount" class="badge"><img src="~/Content/Images/badges-ajax-loader.gif" /></span>
+                                    </h3>
+                                    <div class="collapse" id="collapseMissingDocuments" aria-expanded="true" style="">
+                                        Add data dynamically 
+                                    </div>
+                                </div>
+                            </li>*@
+                            <li>
+                                <i class="fa fa-clock-o"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="box">
+                    <div class="box-body">
+                        @*<a href="@Url.Action("Index", "Patients")" class="small-box btn-info">
+                            <div class="small-box-footer">
+                                View My Patients
+                            </div>
+                            <div class="inner">
+                                <h3 id="myPatientsNumber"><img src="~/Content/Images/badges-ajax-loader.gif" /></h3>
+                            </div>
+                            <div class="percentage" style="">
+                                <i class="fa fa-caret-down"></i> <span id="myPatientsPercentage">0.0</span>%
+                                <div class="vs">Need more information</div>
+                            </div>
+                        </a>*@
+                        <a href="@Url.Action("PatientsList", "Patients")" class="small-box btn-success">
+                            <div class="small-box-footer">
+                                Prescription
+                            </div>
+                            <div class="inner">
+                                <h3 id="patientsNumber"><img src="~/Content/Images/badges-ajax-loader.gif" /></h3>
+                            </div>
+                            <div class="percentage" style="">
+                                <i class="fa fa-caret-down"></i> <span id="patientsPercentage">0.0</span>%
+                                <div class="vs">vs previous 30 days</div>
+                            </div>
+                        </a>
+                        @*<a href="@Url.Action("Refills", "Home")" class="small-box btn-danger">
+                            <div class="small-box-footer">
+                                Action Required
+                            </div>
+                            <div class="inner">
+                                <h3 id="refillsNumber"><img src="~/Content/Images/badges-ajax-loader.gif" /></h3>
+                            </div>
+                            <div class="percentage" style="">
+                                <i class="fa fa-caret-down"></i> <span id="refillsPercentage">0.0</span>%
+                                <div class="vs">vs previous 30 days</div>
+                            </div>
+                        </a>*@
+                        <a href="@Url.Action("Refills", "Home")" class="small-box btn-primary">
+                            <div class="small-box-footer">
+                                Refills
+                            </div>
+                            <div class="inner">
+                                <h3 id="holdRefillsNumber"><img src="~/Content/Images/badges-ajax-loader.gif" /></h3>
+                            </div>
+                            <div class="percentage" style="">
+                                <i class="fa fa-caret-down"></i> <span id="holdRefillsPercentage">0.0</span>%
+                                <div class="vs">vs previous 30 days</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("Index", "Home")" class="small-box btn-warning">
+                            <div class="small-box-footer">
+                                Message Pharmacy
+                            </div>
+                            <div class="inner">
+                                <h3 id="communicationsNumber"><img src="~/Content/Images/badges-ajax-loader.gif" /></h3>
+                            </div>
+                            <div class="percentage" style="">
+                                <i class="fa fa-caret-down"></i> <span id="communicationsPercentage">0.0</span>%
+                                <div class="vs">vs previous 30 days</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<script type="text/javascript">
+    function GetPatientNameFun() {
+        return {
+            searchPatientName: $("#autoComPatientFullName").val()
+        }
+    }
+
+    function onSelectAutoComPatientFullName(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.location.href = '@Url.Content("~/Patients/PatientDetails")' + "?phyId=" + encodeURIComponent(dataItem.PhysicianIdEncrypted) + "&patId=" + encodeURIComponent(dataItem.PatientIdEncrypted);
+    }
+
+    @*$.ajax({
+        url: '@Url.Action("GetMyPatientsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            debugger;
+            if (data.success) {
+                $("#myPatientsNumber").text(data.message);
+                $("#myPatientsPercentage").text(data.patientsAvg);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });*@
+
+    $.ajax({
+        url: '@Url.Action("GetPatientsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#patientsNumber").text(data.message);
+                $("#patientsPercentage").text(data.physicianPortalPatientsAvg);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    @*$.ajax({
+        url: '@Url.Action("GetRefillsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                //$("#refillsNumber").text(data.message);
+                //$("#refillsPercentage").text(data.refillFaxReportLogAvg);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });*@
+
+    $.ajax({
+        url: '@Url.Action("GetHoldRefillsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#holdRefillsNumber").text(data.message);
+                $("#holdRefillsPercentage").text(data.refillFaxReportLogAvg);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    $.ajax({
+        url: '@Url.Action("GetCommunicationsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#communicationsNumber").text(data.message);
+                $("#communicationsPercentage").text(data.messagesAvg);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    $.ajax({
+        url: '@Url.Action("GetNotificationAlertsCount", "Home")',
+        type: "GET",
+        success: function (data) {
+            if (data.success) {
+                $("#newMessagesCount").text(data.NewMessagesCount);
+                //$("#missingDocumentsCount").text(data.MissingDocumentsCount);
+                //$("#needMoreInfoCount").text(data.NeedMoreInfoCount);
+            }
+            else {
+                console.log(data.message);
+            }
+        },
+        error: function (xhr) {
+            console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+        }
+    });
+
+    //Load Notifiactions
+    function GetNotifiactions(ItemId, mainDivName) {
+        $.ajax({
+            url: '@Url.Action("GetNotifiactions", "Home")',
+            data: { ItemId: ItemId },
+            type: "GET",
+            success: function (data) {
+                if (data.success) {
+                    var baseUrl = "@Url.Content("~/")";
+                    var collapseDiv = document.getElementById(mainDivName);
+
+                    data.message.forEach(function (element, index) {
+
+                        var outerDiv = document.createElement("div");
+                        outerDiv.className = "timeline-body";
+                        outerDiv.style.padding = "10px";
+
+                        var innerDiv = document.createElement("div");
+                        innerDiv.className = "pull-right";
+
+                        var a = document.createElement("a");
+                        a.className = "btn-primary btn btn-xs";
+                        a.href = baseUrl + element.Url;
+                        a.innerText = "View";
+                        innerDiv.appendChild(a);
+                        outerDiv.appendChild(innerDiv);
+
+                        var span = document.createElement("span");
+                        span.innerText = element.AlertMessage;
+                        outerDiv.appendChild(span);
+
+                        collapseDiv.appendChild(outerDiv);
+                    });
+                }
+                else {
+                    console.log(data.message);
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    GetNotifiactions(1, "collapseNewMessages");
+    //GetNotifiactions(2, "collapseMissingDocuments");
+    //GetNotifiactions(3, "collapseNeedMoreInfo");
+</script>

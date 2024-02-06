@@ -1,0 +1,426 @@
+﻿@model PhysicianPortal.Web.Models.AddPatientViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+@*<h2>Index</h2>*@
+
+
+<fieldset>
+    <legend>Dashboard</legend>
+
+    <div class="validation-summary" style="height: auto;padding-bottom: 5px;padding-left: 15px; height: auto;"></div>
+
+    <div class="form-group custom-input-form col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+        @if (ViewBag.RoleId == 5)
+        {
+            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                @Html.Label("Select Providers")
+            </div>
+            <div id="divPhysicians" class="col-lg-1 col-md-1 col-sm-12 col-xs-12 box-sizing-border-box padding0" style="margin-right: 4%;">
+                @Html.DropDownListFor(m => m.physicianId,
+                Model.PhysiciansList,
+                new { required = "required", validationmessage = "Select a provider", @id = "physicianField", @style = "width: 100%; max-width: 100%;", @class = "npifieldclass" })
+            </div>
+        }
+        <div id="divChartDates1">
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                @Html.Label("Start Date")
+                @(Html.Kendo().DatePicker()
+                .Name("chart1StartDate")
+                .Format("MM/dd/yyyy")
+                .Value(DateTime.UtcNow.AddMonths(-1))
+                .HtmlAttributes(new { id = "chart1StartDate", style = "width: 150px", onkeydown = "javascript:return false;" })
+                )
+                <span class="k-invalid-msg" data-for="chart1StartDate" style="margin-top: 5px;"></span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                @Html.Label("End Date")
+                @(Html.Kendo().DatePicker()
+                .Name("chart1EndDate")
+                .Format("MM/dd/yyyy")
+                .Value(DateTime.UtcNow)
+                .HtmlAttributes(new { id = "chart1EndDate", style = "width: 150px", onkeydown = "javascript:return false;" })
+                )
+                <span class="k-invalid-msg" data-for="chart1EndDate" style="margin-top: 5px;"></span>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 box-sizing-border-box padding0">
+                <button type="submit" onclick="submitNewSearch();" class="btn btn-primary login-form-field">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding15px">
+        <div id="PhysicianChart"></div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding15px">
+        <div id="PhysicianChart2"></div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding15px">
+        <div id="PhysicianChart3"></div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding15px">
+        <div id="PhysicianChart4"></div>
+    </div>
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#PhysicianChart").kendoChart({
+            //title: { text: "Patients Associated with Physicians", font: "bold 16px Arial,Helvetica,sans-serif" },
+            seriesColors: ["#488eb6"],
+            series: [{
+                type: "column",
+                field: "value",
+                categoryField: "category",
+                labels: { visible: true, template: "${value}" }
+            }],
+            categoryAxis: {
+                field: 'category', labels: { rotation: -60, padding: { right: 10 } }
+            },
+            tooltip: {
+                visible: true,
+                template: "<center><b>${value} </b></center>"
+            }
+        });
+
+        if ($("#physicianField").val()==null)
+        {
+            $("#PhysicianChart").hide();
+        }
+        else if ($("#physicianField").val() != "") {
+            //$("#divChartDates1").show();
+            //getPhysicianChartData();
+        }
+        else {
+            $("#PhysicianChart").hide();
+        }
+        if(@ViewBag.RoleId==2)
+        {
+            submitNewSearch();
+        }
+    });
+
+    function submitNewSearch()
+    {
+        var ddlValue = $("#physicianField").val();
+        var status = $(".validation-summary");
+
+        if(@ViewBag.RoleId==5)
+        {
+            if (ddlValue == "" || ddlValue == null) {
+                status.text("Please Select a provider.")
+                        .removeClass("valid")
+                        .addClass("invalid");
+            }
+            else
+            {
+                status.text("")
+               .removeClass("invalid")
+               .addClass("valid");
+                getPhysicianChartData();
+                getPhysicianChartData2();
+                getPhysicianChartData3();
+                getPhysicianChartData4();
+            }
+        }
+        else {
+            status.text("")
+            .removeClass("invalid")
+            .addClass("valid");
+            getPhysicianChartData();
+            getPhysicianChartData2();
+            getPhysicianChartData3();
+            getPhysicianChartData4();
+
+        }
+    }
+
+    function getPhysicianChartData() {
+        var splitData = $("#chart1StartDate").val().split("/");
+        var date1 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        splitData = $("#chart1EndDate").val().split("/");
+        var date2 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        var physicianId = $("#physicianField").val();
+        var request = {
+            startDate: date1,
+            endDate: date2,
+            selectedPhysicianId: physicianId
+        };
+        $.ajax({
+            data: request,
+            url: '@Url.Action("GetPhysicianChartData", "Dashboard")',
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success && data.message.length > 0) {
+                    var tempArray = [];
+                    data.message.forEach(function (item) {
+                        tempArray.push({ category: item.Date, value: item.PatientCount });
+                    });
+                    var physicianChart = $("#PhysicianChart").data("kendoChart");
+                    physicianChart.dataSource.data(tempArray);
+                    physicianChart.options.series[0].type = "column";
+                    physicianChart.options.title.text = "New Referrals";
+                    physicianChart.options.legend.visible = true;
+                    physicianChart.options.tooltip.template = "<center><b>${value} </b></center>";
+                    physicianChart.refresh();
+
+                    $("#divChartDates1").show();
+                    $("#PhysicianChart").show();
+                }
+                else {
+                    $("#PhysicianChart").hide();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                $("#loading-image").hide();
+                $("#PhysicianChart").hide();
+            }
+        });
+    }
+
+    // chart # 2
+    function getPhysicianChartData2()
+    {
+        var splitData = $("#chart1StartDate").val().split("/");
+        var date1 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        splitData = $("#chart1EndDate").val().split("/");
+        var date2 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        var physicianId = $("#physicianField").val();
+        var request = {
+            startDate: date1,
+            endDate: date2,
+            selectedPhysicianId: physicianId
+        };
+        $.ajax({
+            data: request,
+            url: '@Url.Action("GetPhysicianChartData2", "Dashboard")',
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    var tempArray = [];
+                    $("#PhysicianChart2").kendoChart({
+                        title: {
+                            text: "No of Prescriptions"
+                        },
+                        legend: {
+                            visible: true
+                        },
+                        //seriesDefaults: {
+                        //    type: "bar"
+                        //},
+                        series: data.srData,
+                        valueAxis: {
+                            //max: 140000,
+                            line: {
+                                visible: false
+                            },
+                            minorGridLines: {
+                                visible: true
+                            },
+
+                        },
+                        categoryAxis: {
+                            categories: data.datesList,
+                            majorGridLines: {
+                                visible: false
+                            },
+                            labels: {
+                                rotation: -60, padding: { right: 10 }
+                            }
+                        },
+                        tooltip: {
+                            visible: true,
+                            template: "#= series.name #: #= value #"
+                        }
+                    });
+                    $("#PhysicianChart2").show();
+                }
+                else {
+                    $("#PhysicianChart2").hide();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                $("#loading-image").hide();
+                $("#PhysicianChart2").hide();
+            }
+        });
+    }
+
+    // chart # 3
+    function getPhysicianChartData3()
+    {
+        var splitData = $("#chart1StartDate").val().split("/");
+        var date1 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        splitData = $("#chart1EndDate").val().split("/");
+        var date2 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        var physicianId = $("#physicianField").val();
+        var request = {
+            startDate: date1,
+            endDate: date2,
+            selectedPhysicianId: physicianId
+        };
+        $.ajax({
+            data: request,
+            url: '@Url.Action("GetPhysicianChartData3", "Dashboard")',
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $("#PhysicianChart3").kendoChart({
+                        title: {
+                            text: "Prescriptions by Order Status"
+                        },
+                        legend: {
+                            visible: true
+                        },
+                        //seriesDefaults: {
+                        //    type: "bar"
+                        //},
+                        series: data.srData,
+                        valueAxis: {
+                            //max: 140000,
+                            line: {
+                                visible: false
+                            },
+                            minorGridLines: {
+                                visible: true
+                            }
+
+                        },
+                        categoryAxis: {
+                            categories: data.datesList,
+                            majorGridLines: {
+                                visible: false
+                            },
+                            labels: {
+                                rotation: -60, padding: { right: 10 }
+                            },
+                        },
+                        tooltip: {
+                            visible: true,
+                            template: "#= series.name #: #= value #"
+                        }
+                    });
+                    $("#PhysicianChart3").show();
+                }
+                else {
+                    $("#PhysicianChart3").hide();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                $("#loading-image").hide();
+                $("#PhysicianChart3").hide();
+            }
+        });
+    }
+
+    // chart # 4
+    function getPhysicianChartData4()
+    {
+        var splitData = $("#chart1StartDate").val().split("/");
+        var date1 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        splitData = $("#chart1EndDate").val().split("/");
+        var date2 = splitData[2] + "-" + splitData[0] + "-" + splitData[1];
+        var physicianId = $("#physicianField").val();
+        var request = {
+            startDate: date1,
+            endDate: date2,
+            selectedPhysicianId: physicianId
+        };
+        $.ajax({
+            data: request,
+            url: '@Url.Action("GetPhysicianChartData4", "Dashboard")',
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+
+                if (data.success) {
+                    $("#PhysicianChart4").kendoChart({
+                        title: {
+                            text: "Prescriptions by Insurance"
+                        },
+                        legend: {
+                            visible: true
+                        },
+                        //seriesDefaults: {
+                        //    type: "bar"
+                        //},
+                        series: data.srData,
+                        valueAxis: {
+                            //max: 140000,
+                            line: {
+                                visible: false
+                            },
+                            minorGridLines: {
+                                visible: true
+                            }
+
+                        },
+                        categoryAxis: {
+                            categories: data.datesList,
+                            majorGridLines: {
+                                visible: false
+                            },
+                            labels: {
+                                rotation: -60, padding: { right: 10 }
+                            },
+                        },
+                        tooltip: {
+                            visible: true,
+                            template: "#= series.name #: #= value #"
+                        }
+                    });
+                    $("#PhysicianChart4").show();
+                }
+                else {
+                    $("#PhysicianChart4").hide();
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+                $("#loading-image").hide();
+                $("#PhysicianChart4").hide();
+            }
+        });
+    }
+</script>

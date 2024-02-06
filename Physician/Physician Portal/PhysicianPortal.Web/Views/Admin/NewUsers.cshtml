@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "New Users";
+}
+<fieldset>
+    <legend>New Users</legend>
+
+    @(Html.Kendo().Grid<PhysicianPortal.Web.Models.UsersListModel>()
+    .Name("gridUsersList")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.Email).Title("Email Address");
+        columns.Bound(c => c.FullName).Title("Full Name");
+        columns.Bound(c => c.ContactNumber).Title("Contact Number").Width(120);
+        columns.Bound(c => c.LastLogin).Title("Last Login").Width(180);
+        columns.Bound(c => c.LastLoginIP).Title("IP").Width(60);
+        columns.Bound(c => c.Role).Title("Role").Width(60);
+        columns.Bound(c => c.IsActiveStr).Title("Is Active").Width(60);
+        columns.Bound(c => c.IsVerifiedStr).Title("Is Verified").Width(60);
+        columns.Command(command => command.Custom("Edit").Click("editUser").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+    })
+
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetNewUsersList", "Admin"))
+        .PageSize(10)
+    .Sort(srt => srt.Add("UserId").Descending())
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Sortable()
+    )
+
+</fieldset>
+<div id='EditUserWindow'></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+
+    function editUser(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#EditUserWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/VerifyNewUser")",
+                data: { selectedUserId: dataItem.UserId }
+                //async: true
+            },
+            modal: true,
+            width: "70%",
+            height: "90%",
+            maxWidth: 800,
+            maxHeight: 800,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Verify New User",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                //roleDropdownChangedEditUser(this);
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#EditUserWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#EditUserWindow").data("kendoWindow").center();
+                });
+            }
+        }).data("kendoWindow").center().open();
+    }
+</script>

@@ -1,0 +1,1462 @@
+﻿@using PhysicianPortal.Core.Data
+@using PhysicianPortal.Web.Models
+@model RefFormHivAidViewModel
+@{
+    ViewBag.Title = "Hiv Aids Referral Form";
+    Layout = null;
+}
+@using (Ajax.BeginForm("HivAidsReferralForm", "Patients", new AjaxOptions { OnSuccess = "OnSuccessReferralForm", OnFailure = "OnFailureReferralForm" }, new { @class = "ReferralForm display-inline-block form-style", @id = "HivAidsFormForm" }))
+{
+    @Html.HiddenFor(m => m.PhysicianPortalPatientId)
+    @Html.HiddenFor(m => m.ReferralFormId)
+    @Html.HiddenFor(m => m.RefFormHivAidsId)
+    @Html.HiddenFor(m => m.IsSignatured)
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding-bottom10px buttonsDiv">
+        <button class="btn btn-primary" onclick="ReferralFormSave(); return false;" type="button">Save</button>
+        <button class="btn btn-danger" type="button" onclick="$('#divReferralForm').html(''); return false;">Cancel</button>
+
+        @if (User.IsInRole("Physician")) { if (!ViewBag.IsHaveSignature)
+        {
+        <input class="btn btn-primary" disabled type="button" onclick="GetSignature();" value="Sign It" />
+        <span>Please add your signature into your account</span>
+        }
+        else
+        {
+        <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />} } else { <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />
+        }
+        <button type="button" onclick="printButtonPressed('#HivAidsFormForm');" class="btn btn-primary login-form-field">Print</button>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block" style="padding-bottom: 5px;">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 padding0 visible-lg visible-md visible-sm display-inline-block kroger-logo-container">
+            <img class="kroger-logo-class" alt="@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName3"].ToString() Logo" src="~/Content/images/KrogerLogo.png" style="width: 100%;" />
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 text-center">
+                <span class="color2">SPECIALTY PHARMACY</span>
+            </div>
+        </div>
+        <div class="col-xs-12 padding0 visible-xs text-center display-inline-block kroger-logo-container-xs">
+            <img class="kroger-logo-class" alt="@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName3"].ToString() Logo" src="~/Content/images/KrogerLogo.png" style="width: 35%;" />
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 text-center">
+                <span class="color2">SPECIALTY PHARMACY</span>
+            </div>
+        </div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 padding0 display-inline-block">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                <h1 class="pull-right color2" style="font-weight: 600; line-height: 37px;">INFECTIOUS DISEASE</h1>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                @if (Model.ReferralFormId == 53)
+                {
+                <span class="pull-right">
+                    <span class="color1">Los Angeles, CA</span> <span class="color2">phone</span> 323.935.1186 <span class="color2">fax</span> 323.936.0312
+                </span>
+
+                }
+                 else if (Model.ReferralFormId == 32)
+                {
+                <span class="pull-right">
+                    <span class="color1">New Orleans, LA</span> <span class="color2">toll free</span> 888.355.4191 <span class="color2">toll free fax</span> 888.355.4192
+                </span>
+
+                }
+                else
+                {
+                <span class="pull-right">
+                    <span class="color1">Garden Grove, CA</span> <span class="color2">toll free</span> 800.228.3643 <span class="color2">toll free fax</span> 866.539.1092
+                </span>
+                }
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block form-group padding0">
+                <h3 class="pull-right color2" style="margin: 0;">@System.Web.Configuration.WebConfigurationManager.AppSettings["ClientNameWeb"].ToString()</h3>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0" style="padding-bottom: 5px;">
+                <div class="color3" style="height: 5px;"></div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                <label class="control-label">DATE: </label>
+                @Html.TextBoxFor(m => m.FormDate, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass" })
+
+                <label class="control-label">NEEDS BY DATE: </label>
+                @Html.TextBoxFor(m => m.FormNeedsByDate, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass" })
+
+                <label class="control-label"><b>SHIP TO: </b></label>
+
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToPatient")
+                        PATIENT
+                    </label>
+                </div>
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToOffice")
+                        OFFICE
+                    </label>
+                </div>
+                <div class="checkbox-inline">
+                    <label>
+                        @Html.CheckBox("ChkBox_ShipToOther")
+                        OTHER
+                    </label>
+                    @Html.TextBoxFor(m => m.TxtBox_ShipToOther)
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0" style="padding-top: 5px;">
+                <div class="color3" style="height: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0 patient-prescriber">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <h4 class="heading1">PATIENT INFO</h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding10px" style="border: 1px black solid;">
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Patient Name</label>
+                @Html.TextBoxFor(m => m.PatientFullName, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Address</label>
+                @Html.TextBoxFor(m => m.PatientAddressLine1, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">City, State, Zip</label>
+                @Html.TextBoxFor(m => m.PatientCity_StateProvince_PostalCode, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Main Phone</label>
+                    @Html.TextBoxFor(m => m.PatientPhoneNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Alternate Phone</label>
+                    <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Social Security #</label>
+                <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Date of Birth</label>
+                    @Html.TextBoxFor(m => m.PatientDateOfBirth, "{0:MM/dd/yyyy}", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Gender</label>
+                    <div class="radio-inline">
+                        <label>
+                            @Html.RadioButtonFor(m => m.PatientGender, "M")
+                            Male
+                        </label>
+                    </div>
+                    <div class="radio-inline">
+                        <label>
+                            @Html.RadioButtonFor(m => m.PatientGender, "F")
+                            Female
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <h4 class="heading1">PRESCRIBER INFO</h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding10px" style="border: 1px black solid;">
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Prescriber Name</label>
+                @Html.TextBoxFor(m => m.PhysicianFullName, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding-left0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">DEA #</label>
+                        @Html.TextBoxFor(m => m.PhysicianDrugEnforcementAdministrationNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding-left0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">NPI #</label>
+                        @Html.TextBoxFor(m => m.PhysicianNationalProviderIdentifier, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 display-inline-block padding0">
+                        <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">License #</label>
+                        @Html.TextBoxFor(m => m.PhysicianPhysicianLicenseNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+                    </div>
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Address</label>
+                @Html.TextBoxFor(m => m.PhysicianAddressLine1, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">City, State, Zip</label>
+                @Html.TextBoxFor(m => m.PhysicianCity_StateProvince_PostalCode, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" })
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-left0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Phone</label>
+                    @Html.TextBoxFor(m => m.PhysicianPhoneNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-right0">
+                    <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Fax</label>
+                    @Html.TextBoxFor(m => m.PhysicianFaxNumber, "", new { @class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0 phoneNumberClass" })
+                </div>
+
+                <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">Contact Person</label>
+                <input class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" type="text" />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+        @if (Model.ReferralFormId == 8 || Model.ReferralFormId == 9 || Model.ReferralFormId == 10)
+        {
+        <h4 class="heading2">
+            <b class="font-weight800">INSURANCE: </b>
+            PLEASE FAX COPY OF PRESCRIPTION CARD &amp; MEDICAL CARD FRONT &amp; BACK
+        </h4>
+        }
+        @if (Model.ReferralFormId == 32||Model.ReferralFormId==52||Model.ReferralFormId==53)
+        {
+        <h4 class="heading2yellow">
+            <b class="font-weight800">PLEASE FAX COPY OF: </b>
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand600mgPM2)*@
+            PRESCRIPTION CARD FRONT & BACK
+
+
+
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand400mgPM2)*@
+            CLINICAL NOTES
+
+
+
+            <input type="checkbox" value="">
+            @*@Html.CheckBoxFor(m => m.ChkBox_PRESCRIPTION_600mgAMand400mgPM2)*@
+            MEDICAL CARD FRONT & BACK
+
+
+        </h4>
+        }
+    </div>
+
+    <div id="ClinicalInfoContainer">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <h4 class="heading1">CLINICAL INFORMATION</h4>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                <b>Diagnosis:</b>
+                <div class="display-inline-block">
+                    <div class="checkbox-inline">
+                        <span>
+                            @Html.CheckBox("B20_HIV_AIDS")
+                            B20 HIV/AIDS
+                        </span>
+                    </div>
+                </div>
+                <div class="display-inline-block">
+                    <div class="checkbox-inline">
+                        <span>
+                            @Html.CheckBox("B18_1_Chronic_Hepatitis_B")
+                            B18.1 Chronic Hepatitis B
+                        </span>
+                    </div>
+                </div>
+                <div class="display-inline-block">
+                    <div class="checkbox-inline">
+                        <span>
+                            @Html.CheckBox("B18_2_Chronic_Hepatitis_C")
+                            B18.2 Chronic Hepatitis C
+                        </span>
+                    </div>
+                </div>
+
+                <div class="display-inline-block">
+                    <div class="checkbox-inline">
+                        <span>
+                            @Html.CheckBox("ChkBox_DiagnosisOther")
+                            Others:
+                        </span>
+                    </div>
+                    @Html.TextBoxFor(m => m.TxtBox_DiagnosisOther)
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: table;">
+                <label style="display: table-cell; width: 105px;"><b>Drug Allergies:</b></label>
+                @Html.TextBoxFor(m => m.DrugAllergiesTxt, new { style = "display: table-cell; width: 100%;" })
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0">
+                CD/4/T-cell:
+                @Html.TextBoxFor(m => m.CD_4_T_cell, new { @class = "width50px" })
+
+                HIV RNA:
+                @Html.TextBoxFor(m => m.HIV_RNA, new { @class = "width50px" })
+
+                HCV genotype:
+                @Html.TextBoxFor(m => m.HCV_genotype, new { @class = "width50px" })
+
+                Viral Load:
+                @Html.TextBoxFor(m => m.Viral_Load, new { @class = "width50px" })
+
+                (copies or IU/ml) ALT:
+                @Html.TextBoxFor(m => m.ALT, new { @class = "width50px" })
+
+                Liver Biopsy Results:
+                @Html.TextBoxFor(m => m.Liver_Biopsy_Results, new { style = "width: 249px;" })
+
+                <b>Weight:</b>
+                @Html.TextBoxFor(m => m.Weight, new { @class = "width100px" })
+
+                <b>BLOOD RESULTS-Date Drawn:</b>
+                @Html.TextBoxFor(m => m.BLOOD_RESULTS_Date_Drawn, new { @class = "max-width-110px dateclass" })
+
+                <b>Hgb/Hct:</b>
+                @Html.TextBoxFor(m => m.Hgb_Hct, new { @class = "width100px" })
+
+                <b>WBC:</b>
+                @Html.TextBoxFor(m => m.WBC, new { @class = "width100px" })
+            </div>
+        </div>
+    </div>
+
+    <div id="PrescriptionInfoContainer" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <h4 class="heading1">PRESCRIPTION INFORMATION</h4>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block padding0 border-bottom2px">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding0 border-right5px">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center" style="width: 70%">
+                                    <div class="navy">
+                                        DIRECTIONS
+                                    </div>
+                                </th>
+                                <th class="text-center" style="width: 15%">
+                                    <div class="navy">
+                                        QUANTITY
+                                    </div>
+                                </th>
+                                <th class="text-center" style="width: 15%">
+                                    <div class="navy">
+                                        REFILLS
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="border-bottom5px border-right2px">NRTIs/NNRTIs</th>
+                                <th colspan="3" class="border-bottom5px">&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @* NRTIs/NNRTIs *@
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Edurant")
+                                            Edurant
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Edurant1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Edurant2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Edurant_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Edurant_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Emtriva")
+                                            Emtriva
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Emtriva1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Emtriva2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Emtriva_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Emtriva_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Epivir")
+                                            Epivir
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epivir1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epivir2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epivir_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epivir_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Intelence")
+                                            Intelence
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Intelence1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Intelence2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Intelence_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Intelence_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Resciptor")
+                                            Resciptor
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Resciptor1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Resciptor2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Resciptor_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Resciptor_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Retrovir")
+                                            Retrovir
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Retrovir1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Retrovir2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Retrovir_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Retrovir_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Sustiva")
+                                            Sustiva
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Sustiva1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Sustiva2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Sustiva_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Sustiva_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Videx")
+                                            Videx
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Videx1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Videx2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Videx_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Videx_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Viramune")
+                                            Viramune
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viramune1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viramune2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viramune_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viramune_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Viread")
+                                            Viread
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viread1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viread2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viread_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viread_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Zerit")
+                                            Zerit
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Zerit1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Zerit2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Zerit_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Zerit_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Ziagen")
+                                            Ziagen
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Ziagen1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Ziagen2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Ziagen_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Ziagen_Refill)
+                                </td>
+                            </tr>
+
+                            @* Protease Inhibitors *@
+                            <tr>
+                                <th colspan="2" class="border-bottom5px border-right2px border-Top5px">Protease Inhibitors</th>
+                                <th colspan="3" class="border-bottom5px border-Top5px">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Aptivus")
+                                            Aptivus
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Aptivus1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Aptivus2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Aptivus_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Aptivus_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Invirase")
+                                            Invirase
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Invirase1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Invirase2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Invirase_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Invirase_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Kaletra")
+                                            Kaletra
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Kaletra1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Kaletra2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Kaletra_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Kaletra_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Lexiva")
+                                            Lexiva
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Lexiva1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Lexiva2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Lexiva_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Lexiva_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Norvir")
+                                            Norvir
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Norvir1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Norvir2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Norvir_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Norvir_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Prezista")
+                                            Prezista
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Prezista1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Prezista2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Prezista_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Prezista_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Reyataz")
+                                            Reyataz
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Reyataz1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Reyataz2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Reyataz_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Reyataz_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Viracept")
+                                            Viracept
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viracept1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viracept2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viracept_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Viracept_Refill)
+                                </td>
+                            </tr>
+
+                            @* Empty TextFileds in Protease Inhibitors *@
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 20%"></td>
+                                <td class="border-right2px" style="width: 35%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 20%"></td>
+                                <td class="border-right2px" style="width: 35%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 20%"></td>
+                                <td class="border-right2px" style="width: 35%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                                <td class="border-right2px" style="width: 15%"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center" style="width: 70%">
+                                    <div class="navy">
+                                        DIRECTIONS
+                                    </div>
+                                </th>
+                                <th class="text-center" style="width: 15%">
+                                    <div class="navy">
+                                        QUANTITY
+                                    </div>
+                                </th>
+                                <th class="text-center" style="width: 15%">
+                                    <div class="navy">
+                                        REFILLS
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="border-bottom5px border-right2px">Combinations</th>
+                                <th colspan="3" class="border-bottom5px border-right2px">&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @* Combinations *@
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Atripla")
+                                            Atripla
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Atripla1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Atripla2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Atripla_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Atripla_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Combivir")
+                                            Combivir
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Combivir1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Combivir2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Combivir_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Combivir_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Complera")
+                                            Complera
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Complera1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Complera2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Complera_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Complera_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Epzicom")
+                                            Epzicom
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epzicom1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epzicom2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epzicom_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Epzicom_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Genvoya")
+                                            Genvoya
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Genvoya1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Genvoya2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Genvoya_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Genvoya_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Odefsey")
+                                            Odefsey
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Odefsey1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Odefsey2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Odefsey_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Odefsey_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Stribild")
+                                            Stribild
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Stribild1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Stribild2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Stribild_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Stribild_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Trizivir")
+                                            Trizivir
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Trizivir1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Trizivir2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Trizivir_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Trizivir_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Truvada")
+                                            Truvada
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Truvada1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Truvada2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Truvada_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Truvada_Refill)
+                                </td>
+                            </tr>
+
+                            @* Integrase Inhibitor/CCR5 Inhibitor *@
+                            <tr>
+                                <th colspan="3" class="border-bottom5px border-right2px border-Top5px">Integrase Inhibitor/CCR5 Inhibitor</th>
+                                <th colspan="2" class="border-bottom5px border-right2px border-Top5px">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Isentress")
+                                            Isentress
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Isentress1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Isentress2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Isentress_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Isentress_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Selzentry")
+                                            Selzentry
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Selzentry1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Selzentry2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Selzentry_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Selzentry_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Tivicay")
+                                            Tivicay
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Tivicay1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Tivicay2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Tivicay_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Tivicay_Refill)
+                                </td>
+                            </tr>
+
+                            @* Empty TextFileds in Integrase Inhibitor/CCR5 Inhibitor *@
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+
+                            @* Other Meds *@
+                            <tr>
+                                <th colspan="2" class="border-bottom5px border-right2px border-Top5px">Other Meds</th>
+                                <th colspan="3" class="border-bottom5px border-right2px border-Top5px">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Egrifta")
+                                            Egrifta
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Egrifta1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Egrifta2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Egrifta_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Egrifta_Refill)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <div class="checkbox">
+                                        <span>
+                                            @Html.CheckBox("ChkBox_Serostim")
+                                            Serostim
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Serostim1)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Serostim2)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Serostim_Quantity)
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    @Html.TextBoxFor(m => m.TxtBox_Serostim_Refill)
+                                </td>
+                            </tr>
+
+                            @* Empty TextFileds in Other Meds *@
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right2px border-top2px" style="width: 15%"></td>
+                                <td class="border-right2px border-top2px" style="width: 20%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 35%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                                <td class="border-right2px border-top2px" style="width: 15%">
+                                    <input type="text" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <p class="ft6">By signing this form and utilizing our services, you are authorizing @System.Web.Configuration.WebConfigurationManager.AppSettings["ClientName1"].ToString()<sup>TM</sup> and it’s employees to serve as your prior authorization designated agent in dealing with medical and prescription insurance companies.</p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding-left0">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0">
+                    <img id="imgSignature1" src="" style="height: 60px; width: 250px; border: black 1px solid;" alt="Attach your signature">
+                    &nbsp;
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block padding0">
+                    @Html.TextBoxFor(m => m.Date1, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass", @readonly = "True" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0 border-top1px-black-solid">
+                    <b>Prescriber’s Signature</b> <span class="ft6">(no stamps)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @if (Model.ReferralFormId == 8|| Model.ReferralFormId == 9|| Model.ReferralFormId == 10)
+            {
+                <b>Dispense As Written</b>
+            }
+                    @if (Model.ReferralFormId == 32||Model.ReferralFormId==52||Model.ReferralFormId==53)
+            {
+                <b>Substitution Permitted</b>
+            }
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block border-top1px-black-solid text-center">
+                    <b>Date</b>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 display-inline-block padding-right0">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0">
+                    <img id="imgSignature2" src="" style="height: 60px; width: 250px; border: black 1px solid;" alt="Attach your signature">
+                    &nbsp;
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block padding0">
+                    @Html.TextBoxFor(m => m.Date2, "{0:MM/dd/yyyy}", new { @class = "max-width-110px dateclass", @readonly = "True" })
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 display-inline-block padding0 border-top1px-black-solid">
+                    <b>Prescriber’s Signature</b> <span class="ft6">(no stamps)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @if (Model.ReferralFormId == 8|| Model.ReferralFormId == 9|| Model.ReferralFormId == 10)
+            {
+                <b>Substitution Permitted</b>
+            }
+                    @if (Model.ReferralFormId == 32 || Model.ReferralFormId == 52||Model.ReferralFormId==53)
+            {
+                <b>Dispense As Written</b>
+            }
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 display-inline-block border-top1px-black-solid text-center">
+                    <b>Date</b>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block">
+            <p class="ft6">
+                <b>IMPORTANT NOTICE:</b> This fax is intended to be delivered only to the named addressee. It contains material that is confidential, privileged property or exempt from disclosure under applicable law. If you are not the named addresses you should not disseminate, distribute or copy this fax. Please notify the sender immediately if you have received this document in error and then destroy this document immediately.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 display-inline-block buttonsDiv">
+            <button class="btn btn-primary" onclick="ReferralFormSave(); return false;" type="button">Save</button>
+            <button class="btn btn-danger" type="button" onclick="$('#divReferralForm').html(''); return false;">Cancel</button>
+
+            @if (User.IsInRole("Physician")) { if (!ViewBag.IsHaveSignature)
+    {
+        <input class="btn btn-primary" disabled type="button" onclick="GetSignature();" value="Sign It" />
+        <span>Please add your signature into your account</span>
+    }
+    else
+    {
+        <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />} } else { <input class="btn btn-primary" type="button" onclick="GetSignature();" value="Sign It" />
+    }
+            <button type="button" onclick="printButtonPressed('#HivAidsFormForm');" class="btn btn-primary login-form-field">Print</button>
+        </div>
+}

@@ -1,0 +1,52 @@
+﻿@*@(Html.Kendo().Grid<SalesTeam.Core.Data.vwSalesTeamInfo>()*@
+@(Html.Kendo().Grid<SalesTeam.Web.Models.SalesTeamViewModel>()
+    .Name("gridSalesTeam")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.MasterSalesRepresentativeFirstName).Title("First Name");
+        columns.Bound(c => c.MasterSalesRepresentativeLastName).Title("Last Name");
+        columns.Bound(c => c.SalesTerritory).Title("Sales Territory");
+    })
+    .Sortable()
+    .Pageable(pageable => pageable
+    .Refresh(true))
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("vwSalesTeamInfoes_Read", "SalesTeamInfo"))
+        .PageSize(10)
+    )
+    .Selectable()
+    .NoRecords(n => n.Template("No records to display"))
+    .Events(e => e.Change("onChange"))
+)
+
+<script type="text/javascript">
+
+    var data;
+    function onChange(arg) {
+        var selected = $.map(this.select(), function (item) {
+            data = arg.sender.dataItem(arg.sender.select());
+        });
+    }
+
+    $(document).ready(function () {
+        $("#gridSalesTeam").on("dblclick", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "SalesTeamDetails")' + "?id=" + data.Url_SId;
+            }
+        });
+        $("#gridSalesTeam").on("doubletap", "tr.k-state-selected", function () {
+            if (data != undefined) {
+                window.location.href = '@Url.Action("Index", "SalesTeamDetails")' + "?id=" + data.Url_SId;
+            }
+        });
+        $(".k-dropdown-operator").hide();
+    });
+</script>
+
+<style>
+    #gridSalesTeam tbody tr:hover {
+        cursor: pointer;
+    }
+</style>

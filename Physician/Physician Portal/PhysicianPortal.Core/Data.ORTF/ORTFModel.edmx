@@ -1,0 +1,510 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ORTFModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="sp_parameters_data">
+          <Key>
+            <PropertyRef Name="sp_parameters_dataId" />
+          </Key>
+          <Property Name="parameter_name" Type="nvarchar" MaxLength="255" />
+          <Property Name="PharmacyTeamERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PharmacyERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PharmacistERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PhysicianERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="DrugERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondPhysicianERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsuranceERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsuranceERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientInsuranceERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryPatientInsuranceERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShipERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="RosterERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="RecordLinksERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDiagnosisCodeERPCode1" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDiagnosisCodeERPCode2" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDiagnosisCodeERPCode3" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDiagnosisCodeERPCode4" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PronotesERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionERPCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="BusinessName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientFirstName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientLastName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientAddressLine1" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientCity" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientState" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientPostalCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientCounty" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDOB" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientSocialSecurityNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientGender" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientLanguage" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientRoute" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientReferralDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientHeight" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientWeight" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientAllergies" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientStartOfCareDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientPrimaryDiagnosisCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientSecondaryDiagnosisCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientTerciaryDiagnosisCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientQuaternaryDiagnosisCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientMaritalStatus" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDeliveryInstruction" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientStatus" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientDriverLicense" Type="nvarchar" MaxLength="255" />
+          <Property Name="PharmacySiteNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherAllergies" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientWorkPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientCellPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientEmail" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingAttention" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingAddress" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingCity" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingState" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingPostalCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientShippingType" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatienthippingExpectedDeliveryDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactLastName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactFirstName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientContactRelationship" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactAddress" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactHomePhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactWorkPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactCellPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactCity" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactState" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactZip" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactType" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactEmailAddress" Type="nvarchar" MaxLength="255" />
+          <Property Name="PatientOtherContactWorkPhoneExtension" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsuranceEffectiveDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsurancePolicyNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsuranceGroupNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsuredName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrimaryInsuredEmployerName" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsuranceEffectiveDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsurancePolicyNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsuranceGroupNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsuredName" Type="nvarchar" MaxLength="255" />
+          <Property Name="SecondaryInsuredEmployerName" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderStatus" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderDescription" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderedDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderStartDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderStopDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="DrugStrength" Type="nvarchar" MaxLength="255" />
+          <Property Name="DrugStrengthUnit" Type="nvarchar" MaxLength="255" />
+          <Property Name="DrugFrequency" Type="nvarchar" MaxLength="255" />
+          <Property Name="OriginalPrescriptionNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderClass" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderAcceptedFlag" Type="nvarchar" MaxLength="255" />
+          <Property Name="OrderFrequentType" Type="nvarchar" MaxLength="255" />
+          <Property Name="RefillsRemaining" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationReferenceNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationStartDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationStopDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizedPriceToUse" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizedLimit" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationPeriod" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationType" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationInstruction" Type="nvarchar" MaxLength="255" />
+          <Property Name="PriorAuthorizationRenewalNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="PharmacistName" Type="nvarchar" MaxLength="255" />
+          <Property Name="ProgressNoteDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyName" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacistName" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyNPI" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyAddressLine1" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyAddressLine2" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyCity" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyState" Type="nvarchar" MaxLength="255" />
+          <Property Name="SendingPharmacyZip" Type="nvarchar" MaxLength="255" />
+          <Property Name="OriginalRxNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyName" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacistName" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyNPI" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyPhoneNumber" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyAddressLine1" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyAddressLine2" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyCity" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyState" Type="nvarchar" MaxLength="255" />
+          <Property Name="ReceivingPharmacyZip" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionDoctorName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionDoctorNPI" Type="nvarchar" MaxLength="255" />
+          <Property Name="OriginalDispensedQuantity" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionExpirationDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionDirections" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionInstruction" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionSupplyDays" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescrptionDays" Type="nvarchar" MaxLength="255" />
+          <Property Name="LastFillDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="OriginalPrescriptionDate" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionNumberOfLabel" Type="nvarchar" MaxLength="255" />
+          <Property Name="RXOrigin" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionRefillAuthorizationStatus" Type="nvarchar" MaxLength="255" />
+          <Property Name="PrescriptionFillType" Type="nvarchar" MaxLength="255" />
+          <Property Name="record_id" Type="int" />
+          <Property Name="ReturnMessage" Type="varchar" MaxLength="3000" />
+          <Property Name="sp_parameters_dataId" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="ORTFModelStoreContainer">
+          <EntitySet Name="sp_parameters_data" EntityType="Self.sp_parameters_data" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ORTFModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="ORTFEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="sp_parameters_data" EntityType="ORTFModel.sp_parameters_data" />
+        </EntityContainer>
+        <EntityType Name="sp_parameters_data">
+          <Key>
+            <PropertyRef Name="sp_parameters_dataId" />
+          </Key>
+          <Property Name="parameter_name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PharmacyTeamERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PharmacyERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PharmacistERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PhysicianERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DrugERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondPhysicianERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsuranceERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsuranceERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientInsuranceERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryPatientInsuranceERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShipERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="RosterERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="RecordLinksERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDiagnosisCodeERPCode1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDiagnosisCodeERPCode2" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDiagnosisCodeERPCode3" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDiagnosisCodeERPCode4" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PronotesERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionERPCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="BusinessName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientFirstName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientLastName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientAddressLine1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientCity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientState" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientPostalCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientCounty" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDOB" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientSocialSecurityNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientGender" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientLanguage" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientRoute" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientReferralDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientHeight" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientWeight" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientAllergies" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientStartOfCareDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientPrimaryDiagnosisCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientSecondaryDiagnosisCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientTerciaryDiagnosisCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientQuaternaryDiagnosisCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientMaritalStatus" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDeliveryInstruction" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientStatus" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientDriverLicense" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PharmacySiteNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherAllergies" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientWorkPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientCellPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientEmail" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingAttention" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingAddress" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingCity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingState" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingPostalCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientShippingType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatienthippingExpectedDeliveryDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactLastName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactFirstName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientContactRelationship" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactAddress" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactHomePhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactWorkPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactCellPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactCity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactState" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactZip" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactEmailAddress" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PatientOtherContactWorkPhoneExtension" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsuranceEffectiveDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsurancePolicyNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsuranceGroupNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsuredName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrimaryInsuredEmployerName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsuranceEffectiveDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsurancePolicyNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsuranceGroupNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsuredName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecondaryInsuredEmployerName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderStatus" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderDescription" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderedDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderStartDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderStopDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DrugStrength" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DrugStrengthUnit" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DrugFrequency" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalPrescriptionNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderClass" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderAcceptedFlag" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OrderFrequentType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="RefillsRemaining" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationReferenceNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationStartDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationStopDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizedPriceToUse" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizedLimit" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationPeriod" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationInstruction" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PriorAuthorizationRenewalNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PharmacistName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ProgressNoteDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacistName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyNPI" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyAddressLine1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyAddressLine2" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyCity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyState" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SendingPharmacyZip" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalRxNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacistName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyNPI" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyPhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyAddressLine1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyAddressLine2" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyCity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyState" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ReceivingPharmacyZip" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionDoctorName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionDoctorNPI" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalDispensedQuantity" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionExpirationDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionDirections" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionInstruction" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionSupplyDays" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescrptionDays" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="LastFillDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalPrescriptionDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionNumberOfLabel" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="RXOrigin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionRefillAuthorizationStatus" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PrescriptionFillType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="record_id" Type="Int32" />
+          <Property Name="ReturnMessage" Type="String" MaxLength="3000" FixedLength="false" Unicode="false" />
+          <Property Name="sp_parameters_dataId" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ORTFModelStoreContainer" CdmEntityContainer="ORTFEntities" >
+          <EntitySetMapping Name="sp_parameters_data">
+            <EntityTypeMapping TypeName="ORTFModel.sp_parameters_data">
+              <MappingFragment StoreEntitySet="sp_parameters_data">
+                <ScalarProperty Name="sp_parameters_dataId" ColumnName="sp_parameters_dataId" />
+                <ScalarProperty Name="ReturnMessage" ColumnName="ReturnMessage" />
+                <ScalarProperty Name="record_id" ColumnName="record_id" />
+                <ScalarProperty Name="PrescriptionFillType" ColumnName="PrescriptionFillType" />
+                <ScalarProperty Name="PrescriptionRefillAuthorizationStatus" ColumnName="PrescriptionRefillAuthorizationStatus" />
+                <ScalarProperty Name="RXOrigin" ColumnName="RXOrigin" />
+                <ScalarProperty Name="PrescriptionNumberOfLabel" ColumnName="PrescriptionNumberOfLabel" />
+                <ScalarProperty Name="OriginalPrescriptionDate" ColumnName="OriginalPrescriptionDate" />
+                <ScalarProperty Name="LastFillDate" ColumnName="LastFillDate" />
+                <ScalarProperty Name="PrescrptionDays" ColumnName="PrescrptionDays" />
+                <ScalarProperty Name="PrescriptionSupplyDays" ColumnName="PrescriptionSupplyDays" />
+                <ScalarProperty Name="PrescriptionInstruction" ColumnName="PrescriptionInstruction" />
+                <ScalarProperty Name="PrescriptionDirections" ColumnName="PrescriptionDirections" />
+                <ScalarProperty Name="PrescriptionExpirationDate" ColumnName="PrescriptionExpirationDate" />
+                <ScalarProperty Name="OriginalDispensedQuantity" ColumnName="OriginalDispensedQuantity" />
+                <ScalarProperty Name="PrescriptionDoctorNPI" ColumnName="PrescriptionDoctorNPI" />
+                <ScalarProperty Name="PrescriptionDoctorName" ColumnName="PrescriptionDoctorName" />
+                <ScalarProperty Name="ReceivingPharmacyZip" ColumnName="ReceivingPharmacyZip" />
+                <ScalarProperty Name="ReceivingPharmacyState" ColumnName="ReceivingPharmacyState" />
+                <ScalarProperty Name="ReceivingPharmacyCity" ColumnName="ReceivingPharmacyCity" />
+                <ScalarProperty Name="ReceivingPharmacyAddressLine2" ColumnName="ReceivingPharmacyAddressLine2" />
+                <ScalarProperty Name="ReceivingPharmacyAddressLine1" ColumnName="ReceivingPharmacyAddressLine1" />
+                <ScalarProperty Name="ReceivingPharmacyPhoneNumber" ColumnName="ReceivingPharmacyPhoneNumber" />
+                <ScalarProperty Name="ReceivingPharmacyNPI" ColumnName="ReceivingPharmacyNPI" />
+                <ScalarProperty Name="ReceivingPharmacistName" ColumnName="ReceivingPharmacistName" />
+                <ScalarProperty Name="ReceivingPharmacyName" ColumnName="ReceivingPharmacyName" />
+                <ScalarProperty Name="OriginalRxNumber" ColumnName="OriginalRxNumber" />
+                <ScalarProperty Name="SendingPharmacyZip" ColumnName="SendingPharmacyZip" />
+                <ScalarProperty Name="SendingPharmacyState" ColumnName="SendingPharmacyState" />
+                <ScalarProperty Name="SendingPharmacyCity" ColumnName="SendingPharmacyCity" />
+                <ScalarProperty Name="SendingPharmacyAddressLine2" ColumnName="SendingPharmacyAddressLine2" />
+                <ScalarProperty Name="SendingPharmacyAddressLine1" ColumnName="SendingPharmacyAddressLine1" />
+                <ScalarProperty Name="SendingPharmacyPhoneNumber" ColumnName="SendingPharmacyPhoneNumber" />
+                <ScalarProperty Name="SendingPharmacyNPI" ColumnName="SendingPharmacyNPI" />
+                <ScalarProperty Name="SendingPharmacistName" ColumnName="SendingPharmacistName" />
+                <ScalarProperty Name="SendingPharmacyName" ColumnName="SendingPharmacyName" />
+                <ScalarProperty Name="ProgressNoteDate" ColumnName="ProgressNoteDate" />
+                <ScalarProperty Name="PharmacistName" ColumnName="PharmacistName" />
+                <ScalarProperty Name="PriorAuthorizationRenewalNumber" ColumnName="PriorAuthorizationRenewalNumber" />
+                <ScalarProperty Name="PriorAuthorizationInstruction" ColumnName="PriorAuthorizationInstruction" />
+                <ScalarProperty Name="PriorAuthorizationType" ColumnName="PriorAuthorizationType" />
+                <ScalarProperty Name="PriorAuthorizationPeriod" ColumnName="PriorAuthorizationPeriod" />
+                <ScalarProperty Name="PriorAuthorizedLimit" ColumnName="PriorAuthorizedLimit" />
+                <ScalarProperty Name="PriorAuthorizedPriceToUse" ColumnName="PriorAuthorizedPriceToUse" />
+                <ScalarProperty Name="PriorAuthorizationNumber" ColumnName="PriorAuthorizationNumber" />
+                <ScalarProperty Name="PriorAuthorizationStopDate" ColumnName="PriorAuthorizationStopDate" />
+                <ScalarProperty Name="PriorAuthorizationStartDate" ColumnName="PriorAuthorizationStartDate" />
+                <ScalarProperty Name="PriorAuthorizationReferenceNumber" ColumnName="PriorAuthorizationReferenceNumber" />
+                <ScalarProperty Name="RefillsRemaining" ColumnName="RefillsRemaining" />
+                <ScalarProperty Name="OrderFrequentType" ColumnName="OrderFrequentType" />
+                <ScalarProperty Name="OrderAcceptedFlag" ColumnName="OrderAcceptedFlag" />
+                <ScalarProperty Name="OrderClass" ColumnName="OrderClass" />
+                <ScalarProperty Name="OriginalPrescriptionNumber" ColumnName="OriginalPrescriptionNumber" />
+                <ScalarProperty Name="DrugFrequency" ColumnName="DrugFrequency" />
+                <ScalarProperty Name="DrugStrengthUnit" ColumnName="DrugStrengthUnit" />
+                <ScalarProperty Name="DrugStrength" ColumnName="DrugStrength" />
+                <ScalarProperty Name="OrderStopDate" ColumnName="OrderStopDate" />
+                <ScalarProperty Name="OrderStartDate" ColumnName="OrderStartDate" />
+                <ScalarProperty Name="OrderedDate" ColumnName="OrderedDate" />
+                <ScalarProperty Name="OrderDescription" ColumnName="OrderDescription" />
+                <ScalarProperty Name="OrderStatus" ColumnName="OrderStatus" />
+                <ScalarProperty Name="SecondaryInsuredEmployerName" ColumnName="SecondaryInsuredEmployerName" />
+                <ScalarProperty Name="SecondaryInsuredName" ColumnName="SecondaryInsuredName" />
+                <ScalarProperty Name="SecondaryInsuranceGroupNumber" ColumnName="SecondaryInsuranceGroupNumber" />
+                <ScalarProperty Name="SecondaryInsurancePolicyNumber" ColumnName="SecondaryInsurancePolicyNumber" />
+                <ScalarProperty Name="SecondaryInsuranceEffectiveDate" ColumnName="SecondaryInsuranceEffectiveDate" />
+                <ScalarProperty Name="PrimaryInsuredEmployerName" ColumnName="PrimaryInsuredEmployerName" />
+                <ScalarProperty Name="PrimaryInsuredName" ColumnName="PrimaryInsuredName" />
+                <ScalarProperty Name="PrimaryInsuranceGroupNumber" ColumnName="PrimaryInsuranceGroupNumber" />
+                <ScalarProperty Name="PrimaryInsurancePolicyNumber" ColumnName="PrimaryInsurancePolicyNumber" />
+                <ScalarProperty Name="PrimaryInsuranceEffectiveDate" ColumnName="PrimaryInsuranceEffectiveDate" />
+                <ScalarProperty Name="PatientOtherContactWorkPhoneExtension" ColumnName="PatientOtherContactWorkPhoneExtension" />
+                <ScalarProperty Name="PatientOtherContactEmailAddress" ColumnName="PatientOtherContactEmailAddress" />
+                <ScalarProperty Name="PatientOtherContactType" ColumnName="PatientOtherContactType" />
+                <ScalarProperty Name="PatientOtherContactZip" ColumnName="PatientOtherContactZip" />
+                <ScalarProperty Name="PatientOtherContactState" ColumnName="PatientOtherContactState" />
+                <ScalarProperty Name="PatientOtherContactCity" ColumnName="PatientOtherContactCity" />
+                <ScalarProperty Name="PatientOtherContactCellPhoneNumber" ColumnName="PatientOtherContactCellPhoneNumber" />
+                <ScalarProperty Name="PatientOtherContactWorkPhoneNumber" ColumnName="PatientOtherContactWorkPhoneNumber" />
+                <ScalarProperty Name="PatientOtherContactHomePhoneNumber" ColumnName="PatientOtherContactHomePhoneNumber" />
+                <ScalarProperty Name="PatientOtherContactAddress" ColumnName="PatientOtherContactAddress" />
+                <ScalarProperty Name="PatientContactRelationship" ColumnName="PatientContactRelationship" />
+                <ScalarProperty Name="PatientOtherContactFirstName" ColumnName="PatientOtherContactFirstName" />
+                <ScalarProperty Name="PatientOtherContactLastName" ColumnName="PatientOtherContactLastName" />
+                <ScalarProperty Name="PatienthippingExpectedDeliveryDate" ColumnName="PatienthippingExpectedDeliveryDate" />
+                <ScalarProperty Name="PatientShippingType" ColumnName="PatientShippingType" />
+                <ScalarProperty Name="PatientShippingPhoneNumber" ColumnName="PatientShippingPhoneNumber" />
+                <ScalarProperty Name="PatientShippingPostalCode" ColumnName="PatientShippingPostalCode" />
+                <ScalarProperty Name="PatientShippingState" ColumnName="PatientShippingState" />
+                <ScalarProperty Name="PatientShippingCity" ColumnName="PatientShippingCity" />
+                <ScalarProperty Name="PatientShippingAddress" ColumnName="PatientShippingAddress" />
+                <ScalarProperty Name="PatientShippingAttention" ColumnName="PatientShippingAttention" />
+                <ScalarProperty Name="PatientShippingName" ColumnName="PatientShippingName" />
+                <ScalarProperty Name="PatientEmail" ColumnName="PatientEmail" />
+                <ScalarProperty Name="PatientCellPhoneNumber" ColumnName="PatientCellPhoneNumber" />
+                <ScalarProperty Name="PatientWorkPhoneNumber" ColumnName="PatientWorkPhoneNumber" />
+                <ScalarProperty Name="PatientOtherAllergies" ColumnName="PatientOtherAllergies" />
+                <ScalarProperty Name="PharmacySiteNumber" ColumnName="PharmacySiteNumber" />
+                <ScalarProperty Name="PatientDriverLicense" ColumnName="PatientDriverLicense" />
+                <ScalarProperty Name="PatientStatus" ColumnName="PatientStatus" />
+                <ScalarProperty Name="PatientDeliveryInstruction" ColumnName="PatientDeliveryInstruction" />
+                <ScalarProperty Name="PatientMaritalStatus" ColumnName="PatientMaritalStatus" />
+                <ScalarProperty Name="PatientQuaternaryDiagnosisCode" ColumnName="PatientQuaternaryDiagnosisCode" />
+                <ScalarProperty Name="PatientTerciaryDiagnosisCode" ColumnName="PatientTerciaryDiagnosisCode" />
+                <ScalarProperty Name="PatientSecondaryDiagnosisCode" ColumnName="PatientSecondaryDiagnosisCode" />
+                <ScalarProperty Name="PatientPrimaryDiagnosisCode" ColumnName="PatientPrimaryDiagnosisCode" />
+                <ScalarProperty Name="PatientStartOfCareDate" ColumnName="PatientStartOfCareDate" />
+                <ScalarProperty Name="PatientAllergies" ColumnName="PatientAllergies" />
+                <ScalarProperty Name="PatientWeight" ColumnName="PatientWeight" />
+                <ScalarProperty Name="PatientHeight" ColumnName="PatientHeight" />
+                <ScalarProperty Name="PatientReferralDate" ColumnName="PatientReferralDate" />
+                <ScalarProperty Name="PatientRoute" ColumnName="PatientRoute" />
+                <ScalarProperty Name="PatientLanguage" ColumnName="PatientLanguage" />
+                <ScalarProperty Name="PatientGender" ColumnName="PatientGender" />
+                <ScalarProperty Name="PatientSocialSecurityNumber" ColumnName="PatientSocialSecurityNumber" />
+                <ScalarProperty Name="PatientDOB" ColumnName="PatientDOB" />
+                <ScalarProperty Name="PatientCounty" ColumnName="PatientCounty" />
+                <ScalarProperty Name="PatientPhoneNumber" ColumnName="PatientPhoneNumber" />
+                <ScalarProperty Name="PatientPostalCode" ColumnName="PatientPostalCode" />
+                <ScalarProperty Name="PatientState" ColumnName="PatientState" />
+                <ScalarProperty Name="PatientCity" ColumnName="PatientCity" />
+                <ScalarProperty Name="PatientAddressLine1" ColumnName="PatientAddressLine1" />
+                <ScalarProperty Name="PatientLastName" ColumnName="PatientLastName" />
+                <ScalarProperty Name="PatientFirstName" ColumnName="PatientFirstName" />
+                <ScalarProperty Name="BusinessName" ColumnName="BusinessName" />
+                <ScalarProperty Name="PrescriptionNumber" ColumnName="PrescriptionNumber" />
+                <ScalarProperty Name="PrescriptionERPCode" ColumnName="PrescriptionERPCode" />
+                <ScalarProperty Name="PronotesERPCode" ColumnName="PronotesERPCode" />
+                <ScalarProperty Name="PriorAuthorizationERPCode" ColumnName="PriorAuthorizationERPCode" />
+                <ScalarProperty Name="OrderERPCode" ColumnName="OrderERPCode" />
+                <ScalarProperty Name="PatientDiagnosisCodeERPCode4" ColumnName="PatientDiagnosisCodeERPCode4" />
+                <ScalarProperty Name="PatientDiagnosisCodeERPCode3" ColumnName="PatientDiagnosisCodeERPCode3" />
+                <ScalarProperty Name="PatientDiagnosisCodeERPCode2" ColumnName="PatientDiagnosisCodeERPCode2" />
+                <ScalarProperty Name="PatientDiagnosisCodeERPCode1" ColumnName="PatientDiagnosisCodeERPCode1" />
+                <ScalarProperty Name="RecordLinksERPCode" ColumnName="RecordLinksERPCode" />
+                <ScalarProperty Name="RosterERPCode" ColumnName="RosterERPCode" />
+                <ScalarProperty Name="PatientShipERPCode" ColumnName="PatientShipERPCode" />
+                <ScalarProperty Name="PatientERPCode" ColumnName="PatientERPCode" />
+                <ScalarProperty Name="SecondaryPatientInsuranceERPCode" ColumnName="SecondaryPatientInsuranceERPCode" />
+                <ScalarProperty Name="PatientInsuranceERPCode" ColumnName="PatientInsuranceERPCode" />
+                <ScalarProperty Name="SecondaryInsuranceERPCode" ColumnName="SecondaryInsuranceERPCode" />
+                <ScalarProperty Name="PrimaryInsuranceERPCode" ColumnName="PrimaryInsuranceERPCode" />
+                <ScalarProperty Name="SecondPhysicianERPCode" ColumnName="SecondPhysicianERPCode" />
+                <ScalarProperty Name="DrugERPCode" ColumnName="DrugERPCode" />
+                <ScalarProperty Name="PhysicianERPCode" ColumnName="PhysicianERPCode" />
+                <ScalarProperty Name="PharmacistERPCode" ColumnName="PharmacistERPCode" />
+                <ScalarProperty Name="PharmacyERPCode" ColumnName="PharmacyERPCode" />
+                <ScalarProperty Name="PharmacyTeamERPCode" ColumnName="PharmacyTeamERPCode" />
+                <ScalarProperty Name="parameter_name" ColumnName="parameter_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

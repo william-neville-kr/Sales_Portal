@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "Documents History";
+}
+
+<fieldset>
+    <legend>Documents History</legend>
+
+    <form class="form-inline">
+
+        <div class="form-group">
+            <div class="validation-summary col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>
+            @Html.Label("Start Date")
+            @(Html.Kendo().DatePicker()
+                    .Name("StartDate")
+                    .Max(DateTime.UtcNow)
+                    .Format("MM/dd/yyyy")
+
+            )
+        </div>
+        <div class="form-group">
+
+            @Html.Label("End Date")
+            @(Html.Kendo().DatePicker()
+                    .Name("EndDate")
+                      .Max(DateTime.UtcNow)
+                    .Format("MM/dd/yyyy")
+            )
+        </div>
+        <div class="form-group" style="margin-left: 1% !important;">
+            <button onclick="BtnSearchDocumentFunc(this); return false;" class="btn btn-primary login-form-field" style=" width: 100px;">Search</button>
+            <a onclick="clearForm(this);" class="btn btn-danger" style="width: 100px;">Clear</a>
+        </div>
+    </form>
+
+
+
+    @(Html.Kendo().Grid<PhysicianPortal.Core.Data.vwDocumentsUploadLog>()
+    .Name("gridDoucmentUploadList")
+    .HtmlAttributes(new { @style = "display:inline-block; width: 100%" })
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.LogMessage).Title("Message");
+        columns.Bound(c => c.Data).Title("Data");
+        columns.Bound(c => c.FullName).Title("User");
+        columns.Bound(c => c.AuditStamp).Title("Audit Stamp").Format("{0:MM/dd/yyyy, hh:mm:ss tt}").Width(160).Filterable(false);
+        //columns.Bound(c => c.Url).Title("Page URL");
+        //columns.Bound(c => c.Device).Title("Device");
+    })
+     .ToolBar(tools => tools.Excel())
+                    .Excel(excel => excel
+                        .FileName("Documents Upload History.xlsx")
+                        .Filterable(true)
+                        .AllPages(true)
+                    )
+
+    .Filterable(ftb => ftb
+            .Mode(GridFilterMode.Row)
+            .Extra(true)
+            .Operators(o => o
+            .ForString(s => s
+                .Clear()
+                .Contains("Contains")
+            )
+        )
+    )
+    .Sortable()
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetDocumentsHistory", "Reports").Data("SearchDocumentFunc"))
+        .PageSize(10)
+        .Sort(sort => sort.Add("AuditStamp").Descending())
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    )
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+        $("#EndDate").mask("99/99/9999");
+        $("#StartDate").mask("99/99/9999");
+    });
+
+    function CompareDates() {
+        debugger;
+        if ($("#StartDate").val() != "" && $("#EndDate").val() != "") {
+            var endDate = Date.parse($("#EndDate").val());
+            var startDate = Date.parse($("#StartDate").val());
+            if (endDate >= startDate) {
+                return true;
+            }
+            else {
+                $.notifyBar({ html: "End date must be greater then Start date", cssClass: "warning", position: "top" });
+                return false;
+            }
+        }
+    }
+
+    function SearchDocumentFunc() {
+        var str = " --";
+        if ($("#StartDate").data("kendoDatePicker").value() != null && $("#EndDate").data("kendoDatePicker").value()) {
+            str = $("#StartDate").data("kendoDatePicker").value().toUTCString() + " --" + $("#EndDate").data("kendoDatePicker").value().toUTCString();
+        }
+        return {
+            //sreachString: $("#StartDate").val() + " --" +$("#EndDate").val()
+            sreachString: str
+            //StartDate: getUTCDate($("#StartDate").data("kendoDatePicker").value()),
+            //EndDate: getUTCDate($("#EndDate").data("kendoDatePicker").value())
+        }
+    }
+
+    //function getUTCDate(date)
+    //{
+    //    if (date == null) {
+    //        return null;
+    //    }
+    //    var utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    //    return utcDate;
+    //}
+
+    function clearForm() {
+        $("#StartDate").data("kendoDatePicker").value(null)
+        $("#EndDate").data("kendoDatePicker").value(null)
+        $("#gridDoucmentUploadList").data("kendoGrid").dataSource.read();
+    }
+
+    function BtnSearchDocumentFunc() {
+        debugger;
+        if ($("#StartDate").val() != "" && $("#EndDate").val() != "") {
+            var result = CompareDates();
+            if (result)
+                $("#gridDoucmentUploadList").data("kendoGrid").dataSource.read();
+            else {
+
+            }
+        }
+    }
+
+    @*function submitDocumentsReportForm(button) {
+        var userForm = $("#DocumentsReportForm");
+        kendo.init(userForm);
+        var validator = userForm.kendoValidator().data("kendoValidator");
+
+        var result = "";
+
+
+        //if ($("#StartDate").val() != "" && $("#StartDate").val() != "") {
+        //    result = true;
+        //}
+        //if (result) {
+
+        var activityLogReportViewModel = {};
+        activityLogReportViewModel.StartDate = $("#StartDate").val(),
+        activityLogReportViewModel.EndDate = $("#EndDate").val();
+
+        filenamepdf = '@Url.Action("GenerateDocumentsReport", "Admin")' + '?StartDate=' + encodeURIComponent($("#StartDate").val()) + '&EndDate=' + encodeURIComponent($("#EndDate").val());
+
+        var object = "<object data='{FileName}' type='application/pdf' style='width: inherit; height: 1000px;'>";
+        object += "If you are unable to view file, you can download from <a href = '{FileName}'>here</a>";
+        object += " or download <a target = '_blank' href = 'http://get.adobe.com/reader/'>Adobe PDF Reader</a> to view the file.";
+        object += "</object>";
+        object = object.replace(/{FileName}/g, filenamepdf);
+
+        $("#divDocumentViewer").html(object);
+
+        $("#showPDFFormsListKendoWindow").kendoWindow({
+            modal: true,
+            width: "70%",
+            height: "90%",
+            maxWidth: 800,
+            maxHeight: 800,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Document Activity Log",
+            visible: false,
+            actions: ["Close"],
+            resizable: false,
+            draggable: false,
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                $("#divDocumentViewer").html("");
+            }
+        })
+                   .data("kendoWindow")
+                   .center()
+                   .open();
+
+        return false;
+
+    }*@
+
+
+</script>

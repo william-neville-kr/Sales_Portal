@@ -1,0 +1,400 @@
+﻿@model PhysicianPortal.Web.Models.OfficeUsersViewModel
+@*@using Kendo.Mvc.UI*@
+@(Html.Kendo().Grid<PhysicianPortal.Web.Models.UsersListModel>()
+    .Name("gridUsersList")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.Email).Title("Email Address");
+        columns.Bound(c => c.FullName).Title("Full Name");
+        columns.Bound(c => c.ContactNumber).Title("Contact Number").Width(130).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.NPI).Title("NPI").Width(120).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.LastLogin).Title("Last Login").Width(180).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.LastLoginIP).Title("IP").Width(60).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.Role).Title("Role").Width(115).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.IsActiveStr).Title("Active").Width(60).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.IsVerifiedStr).Title("Verified").Width(60).HtmlAttributes(new { @class = "text-align-center" });
+        columns.Bound(c => c.UserId).ClientTemplate(
+            "#if(Role == \"Provider\"){#" +
+          "<button onclick='showEditPhysicianSignatureWindow(#:UserId#);' class='k-button k-button-icontext k-grid-EditSignature btn-primary btn-grid'>Signature</button>" +
+          "#} else {#" +
+          "" +
+          "# } #").Title("").Width(42).Sortable(false);
+        columns.Command(command => command.Custom("EditPassword").Click("resetUserPassword").HtmlAttributes(new { @class = "btn-primary btn-grid" }).Text("<span class='glyphicon glyphicon-edit'></span>")).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+        columns.Command(command => command.Custom("Edit").Click("editUser").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(42);
+        columns.Command(command => command.Custom("Delete").Click("deleteUser").HtmlAttributes(new { @class = "btn-primary btn-grid" })).Title("").HtmlAttributes(new { @class = "kendoGridButton" }).Width(58);
+    })
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(true)
+        )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("GetUsersList", "Admin", new { officeId = Model.OfficeId }))
+        .PageSize(10)
+    .Sort(srt => srt.Add("UserId").Descending())
+    )
+    .NoRecords(n => n.Template("No records to display"))
+    .Filterable(ftb => ftb.Mode(GridFilterMode.Row).Extra(true).Operators(o => o.ForString(s => s.Clear().Contains("Contains"))))
+    .Sortable()
+)
+
+<div id="divDeleteUserConfirm" style="display: none;">
+    <div style="border: 1px solid #dddddd; border-width: 0 0 1px 0; min-height: 34px;">
+        <p>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span id="lblConfirm">
+                Are you sure you want to delete selected user?
+            </span>
+        </p>
+    </div>
+    <div style="float: right;">
+        <button class="k-button delete-user-btton btn-danger btn-dialog" style="margin: .5em .4em .5em 0;">Yes</button>
+        <button class="k-button close-delete-dialog-button btn-dialog" style="margin: .5em .4em .5em 0;">Cancel</button>
+    </div>
+</div>
+
+<div id="ResetUserPasswordWindow"></div>
+<div id="PhysicinSignatureWindowEditUser"></div>
+
+<script type="text/javascript">
+    function dataChanged() {
+        $('#editUserButton').removeAttr('disabled');
+    }
+
+
+    function showEditPhysicianSignatureWindow(userid) {
+
+        //e.preventDefault();
+
+        $("#PhysicinSignatureWindowEditUser").kendoWindow({
+            content: {
+                url: "@Url.Action("PhysicianSignature", "Admin")",
+            data: { UserId: userid },
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            complete: function () {
+            }
+        },
+            modal: true,
+        width: "70%",
+        height: "70%",
+        maxWidth: 1000,
+        maxHeight: 500,
+        minWidth: 300,
+        minHeight: 300,
+        title: "Add Signature",
+        visible: false,
+        resizable: true,
+        draggable: true,
+        actions: ["Close"],
+        open: function (e) {
+            $("body").css("overflow", "hidden");
+        },
+        close: function (e) {
+            $("body").css("overflow", "");
+        },
+        refresh: function () {
+            //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+            $("#PhysicinSignatureWindowEditUser").bind("orientationchange", function (event) {
+                var x = document.activeElement;
+                if (x != undefined && x != null) {
+                    x.blur();
+                }
+                $("#PhysicinSignatureWindowEditUser").data("kendoWindow").center();
+            });
+        }
+    })
+    .data("kendoWindow")
+    .center()
+    .open();
+
+    }
+
+
+
+    function resetUserPassword(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#ResetUserPasswordWindow").kendoWindow({
+            content: {
+                url: "@Url.Action("ResetUserPassword", "Admin")",
+                data: { UserId: dataItem.UserId },
+                beforeSend: function () {
+                    $("#loading-image").show();
+                },
+                complete: function () {
+                }
+            },
+            modal: true,
+            width: "70%",
+            height: "70%",
+            maxWidth: 800,
+            maxHeight: 600,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Reset Password",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#ResetUserPasswordWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#ResetUserPasswordWindow").data("kendoWindow").center();
+                });
+            }
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    function editUser(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#EditUserWindow").kendoWindow({
+            content: {
+                url: "@Url.Content("~/Admin/EditUser")",
+                data: { selectedUserId: dataItem.UserId }
+            },
+            modal: true,
+            width: "70%",
+            height: "90%",
+            maxWidth: 800,
+            maxHeight: 800,
+            minWidth: 300,
+            minHeight: 300,
+            title: "Edit User",
+            visible: false,
+            resizable: false,
+            draggable: true,
+            actions: ["Close"],
+            open: function (e) {
+                $("body").css("overflow", "hidden");
+            },
+            close: function (e) {
+                $("body").css("overflow", "");
+                roleDropdownChangedEditUser(this);
+            },
+            refresh: function () {
+                // Add Masking
+                $("#phonenumberEditUser").mask("(999) 999-9999");
+
+                //$('#PhysicianListEditUser').data('kendoMultiSelect').dataSource.read({ text: "Salma Mina" });
+                //$('#PhysicianListEditUser').data('kendoMultiSelect').dataSource.read({ text: $("#PhysicianNameList").val() });
+
+                var joinDateContainerEditUser = document.getElementById("joinDateContainerEditUser");
+                //var signatureContainerEditUser = document.getElementById("physicianSignatureEditUser");
+                var dropdownListContainer = document.getElementById("autocompletePhysicianContainerEditUser");
+                if (dropdownListContainer == undefined || dropdownListContainer == null) {
+                    return;
+                }
+                var officeListEditUser = document.getElementById("officeListEditUser");
+                if (officeListEditUser == undefined || officeListEditUser == null) {
+                    return;
+                }
+                var officeList = $("#OfficeList").data("kendoMultiSelect");
+                //var physicianList = $("#PhysicianListEditUser").data("kendoMultiSelect");
+                var selectedRole = document.getElementById("RoleIdEditUser").value;
+                var npiContainer = document.getElementById("npiContainerEditUser");
+
+                if (selectedRole == "1") {
+                    dropdownListContainer.style.display = "none";
+                    officeListEditUser.style.display = "inherit";
+                    npiContainer.style.display = "none";
+                    officeList.options.maxSelectedItems = 1;//only one items could be selected
+                    joinDateContainerEditUser.style.display = "none";
+                    //signatureContainerEditUser.style.display = "none";
+                    if (officeList.value().length > 0) {
+                        officeList.value(officeList.value()[0]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+                else if (selectedRole == "2") {
+                    dropdownListContainer.style.display = "none";
+                    officeListEditUser.style.display = "inherit";
+                    npiContainer.style.display = "inherit";
+                    //signatureContainerEditUser.style.display = "inherit";
+                    officeList.options.maxSelectedItems = null;//only one items could be selected
+                    //physicianList.options.maxSelectedItems = 1; //only one physician can be selected
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value(physicianList.value()[0]);
+                    //}
+                }
+                else if (selectedRole == "3") {
+                    dropdownListContainer.style.display = "inherit";
+                    officeListEditUser.style.display = "inherit";
+                    npiContainer.style.display = "none";
+                    joinDateContainerEditUser.style.display = "none";
+                    //signatureContainerEditUser.style.display = "none";
+                    officeList.options.maxSelectedItems = 1;//only one items could be selected
+                    //physicianList.options.maxSelectedItems = null; // more than one physicians can be selected
+                    if (officeList.value().length > 0) {
+                        officeList.value(officeList.value()[0]);
+                    }
+                }
+                else if (selectedRole == "4") {
+                    dropdownListContainer.style.display = "none";
+                    officeListEditUser.style.display = "none";
+                    joinDateContainerEditUser.style.display = "none";
+                    //signatureContainerEditUser.style.display = "none";
+                    npiContainer.style.display = "none";
+                    if (officeList.value().length > 0) {
+                        officeList.value([]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+                else if (selectedRole == "5") {
+                    dropdownListContainer.style.display = "none";
+                    officeListEditUser.style.display = "none";
+                    npiContainer.style.display = "none";
+                    joinDateContainerEditUser.style.display = "none";
+                    //signatureContainerEditUser.style.display = "none";
+                    if (officeList.value().length > 0) {
+                        officeList.value([]);
+                    }
+                    //if (physicianList.value().length > 0) {
+                    //    physicianList.value([]);
+                    //}
+                }
+
+                if (officeIdVar > 0) {
+                    //If the EditUser screen was accessed from the Userslist of some office, hide the office selection list
+                    officeListEditUser.style.display = "none";
+                }
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#EditUserWindow").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#EditUserWindow").data("kendoWindow").center();
+                });
+
+                //Adding onchange event to all input elements to detect if data was changed
+
+                $('.edit-user-data-changed').each(function () {
+                    //go($(this));
+                    this.onchange = dataChanged;
+                    this.onkeyup = dataChanged;
+                });
+
+                //Disabling edit button on start, button will be enabled when any input field is changed
+                $('#editUserButton').attr('disabled', 'disabled');
+            }
+        }).data("kendoWindow").center().open();
+    }
+
+    var userModelToDelete = null;
+    function deleteUser(e) {
+        e.preventDefault();
+        userModelToDelete = this.dataItem($(e.currentTarget).closest("tr"));
+
+        $("#divDeleteUserConfirm").kendoWindow({
+            modal: true,
+            width: 400,
+            title: "Confirm",
+            visible: false,
+            resizable: false,
+            draggable: false,
+            close: function () {
+                $(".open-button").show();
+            },
+            refresh: function () {
+                //The following function resets the poosition of the kendo window on orientation change on tablets and mobiles
+                $("#divDeleteUserConfirm").bind("orientationchange", function (event) {
+                    var x = document.activeElement;
+                    if (x != undefined && x != null) {
+                        x.blur();
+                    }
+                    $("#divDeleteUserConfirm").data("kendoWindow").center();
+                });
+            },
+            actions: ["Close"]
+        })
+        .data("kendoWindow")
+        .center()
+        .open();
+    }
+
+    $(".delete-user-btton").click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DeleteUser", "Admin")',
+            data: JSON.stringify({ UserId: userModelToDelete.UserId }),
+            cache: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                if (data.success) {
+                    $.notifyBar({ html: data.message, cssClass: "success", position: "top" });
+
+                    //Reloading the grid here
+                    $(".k-grid").each(function () {
+                        $(this).data("kendoGrid").dataSource.read();
+                    });
+                    //$("#divRefaxDocConfirm").data("kendoWindow").close();
+                }
+                else {
+                    $.notifyBar({ html: data.message, cssClass: "warning", position: "top" });
+                }
+            },
+            error: function (xhr) {
+                console.log("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+
+        $("#divDeleteUserConfirm").data("kendoWindow").close();
+    });
+
+    $(".close-delete-dialog-button").click(function () {
+        $("#divDeleteUserConfirm").data("kendoWindow").close();
+    });
+
+    function onEditUserSuccess(arg) {
+        var success = arg.success;
+        var alertMessage = arg.message;
+
+        if (success) {
+            $.notifyBar({ html: alertMessage, cssClass: 'success', position: 'top' });
+        }
+        else {
+            $.notifyBar({ html: alertMessage, cssClass: 'error', position: 'top' });
+        }
+        //Reloading the grid here
+        $(".k-grid").each(function () {
+            $(this).data("kendoGrid").dataSource.read();
+        });
+        $("#EditUserWindow").data("kendoWindow").close();
+    }
+
+    $(document).ready(function () {
+        $(".k-dropdown-operator").hide();
+    });
+
+</script>

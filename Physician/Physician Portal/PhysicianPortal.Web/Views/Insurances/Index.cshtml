@@ -1,0 +1,191 @@
+﻿@{
+    ViewBag.Title = "Insurance";
+}
+
+<fieldset>
+    <legend>Search Patient Insurance</legend>
+    <div class="k-content" style="margin-bottom:20px">
+
+        @(Html.Kendo().AutoComplete()
+          .Name("autoComPatientFullName")
+          .Placeholder("Enter Patient Name")
+          .DataTextField("FullName")
+          .Filter("contains")
+          .MinLength(1)
+          .HtmlAttributes(new { style = "width:80%" })
+          .ClearButton(true)
+          .DataSource(source =>
+              source.Read(read => read.Action("GetPatientNameList", "Patients").Data("GetPatientNameFun"))
+              .ServerFiltering(true)
+           )
+          .Events(e => e.Select("onSelectAutoComPatientFullName"))
+        )
+    </div>
+</fieldset>
+
+<fieldset>
+    <div id="PatientDetailId"> </div>
+</fieldset>
+
+<fieldset>
+    <div id="InsuranceDetailId"> </div>
+</fieldset>
+
+@*<fieldset id="divPatientEligibility" class="hide">
+        @Html.Hidden("PatientId")
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @Html.Label("PokitDok_TradingPartnerId", "Insurance Carrier", new { @class = "col-lg-3 col-md-3 col-sm-6 col-xs-12 row control-label" })
+
+                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                    @(Html.Kendo().DropDownList()
+                    .Name("PokitDok_TradingPartnerId")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter("contains")
+                    .HtmlAttributes(new { style = "width: 100%;" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPokitDok_TradingPartnerList", "Patients");
+                        })
+                        .ServerFiltering(false);
+                    })
+                    )
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <button type="button" onclick="CheckPatientEligibility(false); return false;" class="btn btn-primary pull-left">Check Eligibility</button>
+            </div>
+        </div>*@
+
+    @*<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0">
+        <button type="button" onclick="CheckPatientEligibility(false); return false;" class="btn btn-primary pull-left">Check Eligibility</button>
+    </div>*@
+@*</fieldset>*@
+
+@*<div id="divCheckPatientEligibility"></div>*@
+
+<script>
+
+    function onSelectAutoComPatientFullName(e) {
+        var dataItem = this.dataItem(e.item.index());
+        getInsurances(dataItem.PatientId);
+    }
+
+    function getInsurances(patientId) {
+
+        $.ajax({
+            url: '@Url.Action("InsuranceSearch", "Insurances")',
+            data: JSON.stringify({ PatientId: patientId }),
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#InsuranceDetailId").html(data);
+                $("#InsuranceDetailId").show();
+            }
+        });
+
+        $.ajax({
+            url: '@Url.Action("PatientSearch", "Insurances")',
+            data: JSON.stringify({ PatientId: patientId }),
+            cache: false,
+            type: "POST",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#PatientDetailId").html(data);
+                $("#PatientDetailId").show();
+            }
+        });
+
+        @*$.ajax({
+            url: '@Url.Action("GetPokitDok_TradingPartnerId", "Insurances")',
+            data: { PatientId: patientId },
+            cache: true,
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+               // $("#PokitDok_TradingPartnerId").data("kendoDropDownList").value(data.message);
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });*@
+        $("#PatientId").val(patientId);
+       // $("#divPatientEligibility").removeClass("hide");
+        //CheckPatientEligibility(true);
+    }
+
+    $(document).ready(function () {
+
+        //Here we get the reference to the 'X' button inside the autocomplete list and attach a click event to it
+        var autocompleteCloseButton = $(".k-i-close");
+        autocompleteCloseButton.click(function () {
+
+            $("#autoComPatientFullName").data("kendoAutoComplete").close();
+            $("#autoComPatientFullName").val("");
+            $("#InsuranceDetailId").css("display", "none");
+            $("#PatientDetailId").css("display", "none");
+            $("#divPatientEligibility").addClass("hide");
+        });
+
+        if (localStorage.getItem("phyId") != null && localStorage.getItem("patId") != null && localStorage.getItem("phyId") != "" && localStorage.getItem("patId") != "") {
+            getInsurances(localStorage.getItem("patId"));
+            localStorage.setItem("phyId", "");
+            localStorage.setItem("patId", "");
+        }
+    });
+
+    function GetPatientNameFun() {
+        return {
+            searchPatientName: $("#autoComPatientFullName").val()
+        }
+    }
+
+    function CheckPatientEligibility(isInitial) {
+        $.ajax({
+            url: '@Url.Action("CheckPatientEligibility", "Insurances")',
+            data: { PatientId: $("#PatientId").val(), PokitDok_TradingPartnerId: $("#PokitDok_TradingPartnerId").val(), IsInitial: isInitial },
+            cache: true,
+            type: "GET",
+            dataType: "html",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loading-image").show();
+            },
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.hasOwnProperty("d")) {
+                    data = data.d;
+                }
+                $("#divCheckPatientEligibility").html(data);
+            },
+            error: function (xhr) {
+                alert("An error occured: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+</script>
+

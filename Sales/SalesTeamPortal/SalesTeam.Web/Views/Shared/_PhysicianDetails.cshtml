@@ -1,0 +1,142 @@
+﻿<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>First Name</label>
+                <span>
+                    @Model.FirstName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Phone Number</label>
+                <span>
+                    @Model.PhoneNumber
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Address</label>
+                <span>
+                    @Model.AddressLine1
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>License #</label>
+                <span>
+                    @Model.PhysicianLicenseNumber
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Last Name</label>
+                <span>
+                    @Model.LastName
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Fax Number</label>
+                <span>
+                    @Model.FaxNumber
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>City</label>
+                <span>
+                    @Model.City
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Degree</label>
+                <span>
+                    @Model.ProfessionalDegree
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Last Referral</label>
+                <span>
+                    @String.Format("{0:MM/dd/yyyy}", Model.LastPatientReferralDateId)
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Specialty</label>
+                <span>
+                    @Model.PhysicianSpecialty
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>State</label>
+                <span>
+                    @Model.StateProvince
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>NPI</label>
+                <span>
+                    @Model.NationalProviderIdentifier
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding0" style="display: inline-block;">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+            <div class="msls-label" style="float: left; min-width: 30px; padding: 6px 10px 6px 0;">
+                <label>Zip</label>
+                <span>
+                    @Model.PostalCode
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 padding0">
+        </div>
+    </div>
+    <div>
+        @(Html.Kendo().Grid<SalesTeam.Core.Data.vwPhysicianAddress>()
+    .Name("gridPhysicianAddress")
+    .Columns(columns =>
+    {
+        columns.Bound(c => c.AddressLine1).Title("Address").Visible(true);
+        columns.Bound(c => c.City).Title("City");
+        columns.Bound(c => c.StateProvince).Title("State");
+        columns.Bound(c => c.PostalCode).Title("Postal Code");
+        columns.Bound(c => c.PhoneNumber).Title("Phone");
+        columns.Bound(c => c.FaxNumber).Title("Fax");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("getPhysicianAddressRecords", "ViewPhysicianDetails", Model))
+        .PageSize(10)
+    )
+    .NoRecords(n => n.Template("No records to display"))
+        )
+    </div>
+</div>

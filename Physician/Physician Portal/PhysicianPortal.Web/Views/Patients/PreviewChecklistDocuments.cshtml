@@ -1,0 +1,44 @@
+﻿@model PhysicianPortal.Web.Models.PreviewChecklistDocumentsViewModel
+@{
+    Layout = null;
+}
+
+<h2 class="text-align-center">All Checklist for @Model.ReferralFormName</h2>
+
+<table id="tblChecklist" class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Checklist Name</th>
+            <th>Document Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>&nbsp;</td>
+            <td>@Model.ReferralFormName</td>
+            <td style="word-break: break-all;"><span id="referralFormPath"></span></td>
+        </tr>
+        @foreach (var item in Model.spPatientChecklist_ResultList)
+        {
+            if (item.Isuploaded ?? false)
+            {
+                <tr>
+                    <td><input type="checkbox" value="@item.ReferralFormChecklistRelationshipId" @(item.Isuploaded ?? false ? "checked=checked" : "disabled" )></td>
+                    <td>@item.ChecklistName</td>
+                    <td style="word-break: break-all;">@item.FileName</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div class="text-align-center" style="padding-bottom: 15px;">
+    <button type="button" onclick="POSTReferralFormDATA();" class="btn btn-primary">Submit</button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#referralFormPath").text("PhPt_NewPat_" + $("#PhysicianPortalPatientId").val() + "_FId_" + $("#ReferralFormId").val() + ".pdf");
+    });
+</script>
